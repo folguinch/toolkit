@@ -32,7 +32,7 @@ def load_struct_array(file_name, usecols=None):
     return data, units
 
 def save_struct_array(file_name, data, units, fmt='10.4e\t'):
-    """Save a structured array table.
+    r"""Save a structured array table.
 
     Save the data in a way it can be loaded by the load_struct_array function.
 
@@ -40,6 +40,7 @@ def save_struct_array(file_name, data, units, fmt='10.4e\t'):
         file_name (str): name of the file.
         data (nump.array): array to save.
         units (astropy.units list): physical units of the data.
+        fmt (str, default='10.4e\t'): string format for the data.
     """
     with open(file_name, 'w') as output:
         # Header
