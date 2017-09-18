@@ -7,26 +7,57 @@ def load_struct_array(file_name, usecols=None):
     """Load a structured array table.
 
     Each file has a header. The first row has the name of each parameter and
-    the second the units.
+    the second the units. The name of each parameter must be different.
 
     Parameters:
         file_name (str): file to be loaded.
         usecols (iterable): columns to load.
     """
-
     with open(file_name, 'r') as input:
         # Read first two lines
         line1 = input.readline().strip(' #').split()
         line2 = input.readline().strip(' #').split()
+        assert len(line1)==len(set(line1))
 
         # Read dtype and data units
         dtype = []
-        units = []
+        units = {}
         for i in usecols:
             dtype += [(line1[i], float)]
-            units += [u.Unit(line2[i])]
+            units[line1[i]] = 1.*u.Unit(line2[i])
 
         # Read data
         data = np.loadtxt(input, usecols=usecols, dtype=dtype)
 
     return data, units
+
+def save_struct_array(file_name, data, units, fmt='10.4e\t'):
+    """Save a structured array table.
+
+    Save the data in a way it can be loaded by the load_struct_array function.
+
+    Parameters:
+        file_name (str): name of the file.
+        data (nump.array): array to save.
+        units (astropy.units list): physical units of the data.
+    """
+    with open(file_name, 'w') as output:
+        # Header
+        line1 = '#' 
+        line2 = '#' 
+        for name,dtype in data.dtype:
+            line1 += '{0}\t'.format(name)
+            line2 += '{0.unit}\t'.format(units[name])
+        line1 = line1.strip() + '\n'
+        line2 = line1.strip() + '\n'
+        lines = line1 + line2
+
+        # Data
+        lines += '\n'.join((fmt*len(d)).strip() % d for d in data)
+        
+        # Write
+        output.write(lines)
+
+        
+
+
