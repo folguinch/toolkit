@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 
 def get_logger(name, file_name='debug.log', **kwargs):
     """Creates a new logger.
@@ -40,3 +41,5 @@ def get_logger(name, file_name='debug.log', **kwargs):
 
     return logger
 
+def logger_from_config(file_name):
+   pass 
