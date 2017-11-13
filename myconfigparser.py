@@ -3,7 +3,7 @@ from configparser import ConfigParser
 import numpy as np
 import astropy.units as u
 
-class myconfigparser(ConfigParser):
+class myConfigParser(ConfigParser):
 
     def getquantity(self, *args, **kwargs):
         val = self.get(*args, **kwargs).split()
