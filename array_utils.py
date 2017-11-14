@@ -22,9 +22,9 @@ def load_struct_array(file_name, usecols=None):
         # Read dtype and data units
         dtype = []
         units = {}
-        for i in usecols:
-            dtype += [(line1[i], float)]
-            units[line1[i]] = 1.*u.Unit(line2[i])
+        for dty,unit in zip(line1,line2):
+            dtype += [(dty, float)]
+            units[dty] = 1.*u.Unit(unit)
 
         # Read data
         data = np.loadtxt(input, usecols=usecols, dtype=dtype)
