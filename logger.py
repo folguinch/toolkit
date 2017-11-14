@@ -19,25 +19,26 @@ def get_logger(name, file_name='debug.log', **kwargs):
     """
     # Create logger
     logger = logging.getLogger(name)
-    logger.setLevel(kwargs.get('filelevel', logging.DEBUG))
+    if not len(logger.handlers):
+        logger.setLevel(kwargs.get('filelevel', logging.DEBUG))
 
-    # File handler
-    fh = logging.handlers.RotatingFileHandler(file_name,
-            maxBytes=kwargs.get('maxBytes',5242880),
-            backupCount=kwargs.get('backupCount',5))
-    fh.setLevel(kwargs.get('filelevel', logging.DEBUG))
-    fh.setFormatter(logging.Formatter(kwargs.get('filefmt', 
-        '%(asctime)s - %(name)s - %(levelname)s: %(message)s')))
+        # File handler
+        fh = logging.handlers.RotatingFileHandler(file_name,
+                maxBytes=kwargs.get('maxBytes',5242880),
+                backupCount=kwargs.get('backupCount',5))
+        fh.setLevel(kwargs.get('filelevel', logging.DEBUG))
+        fh.setFormatter(logging.Formatter(kwargs.get('filefmt', 
+            '%(asctime)s - %(name)s - %(levelname)s: %(message)s')))
 
-    # Stream handler
-    sh = logging.StreamHandler()
-    sh.setLevel(kwargs.get('stdoutlevel', logging.INFO))
-    sh.setFormatter(logging.Formatter(kwargs.get('stdoutfmt', 
-        '%(levelname)s: %(message)s')))
+        # Stream handler
+        sh = logging.StreamHandler()
+        sh.setLevel(kwargs.get('stdoutlevel', logging.INFO))
+        sh.setFormatter(logging.Formatter(kwargs.get('stdoutfmt', 
+            '%(levelname)s: %(message)s')))
 
-    # Register handlers
-    logger.addHandler(fh)
-    logger.addHandler(sh)
+        # Register handlers
+        logger.addHandler(fh)
+        logger.addHandler(sh)
 
     return logger
 
