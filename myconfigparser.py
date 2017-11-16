@@ -17,3 +17,8 @@ class myConfigParser(ConfigParser):
             return float(val[0]) * u.Unit(val[1])
         else:
             return np.array(val[:-1], dtype=float) * u.Unit(val[-1])
+
+    def getfloatlist(self, *args, **kwargs):
+        """Return a list of float values."""
+        val = self.get(*args, **kwargs).split()
+        return map(float, val)
