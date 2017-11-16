@@ -12,7 +12,11 @@ class myConfigParser(ConfigParser):
 
         Input parameters are the same as for ``parser.get(*args,**kwargs)``
         """
-        val = self.get(*args, **kwargs).split()
+        val = self.get(*args, **kwargs)
+        if val is None:
+            return val
+        else:
+            val= val.split()
         if len(val)==2:
             return float(val[0]) * u.Unit(val[1])
         else:
@@ -20,5 +24,9 @@ class myConfigParser(ConfigParser):
 
     def getfloatlist(self, *args, **kwargs):
         """Return a list of float values."""
-        val = self.get(*args, **kwargs).split()
+        val = self.get(*args, **kwargs)
+        if val is None:
+            return val
+        else:
+            val= val.split()
         return map(float, val)
