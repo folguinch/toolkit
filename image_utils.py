@@ -3,10 +3,12 @@ import astropy.units as u
 import scipy.ndimage as scimage
 from scipy.stats import linregress
 
+from .logger import get_logger
+
 """Functions for working with fits files.
 """
 
-def get_coord_axis(img, axis):
+def get_coord_axis(img, axis, pixsize=None):
     """Get the coordinate axis.
     
     Parameters:
@@ -20,21 +22,22 @@ def get_coord_axis(img, axis):
     unit = u.Unit(img.header['CUNIT%i' % axis])
     refval = img.header['CRVAL%i' % axis] * unit
     refpix = img.header['CRPIX%i' % axis]
-    pixsize = np.abs(img.header['CDELT%i' % axis]) * unit
+    pixsize = pixsize or np.abs(img.header['CDELT%i' % axis]) * unit
     npix = img.header['NAXIS%i' % axis]
+
+    # Check that the units are the same
+    refval = refval.to(pixsize.unit)
 
     return refval + (np.arange(npix, dtype=float) - (refpix-1))*pixsize
 
-def get_coord_axes(img):
+def get_coord_axes(img, pixsizes=(None,None)):
     """Get the coordinate axes from header.
 
     Parameters:
         img (astropy.hdu): input hdu.
     """
-    x = get_coord_axis(img, 1)
-    y = get_coord_axis(img, 2)
+    return [get_coord_axis(img, i, pixsize=pixsizes[i-1]) for i in [1,2]]
 
-    return x, y
 
 def center_of_mass(img, axis=None, mask=None, x=None, y=None):
     """Calculates the center of mass of img.
@@ -94,7 +97,8 @@ def center_of_mass(img, axis=None, mask=None, x=None, y=None):
 
     return np.array(newx), np.array(center)
 
-def lin_vel_gradient(img, sigma=0., nsigma=5):
+def lin_vel_gradient(img, sigma=0., nsigma=5, pixsizes=(None,None), 
+        filterx=None, logger=get_logger(__name__)):
     """Calculates the linear velocity gradient.
 
     Parameters:
@@ -105,26 +109,47 @@ def lin_vel_gradient(img, sigma=0., nsigma=5):
         center (np.array): the center of mass.
     """
     assert hasattr(img, 'header')
+    assert len(pixsizes)==2
+    assert filterx is None or len(filterx) in [1,2]
 
     # Determine the axis for the center of mass
     if img.header['CTYPE1']=='OFFSET':
         axis = 1
-        newx_units = u.Unit(img.header['CUNIT2'])
-        newy_units = u.Unit(img.header['CUNIT1'])
+        if None not in pixsizes:
+            newx_units = pixsizes[1].unit
+            newy_units = pixsizes[0].unit
+        else:
+            newx_units = u.Unit(img.header['CUNIT2'])
+            newy_units = u.Unit(img.header['CUNIT1'])
     else:
         axis = 0
-        newx_units = u.Unit(img.header['CUNIT1'])
-        newy_units = u.Unit(img.header['CUNIT2'])
+        if None not in pixsizes:
+            newx_units = pixsizes[0].unit
+            newy_units = pixsizes[1].unit
+        else:
+            newx_units = u.Unit(img.header['CUNIT1'])
+            newy_units = u.Unit(img.header['CUNIT2'])
 
     # Calculate center of mass
-    x, y = get_coord_axes(img)
-    newx, center = center_of_mass(img.data, axis=axis, 
-            mask=img.data>nsigma*sigma, x=x.value, y=y.value)
-    print x.to(u.arcsec), y.to(u.km/u.s)
+    x, y = get_coord_axes(img, pixsizes=pixsizes)
+    mask = np.ones(img.data.shape, dtype=bool)
+    if filterx is not None:
+        Y,X = np.indices(img.data.shape)
+        mask = X>filterx[0]
+        if len(filterx)==2:
+            mask = mask & (X<filterx[1])
+    mask = mask & (img.data>nsigma*sigma)
+
+    newx, center = center_of_mass(img.data, axis=axis, mask=mask, 
+            x=x.value, y=y.value)
 
     # Fit line
     fit = linregress(center, newx)
     slope = fit.slope * newx_units / newy_units
-    print slope.to(u.km/u.s/u.arcsec)
+    stderr = fit.stderr * newx_units / newy_units
+    intercept = fit.intercept * newy_units
+    logger.info('Linear velocity gradient fit:')
+    logger.info('\tSlope = %s', slope.to(u.km/u.s/u.arcsec))
+    logger.info('\tError = %s', stderr.to(u.km/u.s/u.arcsec))
 
-    return fit, center
+    return slope, stderr, intercept, newx*newx_units, center*newy_units
