@@ -22,11 +22,25 @@ class myConfigParser(ConfigParser):
         else:
             return np.array(val[:-1], dtype=float) * u.Unit(val[-1])
 
+    def getlist(self, *args, **kwargs):
+        """Return a list of strings"""
+        val = self.get(*args, **kwargs)
+        if val is None:
+            return val
+        else:
+            if ' ' not in val:
+                return [val]
+            else:
+                return val.split()
+
     def getfloatlist(self, *args, **kwargs):
         """Return a list of float values."""
         val = self.get(*args, **kwargs)
         if val is None:
             return val
         else:
-            val= val.split()
+            if ' ' not in val:
+                val = [val]
+            else:
+                val= val.split()
         return map(float, val)
