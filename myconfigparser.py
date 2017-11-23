@@ -1,3 +1,4 @@
+import os
 from configparser import ConfigParser
 
 import numpy as np
@@ -44,3 +45,11 @@ class myConfigParser(ConfigParser):
             else:
                 val= val.split()
         return map(float, val)
+
+    def getpath(self, *args, **kwargs):
+        """Return a real path"""
+        val = self.get(*args, **kwargs)
+        if val is None:
+            return val
+        else:
+            return os.path.realpath(val)
