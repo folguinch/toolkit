@@ -52,4 +52,4 @@ class myConfigParser(ConfigParser):
         if val is None:
             return val
         else:
-            return os.path.realpath(val)
+            return os.path.expanduser(os.path.expandvars(val))
