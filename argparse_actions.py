@@ -2,7 +2,7 @@ import os, argparse
 from configparser import ExtendedInterpolation
 
 import numpy as np
-from mySoRadfit.objects.image import Image
+from astroSource.image import Image
 
 from .myconfigparser import myConfigParser
 
