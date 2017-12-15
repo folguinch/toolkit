@@ -5,6 +5,7 @@ import numpy as np
 from astroSource.image import Image
 
 from .myconfigparser import myConfigParser
+from .dust import Dust
 
 class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse"""
@@ -36,3 +37,9 @@ class LoadFITS(argparse.Action):
                 images += [Image(val)]
         setattr(namespace, self.dest, images)
 
+class LoadDust(argparse.Action):
+    """Action for loading dust files"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        dust = Dust(values)
+        setattr(namespace, self.dest, dust)
