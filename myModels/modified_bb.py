@@ -1,133 +1,159 @@
+from collections import OrderedDict
+
+import numpy as np
 import astropy.units as u
 import astropy.constants as ct
-from astropy.modeling import Fittable1DModel, Parameter
-#from astropy.modeling.blackbody import blackbody_nu
+from astropy.modeling.blackbody import blackbody_nu
 
-class ModifiedBB(Fittable1DModel):
-    STD_UNITS = {'size_c':u.sr, 'size_w':u.sr, 'size_h':u.sr, 'Tc':u.K,
-            'Tw':u.K, 'Th':u.K, 'nu0':u.GHz, 'Nw':1/u.cm**2, 'Nh':1/u.cm**2, 
-            'x':u.GHz, 'y':u.Jy}
-    inputs = ('nu',)
-    outputs = ('F',)
-    
-    # Cold
-    size_c = Parameter()
-    Tc = Parameter()
-    nu0 = Parameter()
-    beta = Parameter()
-    # Warm
-    size_w = Parameter()
-    Tw = Parameter()
-    Nw = Parameter()
-    # Hot
-    size_h = Parameter()
-    Th = Parameter()
-    Nh = Parameter()
+from .model import Model
 
-    def __init__(self, dust, **params):
+class ModifiedBBCold(Model):
+    """Modified blackbody cold component model.
+
+    Attributes:
+        params (dict): model parameters.
+        units (dict): standard units for the model.
+        constraints (tuple): constraints on model parameters.
+    """
+    constraints = OrderedDict([('Tc',(2.3,np.inf)), ('size_c',(0.,np.inf)), 
+        ('nu0',(0.,np.inf)), ('beta',(0.5,4.))])
+
+    def __init__(self, dust, Tc, size_c, nu0, beta):
+        params = OrderedDict()
+        params['Tc'] = Tc
+        params['size_c'] = size_c
+        params['nu0'] = nu0
+        params['beta'] = beta
+        super(ModifiedBB, self).__init__(params)
+
+    def validate(self, params):
+        for key, param in params.items():
+            assert param>0
+            if key=='beta':
+                assert not hasattr(param, 'unit')
+            else:
+                assert hasattr(param, 'unit')
+
+class ModifiedBB(Model):
+    """Modified blackbody model.
+
+    Attributes:
+        params (dict): model parameters.
+        units (dict): standard units for the model.
+        constraints (tuple): constraints on model parameters.
+        dust (Dust): dust properties.
+    """
+    constraints = OrderedDict([('Tc',(2.3,np.inf)), ('Tw',(2.3,np.inf)),
+        ('Th',(2.3,np.inf)), ('size_c',(0.,np.inf)), ('size_w',(0.,np.inf)),
+        ('size_h',(0.,np.inf)), ('nu0',(0.,np.inf)), ('beta',(0.5,4.)),
+        ('Nw',(0.,np.inf)), ('Nh',(0.,np.inf))])
+
+    def __init__(self, dust, Tc, Tw, Th, size_c, size_w, size_h, nu0, beta, Nw,
+            Nh):
+        params = OrderedDict()
+        params['Tc'] = Tc
+        params['Tw'] = Tw
+        params['Th'] = Th
+        params['size_c'] = size_c
+        params['size_w'] = size_w
+        params['size_h'] = size_h
+        params['nu0'] = nu0
+        params['beta'] = beta
+        params['Nw'] = Nw
+        params['Nh'] = Nh
+        super(ModifiedBB, self).__init__(params)
         self.dust = dust
-        size_c = params['size_c']
-        Tc = params['Tc']
-        nu0 = params['nu0']
-        beta = params['beta']
-        size_w = params['size_w']
-        Tw = params['Tw']
-        Nw = params['Nw']
-        size_h = params['size_h']
-        Th = params['Th']
-        Nh = params['Nh']
-        super(ModifiedBB, self).__init__(size_c, Tc, nu0, beta, size_w, Tw, Nw,
-                size_h, Th, Nh)
 
-    @staticmethod
-    def blackbody_nu(nu, T):
-        aux1 = 2.*ct.h*nu**3 / ct.c**2
-        aux1 = aux / u.sr
-        aux2 = np.exp(ct.h*nu/(ct.k_B*T))
-        return aux1 / (aux2 - 1.)
+    def validate(self, params):
+        for key, param in params.items():
+            if key=='beta':
+                assert constraints[key][0]<param<constraints[key][1]
+                assert not hasattr(param, 'unit')
+            else:
+                assert constraints[key][0]<param.value<constraints[key][1]
+                assert hasattr(param, 'unit')
 
-    @staticmethod
-    def cold_component(x, **params):
-        """Modified black body cold component"""
-        cold = params['size_c']*STD_UNITS['size_c'] * \
-                blackbody_nu(x*STD_UNITS['x'], params['Tc']*STD_UNITS['Tc']) * \
-                (1. - np.exp(-(x/params['nu0'])**params['beta']))
-        return cold.to(STD_UNITS['y']).value
+    def sigma_nu(self, x, rdg=1.E-2, mu=2.33):
+        """Cross section."""
+        assert hasattr(x, 'unit')
+        return rdg * mu * ct.m_p * self.dust.interpolate(x)
 
-    @staticmethod
-    def warm_component(x, rdg=1.E-2, mu=2.33, **params):
-        """Modified black body warm component"""
-        sigma = rdg * mu * ct.m_p * self.dust.interpolate(x*STD_UNITS['x'])
-        sigma = sigma.to(1/STD_UNITS['Nw']).value
-        warm = params['size_w']*STD_UNITS['size_w'] * \
-                blackbody_nu(x*STD_UNITS['x'], params['Tw']*STD_UNITS['Tw']) * \
-                (1. - np.exp(-params['Nw']*sigma)) * \
-                np.exp(-0.5 * (x/params['nu0'])**params['beta'])
-        return warm.to(STD_UNITS['y']).value
+    def cold_component(self, x):
+        """Modified black body cold component."""
+        assert hasattr(x, 'unit')
+        cold = self['size_c'] * blackbody_nu(x, self['Tc']) * \
+                (1. - np.exp(-(x/self['nu0'])**self['beta']))
+        return cold
 
-    @staticmethod
-    def hot_component(x, rdg=1.e-2, mu=2.33, **params):
-        """Modified black body hot component"""
-        sigma = rdg * mu * ct.m_H * self.dust.interpolate(x*STD_UNITS['x'])
-        sigma = sigma.to(1/STD_UNITS['Nh']).value
-        hot = params['size_h']*STD_UNITS['size_h'] * \
-                blackbody_nu(x*STD_UNITS['x'], params['Th']*STD_UNITS['Th']) * \
-                (1. - np.exp(-params['Nh']*sigma)) * \
-                np.exp(-0.5*((x/params['nu0'])**params['beta']+params['Nw']*sigma))
-        return hot.to(STD_UNITS['y']).value
+    def warm_component(self, x, rdg=1.E-2, mu=2.33):
+        """Modified black body warm component."""
+        assert hasattr(x, 'unit')
+        sigma = self.sigma_nu(x, rdg=1.E-2, mu=2.33)
+        warm = self['size_w'] * blackbody_nu(x, self['Tw']) * \
+                (1. - np.exp(-self['Nw']*sigma)) * \
+                np.exp(-0.5 * (x/self['nu0'])**self['beta'])
+        return warm
 
-    @staticmethod
-    def deriv_planck(x, T):
-        aux1 = 2.*ct.h**2*(x*STD_UNITS['x'])**4 / \
-                ((T*STD_UNITS['Tc'])**2*ct.c**2*ct.k_B)
-        aux2 = np.exp(ct.h*(x*STD_UNITS['x'])/(ct.k_B*T*STD_UNITS['Tc']))
+    def hot_component(self, x, rdg=1.e-2, mu=2.33):
+        """Modified black body hot component."""
+        sigma = self.sigma_nu(x, rdg=1.E-2, mu=2.33)
+        hot = self['size_h'] * blackbody_nu(x, self['Th']) * \
+                (1. - np.exp(-self['Nh']*sigma)) * \
+                np.exp(-0.5*((x/self['nu0'])**self['beta']+self['Nw']*sigma))
+        return hot
+
+    def deriv_planck(self, x, T):
+        """Derivative of the planck fuction."""
+        aux1 = 2. * ct.h**2 * x**4 / (T**2 * ct.c**2 * ct.k_B)
+        aux2 = np.exp(ct.h*x / (ct.k_B * T))
         deriv = aux1 * aux2/(aux2 - 1.)**2
         deriv = deriv.decompose()
-        return deriv.to(STD_UNITS['y']/STD_UNITS['Tc']).value
+        return deriv / u.sr
 
-    @staticmethod
-    def evaluate(x, size_c, Tc, nu0, beta, size_w, Tw, Nw, size_h, Th, Nh):
-        cold = cold_component(x, size_c=size_c, Tc=Tc, nu0=nu0, beta=beta) 
-        warm = warm_component(x, size_w=size_w, Tw=Tw, Nw=Nw, 
-                nu0=nu0, beta=beta)
-        hot = hot_component(x, size_h=size_h, Th=Th, Nh=Nh, 
-                nu0=nu0, beta=beta, Nw=Nw)
+    def model_function(self, x):
+        cold = self.cold_component(x) 
+        warm = self.warm_component(x)
+        hot = self.hot_component(x)
         return cold + warm + hot
 
-    @staticmethod
-    def fit_deriv(x, size_c, Tc, nu0, beta, size_w, Tw, Nw, size_h, Th, Nh):
+    def deriv(self, x, yunit=u.Jy):
         # Components
-        cold = cold_component(x, size_c=size_c, Tc=Tc, nu0=nu0, beta=beta)
-        warm = warm_component(x, size_w=size_w, Tw=Tw, Nw=Nw,
-                nu0=nu0, beta=beta)
-        hot = hot_component(x, size_h=size_h, Th=Th, Nh=Nh,
-                nu0=nu0, beta=beta, Nw=Nw)
-        sigma = 1.E-2 * 2.33 * ct.m_p * self.dust.interpolate(x*STD_UNITS['x'])
-        sigma = sigma.to(1/STD_UNITS['Nc']).value
+        cold = self.cold_component(x).to(yunit)
+        warm = self.warm_component(x).to(yunit)
+        hot = self.hot_component(x).to(yunit)
+        sigma = self.sigma_nu(x)
 
         # Blackbody functions
-        bbcold = blackbody_nu(x*STD_UNITS['x'], Tc*STD_UNITS['Tc'])
-        bbcold = bbcold.to(STD_UNITS['y']/STD_UNITS['size_c']).value
-        bbwarm = blackbody_nu(x*STD_UNITS['x'], Tc*STD_UNITS['Tw'])
-        bbwarm = bbcold.to(STD_UNITS['y']/STD_UNITS['size_w']).value
-        bbhot = blackbody_nu(x*STD_UNITS['x'], Tc*STD_UNITS['Th'])
-        bbhot = bbcold.to(STD_UNITS['y']/STD_UNITS['size_h']).value
+        bbcold = blackbody_nu(x, self['Tc'])
+        bbwarm = blackbody_nu(x, self['Tw'])
+        bbhot = blackbody_nu(x, self['Th'])
 
-        d_size_c =  cold / size_c
-        d_size_w =  warm / size_w
-        d_size_h =  hot / size_h
-        d_Tc = cold * deriv_planck(x, Tc) / bbcold
-        d_Tw = warm * deriv_planck(x, Tw) / bbwarm 
-        d_Th = hot * deriv_planck(x, Th) / bbhot 
-        d_beta = -size_c*bbcold * np.exp(-(x/nu0)**beta) * \
-                (x/n0)**beta * np.log(x/nu0)
-        d_beta += -0.5*(x/nu0)**beta * np.log(x/nu0) * (warm+hot)
-        d_nu0 = -beta*(x/nu0)**beta * cold / (nu0*(np.exp((x/nu0)**beta)-1.))
-        d_nu0 += 0.5*beta*(x/nu0)**beta / nu0 * (warm+hot)
-        d_Nw = sigma * warm / (np.exp(sigma*Nw) - 1.)
+        d_size_c =  cold / self['size_c']
+        d_size_w =  warm / self['size_w']
+        d_size_h =  hot / self['size_h']
+        d_Tc = cold * self.deriv_planck(x, self['Tc']) / bbcold
+        d_Tc = d_Tc.to(yunit/self.units['Tc'])
+        d_Tw = warm * self.deriv_planck(x, self['Tw']) / bbwarm 
+        d_Tw = d_Tw.to(yunit/self.units['Tw'])
+        d_Th = hot * self.deriv_planck(x, self['Th']) / bbhot 
+        d_Th = d_Th.to(yunit/self.units['Th'])
+        d_beta = -self['size_c'] * bbcold * \
+                np.exp(-(x/self['nu0'])**self['beta']) * \
+                (x/self['nu0'])**self['beta'] * np.log(x/self['nu0'])
+        d_beta += -0.5*(x/self['nu0'])**self['beta'] * \
+                np.log(x/self['nu0']) * (warm+hot)
+        d_beta = d_beta.to(yunit)
+        d_nu0 = -self['beta']*(x/self['nu0'])**self['beta'] * \
+                cold / (self['nu0']*(np.exp((x/self['nu0'])**self['beta'])-1.))
+        d_nu0 += 0.5*self['beta']*(x/self['nu0'])**self['beta'] / \
+                self['nu0'] * (warm+hot)
+        d_nu0 = d_nu0.to(yunit/self.units['nu0'])
+        d_Nw = sigma * warm / (np.exp(sigma*self['Nw']) - 1.)
         d_Nw += -0.5*sigma * hot 
-        d_Nh = sigma * hot / (np.exp(sigma*Nh) - 1.)
+        d_Nw = d_Nw.to(yunit/self.units['Nw'])
+        d_Nh = sigma * hot / (np.exp(sigma*self['Nh']) - 1.)
+        d_Nh = d_Nh.to(yunit/self.units['Nh'])
 
-        return [d_size_c, d_Tc, d_nu0, d_beta, d_size_w, d_Tw, d_Nw, d_size_h,
-                d_Th, d_Nh]
+        return [d_Tc, d_Tw, d_Th, d_size_c, d_size_w, d_size_h, d_nu0, d_beta,
+                d_Nw, d_Nh]
 
