@@ -12,8 +12,9 @@ class Model(object):
         units (dict): standard units for the model.
         constraints (tuple): constraints on model parameters.
     """
-
     __metaclass__ = ABCMeta
+
+    constraints = (-np.inf, np.inf)
 
     def __init__(self, params):
         """Initial parameter of the model.
@@ -27,7 +28,6 @@ class Model(object):
         self.validate(params)
         self.params = OrderedDict()
         self.units = {}
-        self.constraints = (-np.inf, np.inf)
         self._fill_values(params)
 
     def __getitem__(self, key):
@@ -36,16 +36,16 @@ class Model(object):
     def __setitem__(self, key, val):
         self._fill_values({key:val}, check_existance=True)
 
-    def __call__(self, x, *args):
+    def __call__(self, x, *args, **kwargs):
         self._update_values(*args)
-        return self.model_function(x)
+        return self.model_function(x, **kwargs)
 
     @abstractmethod
     def validate(self, params):
         pass
 
     @abstractmethod
-    def model_function(self, *args):
+    def model_function(self, *args, **kwargs):
         pass
 
     @property
@@ -54,7 +54,13 @@ class Model(object):
 
     @property
     def bounds(self):
-        return self.constraints.values()
+        try:
+            bounds = np.array(self.constraints.values(),
+                    dtype=[('lower',float),('upper',float)])
+            return bounds['lower'], bounds['upper']
+        except AttributeError:
+            if len(self.constraints)==2:
+                return self.constraints
 
     def _fill_values(self, params, check_existance=False):
         """Fill the attributes."""
