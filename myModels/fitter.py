@@ -53,10 +53,12 @@ class Fitter(object):
         z = kwargs.get('z')
         if z is not None:
             err = kwargs.get('err', 1.*z.unit).to(z.unit)
-            derivs = np.array([der.value for der in model.deriv(x, y, z.unit)])
+            derivs = np.array([der.value for der in model.deriv(x, y, z.unit,
+                *params)])
         else:
             err = kwargs.get('err', 1.*y.unit).to(y.unit)
-            derivs = np.array([der.value for der in model.deriv(x, y.unit)])
+            derivs = np.array([der.value for der in model.deriv(x, y.unit,
+                *params)])
 
         diff = [np.ravel(chi) for chi in derivs/np.ravel(err.value)]
         return np.array(diff).T
