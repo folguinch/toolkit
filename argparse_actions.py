@@ -5,7 +5,7 @@ import numpy as np
 from astroSource.image import Image
 
 from .myconfigparser import myConfigParser
-from .dust import Dust
+from .classes.dust import Dust
 
 class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse"""
