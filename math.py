@@ -14,4 +14,7 @@ def rms(x):
         rms (float): the root mean square of *x*.
     """
     assert hasattr(x, 'size')
-    return np.sqrt(np.sum(x**2)/data.size)
+    return np.sqrt(np.sum(x**2)/x.size)
+
+#def round_to_sigfig(x, n):
+#    return np.around(x, -int(np.floor(np.sign(x) * np.log10(abs(x)))) + n)
