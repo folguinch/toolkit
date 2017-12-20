@@ -1,3 +1,5 @@
+import astropy.units as u
+
 from .data_1d import Data1D
 from ..logger import get_logger
 
@@ -19,5 +21,6 @@ class Dust(Data1D):
             newx (astropy.quantity): the new wavelength values.
             kwargs: parameters for scipy.interp1d
         """
-        return super(Dust, self).interpolate('wlg', 'kappa', newx, **kwargs)
+        cnewx = newx.to(self.units['wlg'], equivalencies=u.spectral())
+        return super(Dust, self).interpolate('wlg', 'kappa', cnewx, **kwargs)
 
