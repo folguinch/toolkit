@@ -88,11 +88,12 @@ def rebin_irregular_nd(values, bins, *args, **kwargs):
             have the same shape as values.
         kwargs: available keys are:
             * statistic (default=mean): statistic to calculate over the data
-                values (mean, sum, count).
+                values (mean, average, sum, count).
+            * weights: weights for the average statistic.
     """
     # Checks
-    functions = {'mean': np.mean, 'sum': np.sum}#, 'count': count}
-    av_keys = ['bins', 'statistic']
+    functions = {'mean': np.mean, 'average': np.average, 'sum': np.sum} #, 'count': count}
+    av_keys = ['statistic', 'weights']
     assert all(map(lambda x: x in av_keys, kwargs))
     assert kwargs.setdefault('statistic', 'mean') in functions
     assert len(bins)==values.ndim
@@ -118,7 +119,13 @@ def rebin_irregular_nd(values, bins, *args, **kwargs):
         for i,b in enumerate(bins_d):
             ind = np.logical_and(ind, b==it.multi_index[i]+1)
 
-        it[0] = functions[kwargs['statistic']](values.flatten()[ind])
+        try:
+            it[0] = functions[kwargs['statistic']](values.flatten()[ind],
+                    weights=kwargs.get('weights').flatten()[ind])
+        except TypeError:
+            it[0] = functions[kwargs['statistic']](values.flatten()[ind])
+        except ZeroDivisionError:
+            it[0] = np.nan
         it.iternext()
 
     return out
