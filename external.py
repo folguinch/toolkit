@@ -10,7 +10,8 @@ def sendMail(fromadd, toadd, subj, msg, smtp='phys.nthu.edu.tw', port=25):
     s.sendmail(fromadd, [toadd], mess.as_string())
     s.quit()
 
-def run_mollie(dirname, logger=None, shell='csh', np=1, server=None, mpi='mpiexec'):
+def run_mollie(dirname, logger=None, shell='csh', np=1, server=None,
+        mpi='mpiexec', from_email=None, to_email=None):
     if shell=='csh':
         order = r"""csh -c 'cd %s; ps -A >>running.txt; make; %s -n %i ./c.x'"""
     else:
@@ -31,3 +32,10 @@ def run_mollie(dirname, logger=None, shell='csh', np=1, server=None, mpi='mpiexe
     if logger:
         logger.info('Mollie standard output:\n%s', mollie_stdout)
         logger.info('Mollie standard error:\n%s', mollie_stderr)
+
+    # Send the stderr by email
+    if from_email and to_email:
+        msg = 'Order failed:\n%s\n\nMollie satandard error:\n%s' 
+        msg = msg % (order % (dirname,mpi,np), mollie_stderr)
+        subj = 'Mollie error'
+        sendMail(from_email, to_email, subj, msg)
