@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.stats import binned_statistic
+from scipy.ndimage import map_coordinates
+from scipy.interpolate import interp1d
 
 def rms(x):
     """Root mean square (rms).
@@ -123,12 +125,114 @@ def rebin_irregular_nd(values, bins, *args, **kwargs):
             it[0] = functions[kwargs['statistic']](values.flatten()[ind],
                     weights=kwargs.get('weights').flatten()[ind])
         except TypeError:
+            print 'Function does not have weight keyword'
             it[0] = functions[kwargs['statistic']](values.flatten()[ind])
         except ZeroDivisionError:
             it[0] = np.nan
         it.iternext()
 
     return out
+
+def map_sph_to_cart(val, new_x, new_y, new_z, r, th, phi=None, **kwargs):
+    """Resample the distribution in val(r, th, phi) in new Cartesian
+    coordinates.
+
+    Solution taken from:
+    https://stackoverflow.com/questions/2164570/reprojecting-polar-to-cartesian-grid
+
+    Parameters:
+        val: the values at the input position.
+        new_x, new_y, new_z: coordinates of the new grid points.
+        r, th: coordinates of the values in spherical coordinates.
+        phi (default=None): azimuthal spherical coordinate angle.
+        kwargs: keyword arguments for scipy map_coordinates function.
+
+    Notes:
+        The default `order` keyword for scipy map_coordinates is set to zero,
+        i.e. nearest neighbour.
+    """
+    # Set default interpolation order to nearest neighbour
+    kwargs.setdefault('order', 0)
+
+    # New grid meshes
+    Z, Y, X = np.meshgrid(new_z, new_y, new_x, indexing='ij')
+    X = X.to(r.unit).value
+    Y = Y.to(r.unit).value
+    Z = Z.to(r.unit).value
+
+    # New grid in spherical coordinates
+    new_r = np.sqrt(X**2 + Y**2 + Z**2)
+    new_th = np.arctan2(np.sqrt(X**2+Y**2), Z)
+    
+    # Coordinate interpolation functions
+    ir = interp1d(r.value, np.arange(len(r)), bounds_error=False)
+    ith = interp1d(th.value, np.arange(len(th)), bounds_error=False)
+
+    # New coordinates indices
+    new_ir = ir(new_r.ravel())
+    new_ith = ith(new_th.ravel())
+
+    # Values outside the grid
+    new_ir[new_r.ravel() > r.value.max()] = len(r)-1
+    new_ir[new_r.ravel() < r.value.min()] = 0
+    new_ith[new_th.ravel() > th.value.max()] = len(th)-1
+    new_ith[new_th.ravel() < th.value.min()] = 0
+
+    # Include phi if needed
+    if phi is not None:
+        new_phi = np.arctan2(Y, X)
+        iphi = interp1d(phi.value, np.arange(len(phi)), bounds_error=False)
+        new_iphi = iphi(new_phi.ravel())
+        new_iphi[new_phi.ravel() > phi.value.max()] = len(phi)-1
+        new_iphi[new_phi.ravel() < phi.value.min()] = 0
+        map_to = [new_iphi, new_it, new_ir]
+    else:
+        map_to = [new_ith, new_ir]
+
+    # Output
+    out = map_coordinates(val, map_to, **kwargs)
+
+    # Values outside the largest radius set to zero
+    out[new_r.ravel() > r.value.max()] = 0.
+
+    return out.reshape(new_r.shape)
+
+def map_sph_to_cart_axisym(val, r, th, new_x, new_y, new_z, **kwargs):
+    """Resample the axisymmetric distribution in val(r, th) into new Cartesian
+    coordinates.
+
+    Parameters:
+        val: the values at the input positions.
+        r, th: 1-D array of the *val* coordinates.
+        new_x, new_y, new_z: Cartesian coordinates of the new grid points.
+        kwargs: keyword arguments for scipy map_coordinates function.
+
+    Notes:
+        The default `order` keyword for scipy map_coordinates is set to zero,
+        i.e. nearest neighbour.
+    """
+    assert val.ndim == 2
+    return map_sph_to_cart(val, new_x, new_y, new_z, r, th, **kwargs)
+
+def map_sph_to_cart_3d(val, r, th, phi, new_x, new_y, new_z, **kwargs):
+    """Resample the distribution in val(r, th, phi) into new Cartesian
+    coordinates.
+
+    This is the same as the `map_sph_to_cart` function above but with a
+    different input order and checks.
+
+    Parameters:
+        val: the values at the input positions.
+        r, th, phi: 1-D array of the *val* coordinates.
+        new_x, new_y, new_z: Cartesian coordinates of the new grid points.
+        kwargs: keyword arguments for scipy map_coordinates function.
+
+    Notes:
+        The default `order` keyword for scipy map_coordinates is set to zero,
+        i.e. nearest neighbour.
+    """
+    assert val.ndim == 3
+    return map_sph_to_cart(val, new_x, new_y, new_z, r, th, phi=phi, **kwargs)
 
 if __name__=='__main__':
     z = np.array([[1,2,3,4,5,6],
