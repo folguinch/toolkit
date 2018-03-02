@@ -46,6 +46,18 @@ class myConfigParser(ConfigParser):
                 val= val.split()
         return map(float, val)
 
+    def getintlist(self, *args, **kwargs):
+        """Return a list of int values."""
+        val = self.get(*args, **kwargs)
+        if val is None:
+            return val
+        else:
+            if ' ' not in val:
+                val = [val]
+            else:
+                val= val.split()
+        return map(int, val)
+
     def getpath(self, *args, **kwargs):
         """Return a real path"""
         val = self.get(*args, **kwargs)
