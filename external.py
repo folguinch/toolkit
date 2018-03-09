@@ -39,3 +39,11 @@ def run_mollie(dirname, logger=None, shell='csh', np=1, server=None,
         msg = msg % (order % (dirname,mpi,np), mollie_stderr)
         subj = 'Mollie error'
         sendMail(from_email, to_email, subj, msg)
+
+
+def run_bash(cmd, logger=None):
+    subp = subprocess.Popen(cmd, stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE, shell=True)
+    stdout, stderr = subp.communicate()
+    if logger:
+        logger.info(stderr)
