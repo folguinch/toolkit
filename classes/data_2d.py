@@ -78,7 +78,10 @@ class Data2D(Data):
 
     @property
     def unit(self):
-        return 1.*u.Unit(self.header['BUNIT'])
+        try:
+            return 1.*u.Unit(self.header['BUNIT'])
+        except ValueError:
+            return 1.*u.Unit(self.header['BUNIT'].lower())
 
     def max_pix(self):
         """Determine the position of the maximum.
