@@ -14,7 +14,7 @@ class myConfigParser(ConfigParser):
         Input parameters are the same as for ``parser.get(*args,**kwargs)``
         """
         val = self.get(*args, **kwargs)
-        if val is None:
+        if val is None or len(val)==0:
             return val
         else:
             val= val.split()
