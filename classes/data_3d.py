@@ -1,10 +1,12 @@
+import numpy as np
 from spectral_cube import SpectralCube
 from astropy.io import fits
 from astropy.wcs import WCS
 from astropy.coordinates import SkyCoord
 import astropy.units as u
-from myutils.logger import get_logger
 
+from ..logger import get_logger
+from ..rotate import rotate
 from .data import Data
 
 class Data3D(Data):
@@ -62,3 +64,54 @@ class Data3D(Data):
         """
         ra, dec = self.wcs.all_pix2world([[xpix, ypix]], 0)[0]
         return SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame=frame)
+
+    def rotate(self, angle, source, centre=(0,0), mode='bilinear', **kwargs):
+        """Rotate the cube.
+
+        Parameters
+            angle: angle of rotation in degrees.
+            centre: centre of rotation.
+            mode: interpolation mode.
+        """
+        #old_centre = self.centre
+
+        # Rotate the cube
+        aux = None
+        for j, slc in enumerate(self.data.unmasked_data[:]):
+            rotated = rotate(slc, angle, centre=centre, mode=mode)
+            if aux is None:
+                aux = np.array([rotated])
+            else:
+                aux = np.append(aux, [rotated], axis=0)
+
+        # Create a new fits file
+        hdu = fits.PrimaryHDU(aux)
+        hdu.header = self.data.header
+        hdu.header['COMMENT'] = 'Rotated %.3f deg, center %i, %i' % \
+                ((angle,)+centre)
+        self.logger.info('Image rotated %.1f deg, center %i, %i', angle, *centre)
+        
+        # Redefine the reference pixel
+        hdu.header['CRPIX1'] = aux.shape[2]/2. + .5
+        hdu.header['CRPIX2'] = aux.shape[1]/2. + .5
+        hdu.header['CRVAL1'] = source.position.ra.to(u.deg).value
+        hdu.header['CRVAL2'] = source.position.dec.to(u.deg).value
+
+        # Redifine header rotation
+        #if 'CROTA2' in hdu.header:
+        #    #if hdu.header['CROTA2']==angle:
+        #    self.logger.info('Deleting rotation keywords from header')
+        try:
+            del hdu.header['CROTA2']
+            del hdu.header['CROTA1']
+        except KeyError:
+            pass
+            #else:
+            #    self.logger.info('Changing rotation keywords from header')
+            #    hdu.header['CROTA2'] = hdu.header['CROTA2']-angle
+        #else:
+        #    self.logger.info('Setting rotation header keywords')
+        #    hdu.header['CROTA1'] = 0
+        #    hdu.header['CROTA2'] = angle
+
+        return hdu
