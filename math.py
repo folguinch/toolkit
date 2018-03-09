@@ -155,7 +155,10 @@ def map_sph_to_cart(val, new_x, new_y, new_z, r, th, phi=None, **kwargs):
     kwargs.setdefault('order', 0)
 
     # New grid meshes
-    Z, Y, X = np.meshgrid(new_z, new_y, new_x, indexing='ij')
+    if new_x.ndim==3 and new_y.ndim==3 and new_z.ndim==3:
+        Z, Y, X = new_z, new_y, new_x
+    else:
+        Z, Y, X = np.meshgrid(new_z, new_y, new_x, indexing='ij')
     X = X.to(r.unit).value
     Y = Y.to(r.unit).value
     Z = Z.to(r.unit).value
