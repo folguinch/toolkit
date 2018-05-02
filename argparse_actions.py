@@ -20,6 +20,8 @@ def validate_files(filenames, check_is_file=True):
 
     return validated
 
+##### Loaders #####
+
 class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse"""
 
@@ -49,9 +51,26 @@ class LoadFITS(argparse.Action):
                 vals += [fits.open(val)[0]]
         setattr(namespace, self.dest, vals)
 
+
 class LoadDust(argparse.Action):
     """Action for loading dust files"""
 
     def __call__(self, parser, namespace, values, option_string=None):
         dust = Dust(values)
         setattr(namespace, self.dest, dust)
+
+##### Others #####
+
+class NormalizePath(argparse.Action):
+    """Normalizes a path or filename"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_files(values, check_is_file=False)
+        setattr(namespace, self.dest, values)
+
+class CheckFile(argparse.Action):
+    """Normalizes a path or filename"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_files(values)
+        setattr(namespace, self.dest, values)
