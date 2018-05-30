@@ -19,6 +19,55 @@ def rms(x):
     assert hasattr(x, 'size')
     return np.sqrt(np.sum(x**2)/x.size)
 
+def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
+    """Calculate the chi2 between two arrays.
+
+    If errors are not given, the chi2 is equivalent to the mean average
+    difference (mad) squared when dof=0.
+
+    The mad is defined as:
+        mad = sum(|obs_i - mod_i|)/N
+    with N the number of valid points. The chi2 is defined as:
+        chi2 = sum((obs_i - mod_i)**2 / err_i**2)/(N - dof)
+
+    The mask should be defined so it is True where the data is compared. The
+    number of valid points N is equal to the sum of the True values in the mask.
+
+    Parameters:
+        obs (np.array): observed value.
+        mod (np.array): expected value.
+        err (np.array, default=None): errors.
+        mask (np.array, default=None): mask for the data.
+        dof (int, default=0): generally, the number of parameters to fit.
+
+    Return:
+        mad, chi (floats): the mad and chi2 values.
+    """
+
+    # Create a default mask
+    if mask is None:
+        mask = np.ones(obs.shape, dtype=bool)
+    assert obs.shape==mod.shape==mask.shape
+
+    # Create error array 
+    if err is None:
+        err = np.ones(obs.shape)
+    elif not hasattr(err, 'shape'):
+        err = np.ones(obs.shape) * err
+
+    # Statistics
+    mad = np.abs(obs - mod)
+    chi2 = ((obs-mod)/err)**2
+
+    # Number of points
+    N = np.sum(mask)
+    if logger:
+        logger.info('Valid points: %i / %i', N, chi2.size)
+    else:
+        print 'Valid points: %i / %i' % (N, chi2.size)
+
+    return np.mean(mad[mask]), np.sum(chi2[mask])/float(N - dof)
+
 #def round_to_sigfig(x, n):
 #    return np.around(x, -int(np.floor(np.sign(x) * np.log10(abs(x)))) + n)
 
