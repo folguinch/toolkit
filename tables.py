@@ -6,7 +6,8 @@ from astropy.io.votable.tree import VOTableFile, Resource
 
 from .logger import get_logger
 
-def load_table(tabname=None, table_id=None, append=True):
+def load_table(tabname=None, table_id=None, append=True,
+        logger=get_logger(__name__)):
     """Load an xml table.
 
     Parameters:
@@ -14,8 +15,6 @@ def load_table(tabname=None, table_id=None, append=True):
         table_id (str, optional): table ID. Required if tabname given.
         append (bool, default=True): true if new data are appended.
     """
-    logger = get_logger(__name__)
-
     if table_id:
         meta = {'ID':table_id, 'name':table_id+'.xml'}
     try:
@@ -53,4 +52,58 @@ def save_table(table, tabname):
     resource.tables.append(from_table(table).get_first_table())
     results.to_xml(tabname)
 
+class Table:
+    """Define a table object.
+
+    Attributes:
+        name (str): file name.
+        table_id (str): table ID within the file.
+        data (astropy.Table): table.
+        logger (logging.logger): system logger.
+    """
+
+    def __init__(self, filename=None, table_id=None, append=True):
+        """Initialize a new table object.
+
+        Parameters:
+            filename (str, default=None): data filename.
+            table_id (str, default=None): table ID.
+            append (bool, default=True): append data if file exist.
+        """
+        self.logger = get_logger(__name__)
+
+        if filename:
+            self.name = os.path.expanduser(filename)
+        else:
+            self.name = None
+
+        if table_id:
+            self.table_id = table_id
+        elif filename:
+            self.table_id = os.path.splitext(os.path.basename(self.name))[0]
+            self.logger.warn('Using table ID from file name: %s', self.table_id)
+        else:
+            self.logger.warn('Using deafult table ID name')
+            self.table_id = 'table'
+
+        self.data = load_table(tabname=self.name, table_id=self.table_id,
+                append=append, logger=self.logger)
+
+    def add_row(self, row):
+        """Insert a new row to the table.
+
+        Parameters:
+            row (OrderedDict): new row.
+        """
+        self.data = update_table(self.data, row, self.table_id)
+
+    def write(self, tablename=None):
+        """Save table to disk.
+
+        Parameters:
+            tablename (str, optional): update the table file name.
+        """
+        if tablename:
+            self.name = tablename
+        save_table(self.data, self.name)
 
