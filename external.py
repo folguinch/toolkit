@@ -34,7 +34,10 @@ def run_mollie(dirname, logger=None, shell='csh', np=1, server=None,
         logger.info('Mollie standard error:\n%s', mollie_stderr)
 
     # Send the stderr by email
-    if from_email and to_email and mollie_stderr:
+    if mollie_stderr.startswith('Warning') and \
+            len(mollie_stderr.splitlines())==0:
+        pass
+    elif from_email and to_email and mollie_stderr:
         msg = 'Order failed:\n%s\n\nMollie satandard error:\n%s' 
         msg = msg % (order % (dirname,mpi,np), mollie_stderr)
         subj = 'Mollie error'
