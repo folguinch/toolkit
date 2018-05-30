@@ -59,6 +59,28 @@ class LoadDust(argparse.Action):
         dust = Dust(values)
         setattr(namespace, self.dest, dust)
 
+class LoadTable(argparse.Action):
+    """Action for loading astropy Tables"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from .tables import load_table
+
+        try:
+            tabname = ''+values
+            table_id = os.path.splitext(os.path.basename(tabname))[0]
+            table = load_table(tabname=tabname, table_id=table_id)
+        except TypeError:
+            if len(values)==2:
+                table = load_table(tabname=values[0], table_id=values[1])
+            elif len(values)==1:
+                tabname = values[0]
+                table_id = os.path.splitext(os.path.basename(tabname))[0]
+                table = load_table(tabname=tabname, table_id=table_id)
+            else:
+                raise TypeError('Number of values not allowed.')
+
+        setattr(namespace, self.dest, table)
+
 ##### Others #####
 
 class NormalizePath(argparse.Action):
