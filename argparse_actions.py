@@ -2,6 +2,7 @@ import os, argparse
 from configparser import ExtendedInterpolation
 
 import numpy as np
+from astropy.io import fits
 
 from .myconfigparser import myConfigParser
 from .classes.dust import Dust
@@ -14,7 +15,7 @@ def validate_files(filenames, check_is_file=True):
     except AttributeError:
         validated = []
         for fname in filenames:
-            validated += [os.path.expanduser(filenames)]
+            validated += [os.path.expanduser(fname)]
             if check_is_file and not os.path.isfile(validated[-1]):
                 raise IOError('%s does not exist' % (validated[-1]))
 
