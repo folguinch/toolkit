@@ -93,6 +93,36 @@ class LoadTable(argparse.Action):
 
         setattr(namespace, self.dest, table)
 
+##### Lists #####
+
+class ListFromFile(argparse.Action):
+    """Load a list of strings from file"""
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(ListFromFile, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        with open(values, 'r') as dat:
+            flist = dat.readlines()
+
+        setattr(namespace, self.dest, flist)
+
+class ListFromRegex(argparse.Action):
+    """Load a list of files from a regular expression"""
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(ListFromRegex, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from glob import glob
+        flist = glob(values)
+
+        setattr(namespace, self.dest, flist)
+
 ##### Others #####
 
 class NormalizePath(argparse.Action):
