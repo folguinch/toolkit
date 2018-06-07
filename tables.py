@@ -1,6 +1,7 @@
 import os
 
-from astropy.table import Table, vstack, join
+from astropy.table import Table as aspyTable
+from astropy.table import vstack, join
 from astropy.io.votable import from_table
 from astropy.io.votable.tree import VOTableFile, Resource
 
@@ -20,20 +21,20 @@ def load_table(tabname=None, table_id=None, append=True,
     try:
         if append:
             logger.debug('Trying to open %s', tabname)
-            table = Table.read(tabname, table_id=table_id)
+            table = aspyTable.read(tabname, table_id=table_id)
             logger.info('Table loaded: %s', os.path.basename(tabname))
         else:
             logger.info('Creating new table')
-            table = Table(meta=meta)
+            table = aspyTable(meta=meta)
     except IOError:
         logger.info('Creating new table')
-        table = Table(meta=meta)
+        table = aspyTable(meta=meta)
 
     return table
 
 def update_table(table, table_new, table_id):
     try:
-        table_up = Table([table_new], names=table_new.keys(),
+        table_up = aspyTable([table_new], names=table_new.keys(),
                         meta={'ID':table_id, 'name':table_id+'.xml'})
     except ValueError:
         table_up = table_new
