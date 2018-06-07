@@ -1,5 +1,6 @@
 import numpy as np
 from astropy.io import fits
+from astropy.wcs import WCS
 import astropy.units as u
 import scipy.ndimage as scimage
 from scipy.stats import linregress
@@ -10,35 +11,54 @@ from .rotate import rotate, rotate_coord_clockwise
 """Functions for working with fits files.
 """
 
-def get_coord_axis(img, axis, pixsize=None):
-    """Get the coordinate axis.
-    
-    Parameters:
-        img (astropy.hdu): hdu.
-        axis (int): axis to get (1 for x or 2 for y).
-    """
-    assert axis in [1, 2]
-    assert hasattr(img, 'header')
+#def get_coord_axis(img, axis, pixsize=None):
+#    """Get the coordinate axis.
+#    
+#    Parameters:
+#        img (astropy.hdu): hdu.
+#        axis (int): axis to get (1 for x or 2 for y).
+#    """
+#    assert axis in [1, 2]
+#    assert hasattr(img, 'header')
+#
+#    # Parameters from header
+#    unit = u.Unit(img.header['CUNIT%i' % axis])
+#    refval = img.header['CRVAL%i' % axis] * unit
+#    refpix = img.header['CRPIX%i' % axis]
+#    pixsize = pixsize or np.abs(img.header['CDELT%i' % axis]) * unit
+#    npix = img.header['NAXIS%i' % axis]
+#
+#    # Check that the units are the same
+#    refval = refval.to(pixsize.unit)
+#
+#    return refval + (np.arange(npix, dtype=float) - (refpix-1))*pixsize
+#
+#def get_coord_axes(img, pixsizes=(None,None)):
+#    """Get the coordinate axes from header.
+#
+#    Parameters:
+#        img (astropy.hdu): input hdu.
+#    """
+#    return [get_coord_axis(img, i, pixsize=pixsizes[i-1]) for i in [1,2]]
 
-    # Parameters from header
-    unit = u.Unit(img.header['CUNIT%i' % axis])
-    refval = img.header['CRVAL%i' % axis] * unit
-    refpix = img.header['CRPIX%i' % axis]
-    pixsize = pixsize or np.abs(img.header['CDELT%i' % axis]) * unit
-    npix = img.header['NAXIS%i' % axis]
-
-    # Check that the units are the same
-    refval = refval.to(pixsize.unit)
-
-    return refval + (np.arange(npix, dtype=float) - (refpix-1))*pixsize
-
-def get_coord_axes(img, pixsizes=(None,None)):
+def get_coord_axes(img):
     """Get the coordinate axes from header.
 
     Parameters:
         img (astropy.hdu): input hdu.
     """
-    return [get_coord_axis(img, i, pixsize=pixsizes[i-1]) for i in [1,2]]
+    wcs = WCS(img.header)
+
+    nx = img.data.shape[1]
+    ny = img.data.shape[0]
+
+    xaxis = wcs.wcs_pix2world(np.arange(nx), np.zeros(nx),0)[0]
+    yaxis = wcs.wcs_pix2world(np.zeros(ny), np.arange(ny),0)[1]
+
+    xunit = u.Unit(img.header.get('CUNIT1'))
+    yunit = u.Unit(img.header.get('CUNIT2'))
+
+    return xaxis*xunit, yaxis*yunit
 
 def center_of_mass(img, axis=None, mask=None, x=None, y=None):
     """Calculates the center of mass of img.
