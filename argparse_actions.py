@@ -39,6 +39,18 @@ class LoadArray(argparse.Action):
         array = np.array(values, dtype=float)
         setattr(namespace, self.dest, array)
 
+class LoadStructArray(argparse.Action):
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(LoadStructArray, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from .array_utils import load_struct_array
+        array = load_struct_array(validate_files(values))
+        setattr(namespace, self.dest, array)
+
 class LoadFITS(argparse.Action):
     """Action for loading a FITS file with astropy"""
 
@@ -51,7 +63,6 @@ class LoadFITS(argparse.Action):
             for val in values:
                 vals += [fits.open(val)[0]]
         setattr(namespace, self.dest, vals)
-
 
 class LoadDust(argparse.Action):
     """Action for loading dust files"""
