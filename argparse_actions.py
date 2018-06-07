@@ -80,14 +80,14 @@ class LoadTable(argparse.Action):
         try:
             tabname = ''+values
             #table_id = os.path.splitext(os.path.basename(tabname))[0]
-            table = Table(tabname=tabname)
+            table = Table(tabname)
         except TypeError:
             if len(values)==2:
-                table = Table(tabname=values[0], table_id=values[1])
+                table = Table(values[0], table_id=values[1])
             elif len(values)==1:
                 tabname = values[0]
                 #table_id = os.path.splitext(os.path.basename(tabname))[0]
-                table = Table(tabname=tabname)
+                table = Table(tabname)
             else:
                 raise ValueError('Number of values not allowed.')
 
