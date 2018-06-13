@@ -119,7 +119,7 @@ class ListFromRegex(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from glob import glob
-        flist = glob(values)
+        flist = sorted(glob(os.path.expanduser(values)))
 
         setattr(namespace, self.dest, flist)
 
