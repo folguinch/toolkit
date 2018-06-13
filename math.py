@@ -66,7 +66,9 @@ def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
     else:
         print 'Valid points: %i / %i' % (N, chi2.size)
 
-    return np.mean(mad[mask]), np.sum(chi2[mask])/float(N - dof)
+    chi2total = np.sum(chi2[mask])
+
+    return np.mean(mad[mask]), chi2total, chi2total/float(N - dof)
 
 #def round_to_sigfig(x, n):
 #    return np.around(x, -int(np.floor(np.sign(x) * np.log10(abs(x)))) + n)
