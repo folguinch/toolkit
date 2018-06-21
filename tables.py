@@ -106,5 +106,10 @@ class Table:
         """
         if tablename:
             self.name = tablename
+        self.logger.info('Saving table: %s', os.path.basename(self.name))
         save_table(self.data, self.name)
+
+    @property
+    def colnames(self):
+        return self.data.colnames
 
