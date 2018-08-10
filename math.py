@@ -52,7 +52,7 @@ def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
     # Create error array 
     if err is None:
         err = np.ones(obs.shape)
-    elif not hasattr(err, 'shape'):
+    elif not hasattr(err, '__len__'):
         err = np.ones(obs.shape) * err
 
     # Statistics
