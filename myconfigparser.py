@@ -18,6 +18,12 @@ class myConfigParser(ConfigParser):
         # If the value was changed then it may be already a quantity
         if hasattr(val, 'unit'):
             return val
+        else:
+            # Or it may be a dimensionless float or float array
+            try:
+                return val + 0
+            except TypeError:
+                pass
         
         # Fallback values
         if val is None or len(val)==0:
@@ -34,7 +40,12 @@ class myConfigParser(ConfigParser):
             return float(val[0]) * u.Unit(val[1])
         else:
             # Array of values
-            return np.array(val[:-1], dtype=float) * u.Unit(val[-1])
+            try:
+                # Check if dimensionless
+                aux = float(val[-1])
+                return np.array(val, dtype=float)
+            except ValueError:
+                return np.array(val[:-1], dtype=float) * u.Unit(val[-1])
 
     def getlist(self, *args, **kwargs):
         """Return a list of strings"""
