@@ -2,6 +2,17 @@ import os
 
 """Decorator classes and functions"""
 
+DECORATED_CLASSES = {}
+DECORATED_FUNCTIONS = {}
+
+def register_class(cls):
+    REGISTERED_CLASSES[cls.__name__.lower()] = cls
+    return cls
+
+def register_function(fn):
+    REGISTERED_FUNCTIONS[fn.__name__.lower()] = fn
+    return fn
+
 class checkPaths(object):
 
     """Normalize the files or directories paths, and file(s) existance if 
