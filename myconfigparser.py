@@ -21,7 +21,8 @@ class myConfigParser(ConfigParser):
         else:
             # Or it may be a dimensionless float or float array
             try:
-                return val + 0
+                # Set dimenssionless unit
+                return (val + 0) * u.Unit(1)
             except TypeError:
                 pass
         
@@ -34,7 +35,7 @@ class myConfigParser(ConfigParser):
         # Convert string to quantity
         if len(val)==1:
             # Dimesionless
-            return float(val[0])
+            return float(val[0]) * u.Unit(1)
         elif len(val)==2:
             # Single quantity
             return float(val[0]) * u.Unit(val[1])
@@ -43,7 +44,7 @@ class myConfigParser(ConfigParser):
             try:
                 # Check if dimensionless
                 aux = float(val[-1])
-                return np.array(val, dtype=float)
+                return np.array(val, dtype=float) * u.Unit(1)
             except ValueError:
                 return np.array(val[:-1], dtype=float) * u.Unit(val[-1])
 
