@@ -6,6 +6,7 @@ from astropy.io import fits
 
 from .myconfigparser import myConfigParser
 from .classes.dust import Dust
+from .logger import get_logger
 
 def validate_files(filenames, check_is_file=True):
     try:
@@ -138,3 +139,18 @@ class CheckFile(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_files(values)
         setattr(namespace, self.dest, values)
+
+class startLogger(argparse.Action):
+    """Create a logging.logger"""
+
+    def __init__(self, option_strings, dest, nargs=1, **kwargs):
+        if nargs!=1:
+            raise ValueError("nargs value not allowed")
+        default = kwargs.setdefault('default','debug_main.log')
+        kwargs['default'] = get_logger('__main__', file_name=default)
+        super(startLogger, self).__init__(option_strings, dest, nargs=nargs,
+                **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        logger = get_logger('__main__', file_name=values[0])
+        setattr(namespace, self.dest, logger)
