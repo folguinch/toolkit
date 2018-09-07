@@ -1,9 +1,13 @@
 import os
+from functools import wraps
+from datetime import datetime
+
+from .logger import get_logger
 
 """Decorator classes and functions"""
 
-DECORATED_CLASSES = {}
-DECORATED_FUNCTIONS = {}
+REGISTERED_CLASSES = {}
+REGISTERED_FUNCTIONS = {}
 
 def register_class(cls):
     REGISTERED_CLASSES[cls.__name__.lower()] = cls
@@ -12,6 +16,35 @@ def register_class(cls):
 def register_function(fn):
     REGISTERED_FUNCTIONS[fn.__name__.lower()] = fn
     return fn
+
+def logged_class(name, filename):
+
+    class ClassWrapper(object):
+        __metaclass__=type
+
+        def __init__(self, cls, name=name, filename=filename):
+            self.cls = cls
+            print name, filename
+            self.logger = get_logger(name, filename)
+
+        def __call__(self, *args, **kwargs):
+            kwargs.setdefault('logger', self.logger)
+            self.logger.debug('Initializing class')
+            cls = self.cls(*args, **kwargs)
+            return cls
+
+    return ClassWrapper
+
+def timed(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        ti = datetime.now()
+        results = fn(*args, **kwargs)
+        tf = datetime.now()
+        logger = get_logger(__name__)
+        logger.info('Function: %s executed in %s', fn.__name__, tf-ti)
+        return results
+    return wrapper
 
 class checkPaths(object):
 
@@ -40,3 +73,4 @@ class checkPaths(object):
                 continue
 
         self.fn(*args, **kwargs)
+
