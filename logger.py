@@ -1,4 +1,4 @@
-import logging
+import os, logging
 import logging.handlers
 
 def get_logger(name, file_name='debug.log', **kwargs):
@@ -23,12 +23,16 @@ def get_logger(name, file_name='debug.log', **kwargs):
         logger.setLevel(kwargs.get('filelevel', logging.DEBUG))
 
         # File handler
+        file_name = os.path.expanduser(file_name)
+        filefmt = '%(asctime)s [%(levelname)s] - %(filename)s '+\
+                '(%(funcName)s:%(lineno)s): %(message)s'
         fh = logging.handlers.RotatingFileHandler(file_name,
                 maxBytes=kwargs.get('maxBytes',5242880),
                 backupCount=kwargs.get('backupCount',5))
         fh.setLevel(kwargs.get('filelevel', logging.DEBUG))
-        fh.setFormatter(logging.Formatter(kwargs.get('filefmt', 
-            '%(asctime)s - %(name)s - %(levelname)s: %(message)s')))
+        fh.setFormatter(logging.Formatter(kwargs.get('filefmt', filefmt)))
+        #fh.setFormatter(logging.Formatter(kwargs.get('filefmt', 
+        #    '%(asctime)s - %(name)s - %(levelname)s: %(message)s')))
 
         # Stream handler
         sh = logging.StreamHandler()
