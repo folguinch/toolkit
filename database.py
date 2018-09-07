@@ -18,9 +18,12 @@ class myDatabase(object):
         """Commit database"""
         self.db.commit()
 
-    def execute(self, cmd):
+    def execute(self, cmd, values=None):
         """Execute operation"""
-        self.cursor.execute(cmd)
+        if values is None:
+            self.cursor.execute(cmd)
+        else:
+            self.cursor.execute(cmd, values)
 
     def close(self):
         """Close database"""
@@ -37,7 +40,8 @@ class myDatabase(object):
         """
         cols = ['%s %s,' % (key,fmt) for key, fmt in zip(keys, fmts)]
         cols = ' '.join(cols)
-        cmd = 'CREATE TABLE IF NOT EXIST %s (%s)' % (table, cols)
+        cols = cols.strip(',')
+        cmd = 'CREATE TABLE IF NOT EXISTS %s (%s)' % (table, cols)
         self.execute(cmd)
 
         #self.fmt = dbfmt_to_strfmt(fmts)
@@ -68,6 +72,9 @@ class myDatabase(object):
         """
         cmd = 'SELECT %s FROM %s WHERE %s' % (idcol, table, condition)
         self.execute(cmd, values)
+
+    def fetchone(self):
+        return self.cursor.fetchone()
 
 def load_database(filename, table, keys, fmts):
     """Load a database and create table.
