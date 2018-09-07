@@ -3,6 +3,8 @@ from scipy.stats import binned_statistic
 from scipy.ndimage import map_coordinates
 from scipy.interpolate import interp1d
 
+from .decorators import timed
+
 def rms(x):
     """Root mean square (rms).
 
@@ -89,6 +91,7 @@ def rebin_along_axis(x, values, axis, statistic='sum', bins=10, range=None):
     return np.apply_along_axis(binned_stat, axis, values, x, 
             statistic=statistic, bins=bins, range=range)
 
+@timed
 def rebin_regular_nd(values, *args, **kwargs):
     """Rebin a n-dimensional array.
 
