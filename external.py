@@ -1,6 +1,8 @@
 import smtplib, subprocess
 from email.mime.text import MIMEText
 
+from .decorators import timed
+
 def sendMail(fromadd, toadd, subj, msg, smtp='phys.nthu.edu.tw', port=25):
     mess = MIMEText(msg)
     mess['Subject'] = subj
@@ -10,6 +12,7 @@ def sendMail(fromadd, toadd, subj, msg, smtp='phys.nthu.edu.tw', port=25):
     s.sendmail(fromadd, [toadd], mess.as_string())
     s.quit()
 
+@timed
 def run_mollie(dirname, logger=None, shell='csh', np=1, server=None,
         mpi='mpiexec', from_email=None, to_email=None):
     if shell=='csh':
