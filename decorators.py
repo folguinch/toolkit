@@ -41,8 +41,8 @@ def timed(fn):
         ti = datetime.now()
         results = fn(*args, **kwargs)
         tf = datetime.now()
-        logger = get_logger(__name__)
-        logger.info('Function: %s executed in %s', fn.__name__, tf-ti)
+        logger = get_logger(__name__, __package__+'.log')
+        logger.debug('Function: %s executed in %s', fn.__name__, tf-ti)
         return results
     return wrapper
 
