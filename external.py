@@ -46,6 +46,20 @@ def run_mollie(dirname, logger=None, shell='csh', np=1, server=None,
         subj = 'Mollie error'
         sendMail(from_email, to_email, subj, msg)
 
+@timed
+def run_casa(script, *args, **kwargs):
+    casa = '/home/myso/opt/casa-release-4.7.2-el7/bin/casa'
+    casa_opts = '--nologger --nogui --log2term'
+    opts = ''
+    for key, val in kwargs.items():
+        if len(key)>1:
+            opts += '--%s %s ' % (key, val)
+        else:
+            opts += '-%s %s' % (key, val)
+    inp = ('%s '*len(args)).strip() % args
+    cmd = '%s %s -c %s %s %s' % (casa, casa_opts, script, opts.strip(), inp)
+    print cmd
+    run_bash(cmd)
 
 def run_bash(cmd, logger=None):
     subp = subprocess.Popen(cmd, stderr=subprocess.PIPE,
@@ -53,3 +67,5 @@ def run_bash(cmd, logger=None):
     stdout, stderr = subp.communicate()
     if logger:
         logger.info(stderr)
+    else:
+        print stderr
