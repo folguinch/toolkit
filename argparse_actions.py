@@ -52,6 +52,11 @@ class LoadStructArray(argparse.Action):
         array = load_struct_array(validate_files(values))
         setattr(namespace, self.dest, array)
 
+class LoadTXTArray(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = np.loadtxt(values, dtype=float)
+        setattr(namespace, self.dest, array)
+
 class LoadFITS(argparse.Action):
     """Action for loading a FITS file with astropy"""
 
