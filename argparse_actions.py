@@ -2,6 +2,7 @@ import os, argparse
 from configparser import ExtendedInterpolation
 
 import numpy as np
+import astropy.units as u
 from astropy.io import fits
 
 from .myconfigparser import myConfigParser
@@ -128,6 +129,24 @@ class ListFromRegex(argparse.Action):
         flist = sorted(glob(os.path.expanduser(values)))
 
         setattr(namespace, self.dest, flist)
+
+##### Quantities #####
+
+class readQuantity(argparse.Action):
+    """Read quantity or a quantity list from the cmd line"""
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        if nargs < 2 or nargs in ['*', '+', '?']:
+            raise ValueError("nargs not allowed")
+        super(readQuantity, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        vals = np.array(values[:-1], dtype=float)
+        unit = u.Unit(values[-1])
+        if len(vals)==1:
+            vals = vals[0]
+        vals = vals*unit
+        setattr(namespace, self.dest, vals)
 
 ##### Others #####
 
