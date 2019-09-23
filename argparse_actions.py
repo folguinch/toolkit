@@ -41,6 +41,35 @@ class LoadArray(argparse.Action):
         array = np.array(values, dtype=float)
         setattr(namespace, self.dest, array)
 
+class ArrayFromRange(argparse.Action):
+    """Action class for creating a np.array with linspace from command line"""
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        if nargs not in range(2, 5):
+            raise ValueError('only 2,3 or 4 nargs allowed')
+        super(ArrayFromRange, self).__init__(option_strings, dest,
+                nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        start, stop = map(float, values[:2])
+        if len(values)==4:
+            n = int(values[2])
+            if values[-1]=='linear':
+                fn = np.linspace
+            elif values[-1]=='log':
+                fn = np.logspace
+                start = np.log10(start)
+                stop = np.log10(stop)
+            else:
+                raise NotImplementedError('%s not implemented' % values[-1])
+        elif len(values)==3:
+            fn = np.linspace
+            n = int(values[2])
+        else:
+            fn = np.linspace
+        value = fn(start, stop, n)
+        setattr(namespace, self.dest, value)
+
 class LoadStructArray(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
@@ -51,6 +80,18 @@ class LoadStructArray(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         from .array_utils import load_struct_array
         array = load_struct_array(validate_files(values))
+        setattr(namespace, self.dest, array)
+
+class LoadMixedStructArray(argparse.Action):
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError("nargs not allowed")
+        super(LoadMixedStructArray, self).__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from .array_utils import load_mixed_struct_array
+        array = load_mixed_struct_array(validate_files(values))
         setattr(namespace, self.dest, array)
 
 class LoadTXTArray(argparse.Action):
@@ -137,7 +178,7 @@ class readQuantity(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=2, **kwargs):
         if nargs < 2 or nargs in ['*', '+', '?']:
-            raise ValueError("nargs not allowed")
+            print('WARNING: changed from previous version, nargs are allowed')
         super(readQuantity, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):

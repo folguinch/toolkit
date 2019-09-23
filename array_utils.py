@@ -31,6 +31,40 @@ def load_struct_array(file_name, usecols=None):
 
     return data, units
 
+def load_mixed_struct_array(file_name, usecols=None):
+    """Load a structured array table of mixed types.
+
+    Each file has a header. The first row has the name of each parameter and
+    the second the units. The name of each parameter must be different. String
+    values are marked with unit `-` in the second line.
+
+    Parameters:
+        file_name (str): file to be loaded.
+        usecols (iterable): columns to load.
+    """
+    with open(file_name, 'r') as input:
+        # Read first two lines
+        line1 = input.readline().strip(' #').split()
+        line2 = input.readline().strip(' #').split()
+        assert len(line1)==len(set(line1))
+
+        # Read dtype and data units
+        names = []
+        units = {}
+        for i,(dty,unit) in enumerate(zip(line1,line2)):
+            if usecols is not None and i not in usecols:
+                continue
+            names += [dty]
+            if unit == '-':
+                units[dty] = None
+            else:
+                units[dty] = 1.*u.Unit(unit)
+
+        # Read data
+        data = np.genfromtxt(input, usecols=usecols, dtype=None, names=names)
+
+    return data, units
+
 def save_struct_array(file_name, data, units, fmt='%10.4e\t'):
     r"""Save a structured array table.
 
