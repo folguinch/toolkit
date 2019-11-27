@@ -66,7 +66,9 @@ class Data3D(Data):
         return SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame=frame)
 
     def get_pixel(self, coord):
-        return self.wcs.world_to_pixel(coord)
+        crd = [[coord.ra.hour, coord.dec.degree]]
+        return self.wcs.all_world2pix(crd, 0)[0]
+        #return self.wcs.world_to_pixel(coord)
 
     def get_spectrum(self, coord=None, pixel=None):
         if coord is not None:
@@ -75,6 +77,7 @@ class Data3D(Data):
             x, y = pixel
         else:
             raise ValueError('Could not determine position')
+        self.logger.info('Extracting spectrum at pixel: %i, %i', x, y)
         return self.data[:,y,x]
 
     def rotate(self, angle, source, centre=(0,0), mode='bilinear', **kwargs):
