@@ -65,6 +65,18 @@ class Data3D(Data):
         ra, dec = self.wcs.all_pix2world([[xpix, ypix]], 0)[0]
         return SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame=frame)
 
+    def get_pixel(self, coord):
+        return self.wcs.world_to_pixel(coord)
+
+    def get_spectrum(self, coord=None, pixel=None):
+        if coord is not None:
+            x, y = self.get_pixel(coord)
+        elif pixel is not None:
+            x, y = pixel
+        else:
+            raise ValueError('Could not determine position')
+        return self.data[:,y,x]
+
     def rotate(self, angle, source, centre=(0,0), mode='bilinear', **kwargs):
         """Rotate the cube.
 
