@@ -14,7 +14,7 @@ def check_composed_units(line):
                 aux1 += [aux2]
                 aux2 = ''
             else:
-                aux2.strip()
+                aux2 = aux2.strip()
         else:
             aux1 += [unit]
 
