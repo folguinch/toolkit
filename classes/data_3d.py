@@ -6,6 +6,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 
 from ..logger import get_logger
+from ..masks import image_circular_mask
 from ..rotate import rotate
 from .data import Data
 
@@ -66,19 +67,43 @@ class Data3D(Data):
         return SkyCoord(ra=ra*u.degree, dec=dec*u.degree, frame=frame)
 
     def get_pixel(self, coord):
-        crd = [[coord.ra.hour, coord.dec.degree]]
+        crd = [[coord.ra.degree, coord.dec.degree]]
         return self.wcs.all_world2pix(crd, 0)[0]
         #return self.wcs.world_to_pixel(coord)
 
     def get_spectrum(self, coord=None, pixel=None):
         if coord is not None:
-            x, y = self.get_pixel(coord)
+            xy = self.get_pixel(coord)
         elif pixel is not None:
-            x, y = pixel
+            xy = pixel
         else:
             raise ValueError('Could not determine position')
+        x, y = map(int, xy)
         self.logger.info('Extracting spectrum at pixel: %i, %i', x, y)
         return self.data[:,y,x]
+
+    def get_avg_spectrum(self, coord, r=None):
+        # Position
+        xy = self.get_pixel(coord)
+        x, y = map(int, xy)
+        self.logger.info('Region centered at pixel: %i, %i', x, y)
+
+        # Multiple beams
+        bmaj = 0.
+        bmin = 0.
+        for beam in self.data.beams:
+            bmaj += beam.major.to(u.deg).value
+            bmin += beam.minor.to(u.deg).value
+        bmaj = bmaj/len(self.data.beams)
+        bmin = bmin/len(self.data.beams)
+        
+        # Get mask
+        mask = image_circular_mask(self.data, xy=[x,y], r=r, bmin=bmin,
+                bmaj=bmaj)
+
+        # Get spectrum
+        maskedcube = self.data.with_mask(mask)  
+        return maskedcube.mean(axis=(-2,-1))
 
     def rotate(self, angle, source, centre=(0,0), mode='bilinear', **kwargs):
         """Rotate the cube.
