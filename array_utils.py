@@ -3,6 +3,23 @@ import astropy.units as u
 
 """Functions for working with numpy arrays"""
 
+def check_composed_units(line):
+    aux1 = []
+    aux2 = ''
+    for unit in line:
+        if '[' in unit or aux2!='':
+            aux2 = aux2 + ' ' + unit
+            if aux2[-1]==']':
+                aux2 = aux2[1:-1]
+                aux1 += [aux2]
+                aux2 = ''
+            else:
+                aux2.strip()
+        else:
+            aux1 += [unit]
+
+    return aux1
+
 def load_struct_array(file_name, usecols=None):
     """Load a structured array table.
 
@@ -17,6 +34,8 @@ def load_struct_array(file_name, usecols=None):
         # Read first two lines
         line1 = input.readline().strip(' #').split()
         line2 = input.readline().strip(' #').split()
+        line2 = check_composed_units(line2)
+
         assert len(line1)==len(set(line1))
 
         # Read dtype and data units
@@ -24,7 +43,10 @@ def load_struct_array(file_name, usecols=None):
         units = {}
         for dty,unit in zip(line1,line2):
             dtype += [(dty, float)]
-            units[dty] = 1.*u.Unit(unit)
+            if unit=='-':
+                units[dty] = 1.*u.Unit('')
+            else:
+                units[dty] = 1.*u.Unit(unit)
 
         # Read data
         data = np.loadtxt(input, usecols=usecols, dtype=dtype)
@@ -46,6 +68,7 @@ def load_mixed_struct_array(file_name, usecols=None):
         # Read first two lines
         line1 = input.readline().strip(' #').split()
         line2 = input.readline().strip(' #').split()
+        line2 = check_composed_units(line2)
         assert len(line1)==len(set(line1))
 
         # Read dtype and data units
@@ -82,7 +105,13 @@ def save_struct_array(file_name, data, units, fmt='%10.4e\t'):
         line2 = '#' 
         for name in data.dtype.names:
             line1 += '{0}\t'.format(name)
-            line2 += '{0}\t'.format(units[name])
+            if units[name] is None or units[name]==u.Unit(''):
+                unit = '-'
+            else:
+                unit = '{0}'.format(units[name])
+            if ' ' in unit:
+                unit = '[%s]' % unit
+            line2 += '{0}\t'.format(unit)
         line1 = line1.strip() + '\n'
         line2 = line2.strip() + '\n'
         lines = line1 + line2
@@ -92,7 +121,4 @@ def save_struct_array(file_name, data, units, fmt='%10.4e\t'):
         
         # Write
         output.write(lines)
-
-        
-
 
