@@ -117,7 +117,10 @@ def save_struct_array(file_name, data, units, fmt='%10.4e\t'):
         lines = line1 + line2
 
         # Data
-        lines += '\n'.join((fmt*len(d)).strip() % tuple(d) for d in data)
+        try:
+            lines += '\n'.join((fmt*len(d)).strip() % tuple(d) for d in data)
+        except TypeError:
+            lines += '\n'.join(fmt.strip() % tuple(d) for d in data)
         
         # Write
         output.write(lines)
