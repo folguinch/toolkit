@@ -199,7 +199,7 @@ class NormalizePath(argparse.Action):
         setattr(namespace, self.dest, values)
 
 class CheckFile(argparse.Action):
-    """Normalizes a path or filename"""
+    """Validates file and check if file or path exist"""
 
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_files(values)
