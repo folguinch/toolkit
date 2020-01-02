@@ -1,13 +1,15 @@
 import os, argparse
 from configparser import ExtendedInterpolation
 
-import numpy as np
-import astropy.units as u
+import astropy.coordinates as apycoord
 from astropy.io import fits
+import astropy.units as u
+from astropy import wcs
+import numpy as np
 
-from .myconfigparser import myConfigParser
-from .classes.dust import Dust
-from .logger import get_logger
+from ..myconfigparser import myConfigParser
+from ..classes.dust import Dust
+from ..logger import get_logger
 
 def validate_files(filenames, check_is_file=True):
     try:
@@ -189,6 +191,32 @@ class readQuantity(argparse.Action):
         vals = vals*unit
         setattr(namespace, self.dest, vals)
 
+##### Advanced processing #####
+
+class PeakPosition(argparse.Action):
+    """Load FITS file and get peak postion"""
+
+    def __init__(self, option_strings, dest, nargs='*', **kwargs):
+        if nargs not in ['*', '?', '+']:
+            raise ValueError('nargs=%s not accepted for PeakToPosition' % nargs)
+        super(PeakPosition, self).__init__(option_strings, dest, nargs=nargs,
+                **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        positions = []
+        values = validate_files(values, check_is_file=True)
+        for val in values:
+            # Data
+            imgi = fits.open(val)[0]
+            wcsi = wcs.WCS(imgi.header, naxis=('longitude','latitude'))
+
+            # Maximum
+            data = np.squeeze(imgi.data)
+            ymax, xmax = np.unravel_index(np.nanargmax(data), data.shape)
+            positions += [(xmax, ymax)]
+
+        setattr(namespace, self.dest, positions)
+
 ##### Others #####
 
 class NormalizePath(argparse.Action):
@@ -219,3 +247,25 @@ class startLogger(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         logger = get_logger('__main__', file_name=values[0])
         setattr(namespace, self.dest, logger)
+
+class readSkyCoords(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        if nargs not in ['*', '+', '?']:
+            try:
+                if nargs%2!=0:
+                    raise ValueError('Only even nargs allowed for coordinates')
+            except TypeError:
+                raise ValueError('Only even nargs allowed for coordinates')
+        kwargs.setdefault('metavar',('RA Dec',)*2)
+        super(readSkyCoords, self).__init__(option_strings, dest, nargs=nargs,
+                **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if len(values)%2 != 0:
+            raise ValueError('Odd number of coordinate values')
+
+        vals = []
+        for ra, dec in zip(values[::2], values[1::2]):
+            vals += [apycoord.SkyCoord(ra, dec, frame='icrs')]
+
+        setattr(namespace, self.dest, vals)
