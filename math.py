@@ -1,3 +1,4 @@
+import astropy.stats as apystats
 import numpy as np
 from scipy.stats import binned_statistic
 from scipy.ndimage import map_coordinates
@@ -20,6 +21,10 @@ def rms(x):
     """
     assert hasattr(x, 'size')
     return np.sqrt(np.sum(x**2)/x.size)
+
+def quick_rms(data):
+    return 1.482602219 * apystats.median_absolute_deviation(data,
+            ignore_nan=True)
 
 def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
     """Calculate the chi2 between two arrays.
