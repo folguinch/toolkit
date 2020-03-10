@@ -11,17 +11,34 @@ from ..myconfigparser import myConfigParser
 from ..classes.dust import Dust
 from ..logger import get_logger
 
-def validate_files(filenames, check_is_file=True):
+def validate_files(filenames, check_is_file=True, check_is_dir=False, 
+        mkdir=False):
     try:
         validated = os.path.expanduser(filenames)
         if check_is_file and not os.path.isfile(validated):
             raise IOError('%s does not exist' % validated)
+        elif check_is_dir or mkdir:
+            if not os.path.isdir(validated) and not mkdir:
+                raise IOError('%s directory does not exist' % validated)
+            else:
+                try:
+                    os.makedirs(validated)
+                except:
+                    pass
     except AttributeError:
         validated = []
         for fname in filenames:
             validated += [os.path.expanduser(fname)]
             if check_is_file and not os.path.isfile(validated[-1]):
                 raise IOError('%s does not exist' % (validated[-1]))
+            elif check_is_dir or mkdir:
+                if not os.path.isdir(validated[-1]) and not mkdir:
+                    raise IOError('%s directory does not exist' % validated)
+                else:
+                    try:
+                        os.makedirs(validated[-1])
+                    except:
+                        pass
 
     return validated
 
@@ -92,7 +109,7 @@ class LoadMixedStructArray(argparse.Action):
         super(LoadMixedStructArray, self).__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        from .array_utils import load_mixed_struct_array
+        from ..array_utils import load_mixed_struct_array
         array = load_mixed_struct_array(validate_files(values))
         setattr(namespace, self.dest, array)
 
@@ -224,6 +241,13 @@ class NormalizePath(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_files(values, check_is_file=False)
+        setattr(namespace, self.dest, values)
+
+class MakePath(argparse.Action):
+    """Check and create directory if needed"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_files(values, check_is_file=False, mkdir=True)
         setattr(namespace, self.dest, values)
 
 class CheckFile(argparse.Action):
