@@ -48,9 +48,10 @@ class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse"""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        assert os.path.isfile(values)
+        values = validate_files(values)
         config = myConfigParser(interpolation=ExtendedInterpolation())
-        config.read(values)
+        aux = config.read(values)
+        assert aux==values
         setattr(namespace, self.dest, config)
 
 class LoadArray(argparse.Action):
