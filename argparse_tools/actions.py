@@ -6,6 +6,7 @@ from astropy.io import fits
 import astropy.units as u
 from astropy import wcs
 import numpy as np
+from spectral_cube import SpectralCube
 
 from ..myconfigparser import myConfigParser
 from ..classes.dust import Dust
@@ -51,7 +52,7 @@ class LoadConfig(argparse.Action):
         values = validate_files(values)
         config = myConfigParser(interpolation=ExtendedInterpolation())
         aux = config.read(values)
-        assert aux==values
+        assert aux==values or values in aux
         setattr(namespace, self.dest, config)
 
 class LoadArray(argparse.Action):
@@ -91,7 +92,6 @@ class ArrayFromRange(argparse.Action):
         setattr(namespace, self.dest, value)
 
 class LoadStructArray(argparse.Action):
-
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
             raise ValueError("nargs not allowed")
@@ -130,6 +130,19 @@ class LoadFITS(argparse.Action):
             vals = []
             for val in values:
                 vals += [fits.open(val)[0]]
+        setattr(namespace, self.dest, vals)
+
+class LoadCube(argparse.Action):
+    """Action for loading a FITS file with astropy"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_files(values)
+        try:
+            vals = SpectralCube.read(''+values)
+        except TypeError:
+            vals = []
+            for val in values:
+                vals += [SpectralCube.read(val)]
         setattr(namespace, self.dest, vals)
 
 class LoadDust(argparse.Action):
@@ -209,6 +222,20 @@ class readQuantity(argparse.Action):
         vals = vals*unit
         setattr(namespace, self.dest, vals)
 
+class readUnit(argparse.Action):
+    """Read quantity or a quantity list from the cmd line"""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        vals = []
+        try:
+            for val in values:
+                vals += [u.Unit(val)]
+            if len(vals)==1:
+                vals = vals[0]
+        except ValueError:
+            vals = u.Unit(values)
+        setattr(namespace, self.dest, vals)
+
 ##### Advanced processing #####
 
 class PeakPosition(argparse.Action):
@@ -226,7 +253,7 @@ class PeakPosition(argparse.Action):
         for val in values:
             # Data
             imgi = fits.open(val)[0]
-            wcsi = wcs.WCS(imgi.header, naxis=('longitude','latitude'))
+            #wcsi = wcs.WCS(imgi.header, naxis=('longitude','latitude'))
 
             # Maximum
             data = np.squeeze(imgi.data)

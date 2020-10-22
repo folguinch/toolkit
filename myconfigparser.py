@@ -8,7 +8,10 @@ import numpy as np
 def converters(value, dtype):
     if dtype.lower()=='quantity':
         aux = value.split()
-        return float(aux[0])*u.Unit(aux[1])
+        if len(aux) == 2:
+            return float(aux[0])*u.Unit(aux[1])
+        else:
+            return np.array(aux[:-1], dtype=float) * u.Unit(aux[-1])
     elif dtype.lower()=='skycoord':
         try:
             ra, dec, frame = value.split()
