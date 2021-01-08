@@ -355,7 +355,7 @@ class startLogger(argparse.Action):
             raise ValueError("nargs value not allowed")
         default = kwargs.setdefault('default', 'debug_main.log')
         if nargs == 0:
-            kwargs['default'] = get_logger('__main__', file_name=default)
+            kwargs['default'] = get_logger('__main__', filename=default)
         else:
             kargs.setdefault('metavar', 'LOGFILE')
         # Testing
@@ -364,6 +364,6 @@ class startLogger(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         if len(values) == 1:
-            logger = get_logger('__main__', file_name=values[0])
+            logger = get_logger('__main__', filename=values[0])
         setattr(namespace, self.dest, logger)
 
