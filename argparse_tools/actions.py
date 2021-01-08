@@ -363,7 +363,10 @@ class startLogger(argparse.Action):
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
+        print(option_string)
         if len(values) == 1:
             logger = get_logger('__main__', filename=values[0])
-        setattr(namespace, self.dest, logger)
+            setattr(namespace, self.dest, logger)
+        else:
+            pass
 
