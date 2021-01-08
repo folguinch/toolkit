@@ -4,7 +4,7 @@ import actions
 import functions as fns
 from ..logger import get_logger
 
-'''Argparse parent parsers commonly used'''
+"""Argparse parent parsers commonly used"""
 
 def astro_source(parser):
     try:
