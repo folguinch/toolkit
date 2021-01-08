@@ -348,25 +348,35 @@ class CheckFile(argparse.Action):
 
 # Loger actions
 class startLogger(argparse.Action):
-    """Create a logger."""
+    """Create a logger.
+    
+    For verbose levels, the standard option_string values are:
+      -v, --vv, --vvv, --log, --info, --debug, --fulldebug
+    With: -v = --log = --info
+          --vv = --debug
+          --vvv = --fulldebug
+    Other values will create a normal logger.
+    """
 
-    def __init__(self, option_strings, dest, nargs=1, **kwargs):
-        if nargs not in [0, 1]:
+    def __init__(self, option_strings, dest='log', nargs='?',
+                 metavar='LOGFILE', const='debug_main.log', 
+                 default='debug_main.log', **kwargs):
+        if nargs not in ['?']:
             raise ValueError("nargs value not allowed")
-        default = kwargs.setdefault('default', 'debug_main.log')
-        if nargs == 0:
-            kwargs['default'] = get_logger('__main__', filename=default)
-        else:
-            kargs.setdefault('metavar', 'LOGFILE')
-        # Testing
-        print(option_strings)
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        print(option_string)
-        if len(values) == 1:
-            logger = get_logger('__main__', filename=values[0])
-            setattr(namespace, self.dest, logger)
+    def __call__(self, parser, namespace, value, option_string=None):
+        print(value)
+        # Determine verbose
+        if option_string in ['-v', '--log', '--info']:
+            verbose = 'v'
+        elif option_string in ['--vv', '--debug']:
+            verbose = 'vv'
+        elif option_string in ['--vvv', '--fulldebug']:
+            verbose = 'vvv'
         else:
-            pass
+            verbose = None
+
+        logger = get_logger('__main__', filename=value, verbose=verbose)
+        setattr(namespace, self.dest, logger)
 
