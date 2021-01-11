@@ -368,6 +368,8 @@ class startLogger(argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):
         if value is None:
             value = self.default or self.const
+        print(value is None)
+        print(type(value))
         print(value)
 
         # Determine verbose
