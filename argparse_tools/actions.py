@@ -368,6 +368,7 @@ class startLogger(argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):
         if value is None:
             value = self.default or self.const
+        print(value)
 
         # Determine verbose
         if option_string in ['-v', '--log', '--info']:
