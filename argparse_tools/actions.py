@@ -358,7 +358,7 @@ class startLogger(argparse.Action):
     Other values will create a normal logger.
     """
 
-    def __init__(self, option_strings, dest='log', nargs='?',
+    def __init__(self, *option_strings, dest='log', nargs='?',
                  metavar='LOGFILE', const='debug_main.log', 
                  default='debug_main.log', **kwargs):
         if nargs not in ['?']:
@@ -371,7 +371,7 @@ class startLogger(argparse.Action):
         print(self.dest)
         print(option_string)
         if value is None:
-            value = self.default or self.const
+            value = self.default
 
         # Determine verbose
         if option_string in ['-v', '--log', '--info']:
