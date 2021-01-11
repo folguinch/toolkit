@@ -346,10 +346,12 @@ class CheckFile(argparse.Action):
         values = validate_files(values, check_is_file=True)
         setattr(namespace, self.dest, values)
 
-# Loger actions
+# Logger actions
 class startLogger(argparse.Action):
     """Create a logger.
     
+    If nargs=? (default), log to default or const if provided and flag used
+    else log only to stdout.
     For verbose levels, the standard option_string values are:
       -v, --vv, --vvv, --log, --info, --debug, --fulldebug
     With: -v = --log = --info
@@ -358,20 +360,26 @@ class startLogger(argparse.Action):
     Other values will create a normal logger.
     """
 
-    def __init__(self, *option_strings, dest='log', nargs='?',
-                 metavar='LOGFILE', const='debug_main.log', 
-                 default='debug_main.log', **kwargs):
+    def __init__(self, option_strings, dest, nargs='?', metavar='LOGFILE', 
+                 const=None, default=None, **kwargs):
+        # Cases from nargs
         if nargs not in ['?']:
             raise ValueError("nargs value not allowed")
-        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
-                         const=const, default=default, **kwargs)
+            
+        # Default dest and default log file
+        dest = 'log'
+        self._logfile = const or default
+
+        # Set default to stdout
+        const = None
+        default = get_stdout_logger('__main__', verbose='v')
+
+        super().__init__(option_strings, dest, metavar=metavar, const=const, 
+                         default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):
-        print(namespace)
-        print(self.dest)
-        print(option_string)
         if value is None:
-            value = self.default
+            value = self._logfile
 
         # Determine verbose
         if option_string in ['-v', '--log', '--info']:
@@ -383,6 +391,6 @@ class startLogger(argparse.Action):
         else:
             verbose = None
 
-        logger = get_logger('__main__', filename=value, verbose=verbose)
+        logger = update_logger(self.default, filename=value, verbose=verbose)
         setattr(namespace, self.dest, logger)
 
