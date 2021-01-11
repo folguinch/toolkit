@@ -62,7 +62,7 @@ def get_file_handler(level: int, filename: Union[str, pathlib.Path],
     """
     filename = pathlib.Path(filename).expanduser().resolve()
     if timestamp:
-        tstamp = '.' + datetime.now().isformat(timespec='milliseconds')
+        tstamp = '.' + datetime.now().isoformat(timespec='milliseconds')
         filename = filename.with_suffix(tstamp + filename.suffix)
     if fmt is None:
         fmt = ('%(asctime)s [%(levelname)s] - %(filename)s '
@@ -148,7 +148,7 @@ def get_logger(name: str,
 
     # Create logger
     logger = logging.getLogger(name)
-    if not logger.hasHandlers:
+    if not len(logger.handlers):
         logger.setLevel(levels['file'])
 
         # File handler

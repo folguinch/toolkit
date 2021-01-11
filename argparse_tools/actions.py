@@ -12,7 +12,7 @@ import numpy as np
 from spectral_cube import SpectralCube
 
 from ..classes.dust import Dust
-from ..logger import get_logger
+from ..logger import get_stdout_logger, update_logger
 
 def validate_path(path: pathlib.Path, 
                   check_is_file: bool = False,
@@ -374,8 +374,8 @@ class startLogger(argparse.Action):
         const = None
         default = get_stdout_logger('__main__', verbose='v')
 
-        super().__init__(option_strings, dest, metavar=metavar, const=const, 
-                         default=default, **kwargs)
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar, 
+                         const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):
         if value is None:
