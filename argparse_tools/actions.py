@@ -367,6 +367,8 @@ class startLogger(argparse.Action):
                          const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):
+        print(namespace)
+        print(self.dest)
         print(option_string)
         if value is None:
             value = self.default or self.const
