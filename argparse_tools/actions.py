@@ -363,14 +363,12 @@ class startLogger(argparse.Action):
                  default='debug_main.log', **kwargs):
         if nargs not in ['?']:
             raise ValueError("nargs value not allowed")
-        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
+                         const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):
         if value is None:
             value = self.default or self.const
-        print(value is None)
-        print(type(value))
-        print(value)
 
         # Determine verbose
         if option_string in ['-v', '--log', '--info']:
