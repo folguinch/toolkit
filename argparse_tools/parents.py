@@ -1,5 +1,6 @@
-from typing import Callable, Optional, TypeVar
+from typing import Callable, Optional, Union
 import argparse
+import pathlib
 
 import actions
 import functions as fns
@@ -8,7 +9,7 @@ import functions as fns
 
 # Typing
 PosFunction = Callable[[argparse.Namespace], None]
-Path = TypeVar('Path')
+Path = Union[pathlib.Path, str]
 
 def astro_source(parser):
     try:
@@ -37,7 +38,7 @@ def source_position(required: bool = False,
 
     return parser
 
-def logger(filename: Optional[str, Path] = None) -> argparse.ArgumentParser:
+def logger(filename: Optional[Path] = None) -> argparse.ArgumentParser:
     """Parent parser to initiate a logging system.
 
     Args:
