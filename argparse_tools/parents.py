@@ -1,10 +1,14 @@
+from typing import Callable, Optional, TypeVar
 import argparse
 
 import actions
 import functions as fns
-from ..logger import get_logger
 
 """Argparse parent parsers commonly used"""
+
+# Typing
+PosFunction = Callable[[argparse.Namespace], None]
+Path = TypeVar('Path')
 
 def astro_source(parser):
     try:
@@ -15,12 +19,13 @@ def astro_source(parser):
         print('astroSource not available')
         pass
 
-def source_position(required=False, function=fns.positions_to_pos):
+def source_position(required: bool = False, 
+                    function: PosFunction = fns.positions_to_pos):
 
     parser = argparse.ArgumentParser(add_help=False)
     group1 = parser.add_mutually_exclusive_group(required=required)
     group1.add_argument('--coordinate', nargs='*', 
-            action=actions.readSkyCoords,
+            action=actions.ReadSkyCoords,
             help='Sky coordinates with units or : separator')
     group1.add_argument('--position', metavar=('X Y',)*2, nargs='*', type=int,
             help='Positions')
@@ -32,11 +37,16 @@ def source_position(required=False, function=fns.positions_to_pos):
 
     return parser
 
-def logger():
+def logger(filename: Optional[str, Path] = None) -> argparse.ArgumentParser:
+    """Parent parser to initiate a logging system.
+
+    Args:
+      filename: optional; default filename for logging.
+    """
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument('--loglevel', default=['info'], nargs=1,
-            choices=['info','debug','warn','error'],
-            help='Logging stdout level')
-    parser.set_defaults(log=get_logger)
+    parser.add_argument('-v', '--vv', '--vvv', 
+                        default=filename,
+                        action=actions.StartLogger,
+                        help='Logging setup')
 
     return parser

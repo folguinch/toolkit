@@ -137,7 +137,7 @@ class LoadMixedStructArray(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from ..array_utils import load_mixed_struct_array
-        array = load_mixed_struct_array(validate_files(values,
+        array = load_mixed_struct_array(validate_paths(values,
                                                        check_is_file=True))
         setattr(namespace, self.dest, array)
 
@@ -234,7 +234,7 @@ class ListFromRegex(argparse.Action):
         setattr(namespace, self.dest, flist)
 
 # Quantity actions
-class readQuantity(argparse.Action):
+class ReadQuantity(argparse.Action):
     """Read quantity or a quantity list from the cmd line."""
 
     def __init__(self, option_strings, dest, nargs=2, **kwargs):
@@ -256,7 +256,7 @@ class readQuantity(argparse.Action):
         vals = vals * unit
         setattr(namespace, self.dest, vals)
 
-class readUnit(argparse.Action):
+class ReadUnit(argparse.Action):
     """Read quantity or a quantity list from the cmd line."""
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -294,7 +294,7 @@ class PeakPosition(argparse.Action):
 
         setattr(namespace, self.dest, positions)
 
-class readSkyCoords(argparse.Action):
+class ReadSkyCoords(argparse.Action):
     """Read one or more sky coordinates."""
 
     def __init__(self, option_strings, dest, nargs=2, **kwargs):
@@ -347,7 +347,7 @@ class CheckFile(argparse.Action):
         setattr(namespace, self.dest, values)
 
 # Logger actions
-class startLogger(argparse.Action):
+class StartLogger(argparse.Action):
     """Create a logger.
     
     If nargs=? (default), log to default or const if provided and flag used
