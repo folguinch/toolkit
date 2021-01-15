@@ -74,7 +74,7 @@ class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values, check_is_file=True)
+        values = validate_paths(values, check_is_file=True)
         config = configparser.ConfigParserAdv()
         aux = config.read(values)
         setattr(namespace, self.dest, config)
@@ -124,7 +124,7 @@ class LoadStructArray(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         from ..array_utils import load_struct_array
-        array = load_struct_array(validate_files(values, check_is_file=True))
+        array = load_struct_array(validate_paths(values, check_is_file=True))
         setattr(namespace, self.dest, array)
 
 class LoadMixedStructArray(argparse.Action):
@@ -145,7 +145,7 @@ class LoadTXTArray(argparse.Action):
     """Load an np.array from file."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        array = np.loadtxt(validate_files(values, check_is_file=True), 
+        array = np.loadtxt(validate_paths(values, check_is_file=True), 
                            dtype=float)
         setattr(namespace, self.dest, array)
 
@@ -153,7 +153,7 @@ class LoadFITS(argparse.Action):
     """Action for loading a FITS file with astropy"""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values, check_is_file=True)
+        values = validate_paths(values, check_is_file=True)
         try:
             vals = fits.open(values.resolve())[0]
         except AttributeError:
@@ -166,7 +166,7 @@ class LoadCube(argparse.Action):
     """Action for loading an SpectralCube"""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values, check_is_file=True)
+        values = validate_paths(values, check_is_file=True)
         try:
             vals = SpectralCube.read(values.resolve())
         except AttributeError:
@@ -282,7 +282,7 @@ class PeakPosition(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         positions = []
-        values = validate_files(values, check_is_file=True)
+        values = validate_paths(values, check_is_file=True)
         for val in values:
             # Data
             imgi = fits.open(val)[0]
@@ -329,21 +329,21 @@ class NormalizePath(argparse.Action):
     """Normalizes a path or filename."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values)
+        values = validate_paths(values)
         setattr(namespace, self.dest, values)
 
 class MakePath(argparse.Action):
     """Check and create directory if needed."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values, mkdir=True)
+        values = validate_paths(values, mkdir=True)
         setattr(namespace, self.dest, values)
 
 class CheckFile(argparse.Action):
     """Validates files and check if they exist."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        values = validate_files(values, check_is_file=True)
+        values = validate_paths(values, check_is_file=True)
         setattr(namespace, self.dest, values)
 
 # Logger actions
