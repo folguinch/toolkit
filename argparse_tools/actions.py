@@ -11,6 +11,7 @@ import astropy.units as u
 import numpy as np
 from spectral_cube import SpectralCube
 
+from ..array_utils import load_mixed_struct_array, load_struct_array
 from ..classes.dust import Dust
 from ..logger import get_stdout_logger, update_logger
 
@@ -117,28 +118,16 @@ class ArrayFromRange(argparse.Action):
 class LoadStructArray(argparse.Action):
     """Load an structured np.array from file."""
 
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        if nargs is not None:
-            raise ValueError("nargs not allowed")
-        super().__init__(option_strings, dest, **kwargs)
-
     def __call__(self, parser, namespace, values, option_string=None):
-        from ..array_utils import load_struct_array
         array = load_struct_array(validate_paths(values, check_is_file=True))
         setattr(namespace, self.dest, array)
 
 class LoadMixedStructArray(argparse.Action):
     """Load a mixed structured np.array from file."""
 
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        if nargs is not None:
-            raise ValueError("nargs not allowed")
-        super().__init__(option_strings, dest, **kwargs)
-
     def __call__(self, parser, namespace, values, option_string=None):
-        from ..array_utils import load_mixed_struct_array
-        array = load_mixed_struct_array(validate_paths(values,
-                                                       check_is_file=True))
+        array = load_mixed_struct_array(
+            validate_paths(values, check_is_file=True))
         setattr(namespace, self.dest, array)
 
 class LoadTXTArray(argparse.Action):

@@ -2,6 +2,7 @@ from typing import List, Optional, TypeVar, Union
 import os
 
 from spectral_cube import SpectralCube
+import astropy
 import astropy.units as u
 import numpy as np
 
@@ -446,3 +447,82 @@ def get_moment(cube: SpectralCube,
 
     return mmnt
 
+def spectrum_at_position(cube: SpectralCube, 
+                         position: astropy.coordinates.SkyCoord,
+                         spectral_axis_unit: Optional[u.Unit] = None,
+                         restfreq: Optional[u.Quantity] = None,
+                         vlsr: Optional[u.Quantity] = None,
+                         filename: Optional[Union[pathlib.Path, str]] = None,
+                         ) -> Tuple[u.Quantity]:
+    """Extract spectrum at position.
+
+    Args:
+      cube: spectral cube.
+      position: coordiante where to extract the spectrum from.
+      spectral_axis_unit: optional; unit of the spectral axis.
+      restfreq: optional; rest frequency.
+      vlsr: optional; LSR velocity.
+      filename: optional; output filename.
+    Returns:
+      xaxis: an array with the spectral axis.
+      spec: the spectrum.
+    """
+    # Restfreq
+    if restfreq is None:
+        restfreq = get_restfreq(cube)
+
+    # Spectral axis unit
+    if spectral_axis_unit is None:
+        spectral_axis_unit = cube.spectral_axis.unit
+
+    # Spectral axis
+    if spectral_axis_unit.is_equivalent(u.km/u.s):
+        aux_cube = cube.with_spectral_unit(spectral_axis_unit, 
+                                           velocity_convention='radio',
+                                           rest_value=restfreq)
+    elif (spectral_axis_unit.is_equivalent(u.Hz) and  vlsr is not None and
+          restfreq is not None):
+        # vlsr to freq
+        freq_to_vel = u.doppler_radio(restfreq)
+        flsr = vlsr.to(spectral_axis_unit, equivalencies=freq_to_vel)
+
+        # Convert to velocity
+        aux_cube = cube.with_spectral_unit(u.km/u.s, 
+                                           velocity_convention='radio',
+                                           rest_value=flsr)
+
+        # Convert back
+        aux_cube = aux_cube.with_spectral_unit(spectral_axis_unit, 
+                                               velocity_convention='radio',
+                                               rest_value=restfreq)
+    elif spectral_axis_unit.is_equivalent(u.Hz):
+        # Convert to requested unit
+        aux_cube = cube.with_spectral_unit(spectral_axis_unit, 
+                                           velocity_convention='radio',
+                                           rest_value=restfreq)
+    else:
+        aux_cube = cube
+
+    # Spectra position
+    wcs = cube.wcs.sub(['longitude', 'latitude'])
+    x, y = wcs.all_world2pix(
+        [[position.ra.degree, position.dec.degree]], 0)[0]
+    x, y = int(x), int(y)
+
+    # Spectrum
+    xaxis = aux_cube.spectral_axis
+    spec = aux_cube[:, y, x]
+
+    # Shift velocity
+    if xaxis.unit.is_equivalent(u.km/u.s) and vlsr is not None:
+        xaxis = xaxis - vlsr
+
+    if filename is not None:
+        filename = pathlib.Path(filename).expanduser().resolve()
+        with filename.open('w') as out:
+            out.write('#v\tF\n')
+            out.write('#{0.unit}\t{1.unit}\n'.format(xaxis, spec))
+            for dt in zip(xaxis, spec[:]):
+                out.write('{0.value:f}\t{1.value:f}\n'.format(*dt))
+
+    return xaxis, spec
