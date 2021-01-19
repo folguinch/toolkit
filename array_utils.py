@@ -39,7 +39,7 @@ def check_composed_units(line: List[str], left_delimiter: str = '[',
     return units
 
 def _load_struct_array(file_name: pathlib.Path, 
-                       usecols: Optional[List[int]] = None
+                       usecols: Optional[List[int]] = None,
                        nounit: str = '-',
                        empty_unit: Optional[u.Unit] = None,
                        dtype: Optional[np.dtype] = None
@@ -117,7 +117,7 @@ def filename_to_list(file_name: Union[pathlib.Path,
     return file_names, was_list
 
 def load_struct_array(file_name: Union[pathlib.Path, List[pathlib.Path]],
-                      usecols: Optional[List[int]] = None
+                      usecols: Optional[List[int]] = None,
                       nounit: str = '-',
                       empty_unit: Optional[u.Unit] = u.Unit(1),
                       ) -> Union[Tuple[np.array, dict], 
@@ -146,7 +146,7 @@ def load_struct_array(file_name: Union[pathlib.Path, List[pathlib.Path]],
         return data
 
 def load_mixed_struct_array(file_name: Union[pathlib.Path, List[pathlib.Path]],
-                            usecols: Optional[List[int]] = None
+                            usecols: Optional[List[int]] = None,
                             nounit: str = '-',
                             empty_unit: Optional[u.Unit] = None,
                             ) -> Union[Tuple[np.array, dict], 
