@@ -71,7 +71,7 @@ def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
     if logger:
         logger.info('Valid points: %i / %i', N, chi2.size)
     else:
-        print 'Valid points: %i / %i' % (N, chi2.size)
+        print('Valid points: %i / %i' % (N, chi2.size))
 
     chi2total = np.sum(chi2[mask])
 
@@ -184,7 +184,7 @@ def rebin_irregular_nd(values, bins, *args, **kwargs):
             it[0] = functions[kwargs['statistic']](values.flatten()[ind],
                     weights=kwargs.get('weights').flatten()[ind])
         except TypeError:
-            print 'Function does not have weight keyword'
+            print('Function does not have weight keyword')
             it[0] = functions[kwargs['statistic']](values.flatten()[ind])
         except ZeroDivisionError:
             it[0] = np.nan
@@ -295,22 +295,4 @@ def map_sph_to_cart_3d(val, r, th, phi, new_x, new_y, new_z, **kwargs):
     """
     assert val.ndim == 3
     return map_sph_to_cart(val, new_x, new_y, new_z, r, th, phi=phi, **kwargs)
-
-if __name__=='__main__':
-    z = np.array([[1,2,3,4,5,6],
-        [7,8,9,10,11,12],
-        [12,11,10,9,8,7],
-        [6,5,4,3,2,1],
-        [1,2,3,4,5,6],
-        [1,2,3,4,5,6]])
-
-    x = np.arange(6)
-    X, Y = np.meshgrid(x,x)
-    bins = [np.array([ 0.        ,  1.66666667,  3.33333333,  5.        ]),
-            np.array([ 0.        ,  1.66666667,  3.33333333,  5.        ])]
-
-    print z
-
-    print rebin_regular_nd(z, x, x, statistic='mean', bins=3)
-    print rebin_irregular_nd(z, bins, Y, X, statistic='mean')
 

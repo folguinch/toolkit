@@ -18,7 +18,7 @@ def check_composed_units(line: List[str], left_delimiter: str = '[',
       Validated units.
     """
     # Check delimiters
-    if len(left_delimiter) == 1 or len(right_delimiter) == 1:
+    if len(left_delimiter) != 1 or len(right_delimiter) != 1:
         raise ValueError('Delimiter length must be 1')
 
     # Process units
