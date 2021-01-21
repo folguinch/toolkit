@@ -226,12 +226,14 @@ class ListFromRegex(argparse.Action):
 class ReadQuantity(argparse.Action):
     """Read quantity or a quantity list from the cmd line."""
 
-    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False, 
+                 **kwargs):
         try:
             if nargs < 2:
                 raise ValueError('nargs cannot be < 2')
         except TypeError:
             pass
+        self.enforce_list = enforce_list
 
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
@@ -240,7 +242,7 @@ class ReadQuantity(argparse.Action):
             raise ValueError(f'Cannot read quantity from values: {values}')
         vals = np.array(values[:-1], dtype=float)
         unit = u.Unit(values[-1])
-        if len(vals) == 1:
+        if len(vals) == 1 and not enforce_list:
             vals = vals[0]
         vals = vals * unit
         setattr(namespace, self.dest, vals)

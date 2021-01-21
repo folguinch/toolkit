@@ -20,8 +20,10 @@ def get_restfreq(cube: SpectralCube) -> u.Quantity:
         restfreq = cube.header['RESTFREQ'] * u.Hz
     return restfreq
 
-def get_cube_rms(cube: SpectralCube) -> u.Quantity:
+def get_cube_rms(cube: SpectralCube, use_header: bool = False) -> u.Quantity:
     """Do a quick calculation of the rms."""
+    if use_header and 'RMS' in cube.header:
+        return cube.header['RMS'] * cube.unit
     try:
         rms = quick_rms(cube.unmasked_data)
     except TypeError:
