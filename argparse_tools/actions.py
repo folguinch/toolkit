@@ -242,7 +242,7 @@ class ReadQuantity(argparse.Action):
             raise ValueError(f'Cannot read quantity from values: {values}')
         vals = np.array(values[:-1], dtype=float)
         unit = u.Unit(values[-1])
-        if len(vals) == 1 and not enforce_list:
+        if len(vals) == 1 and not self.enforce_list:
             vals = vals[0]
         vals = vals * unit
         setattr(namespace, self.dest, vals)

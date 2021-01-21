@@ -1,5 +1,5 @@
-from typing import List, Optional, TypeVar, Union
-import os
+from typing import List, Optional, TypeVar, Tuple, Union
+import pathlib
 
 from spectral_cube import SpectralCube
 import astropy
@@ -11,6 +11,7 @@ from ..math import quick_rms
 Logger = TypeVar('Logger')
 Config = TypeVar('ConfigParserAdv')
 Map = TypeVar('Projection')
+Path = TypeVar('Path', pathlib.Path, str)
 
 def get_restfreq(cube: SpectralCube) -> u.Quantity:
     """Get rest frequency from cube header."""
@@ -118,7 +119,7 @@ def moments01(cube: SpectralCube,
 def get_spectral_limits(cube: SpectralCube, 
                         freq_range: Optional[u.Quantity] = None, 
                         vel_range: Optional[u.Quantity] = None, 
-                        chan_range: Optional[List[int, int]] = None,
+                        chan_range: Optional[List[int]] = None,
                         chan_halfwidth: Optional[int] = None, 
                         vlsr: Optional[u.Quantity] = None, 
                         linefreq: Optional[u.Quantity] = None,
@@ -202,7 +203,7 @@ def get_spectral_limits(cube: SpectralCube,
 def get_subcube(cube: SpectralCube, 
                 freq_range: Optional[u.Quantity] = None, 
                 vel_range: Optional[u.Quantity] = None, 
-                chan_range: Optional[List[int, int]] = None,
+                chan_range: Optional[List[int]] = None,
                 chan_halfwidth: Optional[int] = None, 
                 vlsr: Optional[u.Quantity] = None, 
                 linefreq: Optional[u.Quantity] = None,
@@ -284,8 +285,8 @@ def moment_from_config(cube: SpectralCube,
                        mom: int, 
                        config: Config, 
                        vlsr: Optional[u.Quantity] = None, 
-                       filenamebase: Optional[pathlib.Path, str] = None,
-                       filename: Optional[pathlib.Path, str]=None) -> Image:
+                       filenamebase: Optional[Path] = None,
+                       filename: Optional[Path] = None) -> Map:
     """Calculate the moments with parameters from config file.
 
     The parameters are passed to the get_moment function.
@@ -331,8 +332,8 @@ def moment_from_config(cube: SpectralCube,
 def get_moment(cube: SpectralCube, 
                mom: int, 
                linefreq: Optional[u.Quantity] = None, 
-               filenamebase: Optional[u.Quantity, str] = None, 
-               filename: Optional[u.Quantity, str] = None,
+               filenamebase: Optional[Path] = None, 
+               filename: Optional[Path] = None,
                lower_limit: Optional[u.Quantity] = None, 
                upper_limit: Optional[u.Quantity] = None, 
                nsigma: float = 5., 
@@ -445,7 +446,7 @@ def get_moment(cube: SpectralCube,
     elif filename:
         if log is not None:
             LOG.info(f'Saving moment: {filename}')
-        mmnt.write(os.path.expanduser(filename))
+        mmnt.write(pathlib.Path(filename).expanduser().resolve())
 
     return mmnt
 
