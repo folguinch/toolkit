@@ -85,7 +85,7 @@ def get_spectral_limits(cube, freq_range=None, vel_range=None, chan_range=None,
     rangefmt = '{0.value[0]:.4f} {0.value[1]:.4f} {0.unit}'
     if freq_range is not None:
         LOG.info('Using frequency range = %s', 
-                rangefmt.fmt(freq_range.to(u.GHz)))
+                rangefmt.format(freq_range.to(u.GHz)))
         if spec_unit.is_equivalent(freq_range.unit):
             return freq_range[0], freq_range[1]
         else:
