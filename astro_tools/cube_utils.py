@@ -261,13 +261,13 @@ def get_subcube(cube: SpectralCube,
     
     # Copy RMS
     if 'RMS' in cube.header:
-        subcube.header['RMS'] = cube.header['RMS']
+        subcube.meta['RMS'] = cube.header['RMS']
     elif put_rms:
         # Use original cube to measure rms
         rms = get_cube_rms(cube)
         if hasattr(rms, 'unit'):
             rms = rms.value
-        subcube.header['RMS'] = rms
+        subcube.meta['RMS'] = rms
     else:
         pass
 
@@ -401,12 +401,17 @@ def get_moment(cube: SpectralCube,
                 log.info('Using lower flux limit: %s', 
                          f'{lower_limit.value:.3f} {lower_limit.unit}')
             mask = subcube >= lower_limit
-        elif rms or 'RMS' in subcube.header or auto_rms:
+        elif (rms or 'RMS' in subcube.header or 
+              'RMS' in subcube.meta or auto_rms):
             if rms:
                 if log is not None:
                     log.info(f'Using input rms: {rms.value:.3e} {rms.unit}')
             elif 'RMS' in subcube.header:
-                rms = subcube.header['RMS'] * subcube.unit
+                rms = float(subcube.header['RMS']) * subcube.unit
+                if log is not None:
+                    log.info(f'Using header rms: {rms.value:.3e} {rms.unit}')
+            elif 'RMS' in subcube.meta:
+                rms = float(subcube.meta['RMS']) * subcube.unit
                 if log is not None:
                     log.info(f'Using header rms: {rms.value:.3e} {rms.unit}')
             else:
