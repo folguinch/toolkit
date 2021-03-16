@@ -160,13 +160,14 @@ def get_subcube(cube, freq_range=None, vel_range=None, chan_range=None,
     
     # Copy RMS
     if 'RMS' in cube.header:
-        subcube.header['RMS'] = cube.header['RMS']
+        subcube.meta['RMS'] = cube.header['RMS']
     elif put_rms:
         # Use original cube to measure rms
         rms = get_cube_rms(cube)
         if hasattr(rms, 'unit'):
             rms = rms.value
-        subcube.header['RMS'] = rms
+        subcube.meta['RMS'] = rms
+        LOG.info('Writing rms in metadata: %.3f', rms)
     else:
         pass
 
@@ -246,13 +247,17 @@ def get_moment(cube, mom, linefreq=None, filenamebase=None, filename=None,
             LOG.info('Using lower flux limit: %s', 
                     '{0.value:.3f} {0.unit}'.format(lower_limit))
             mask = subcube >= lower_limit
-        elif rms or 'RMS' in subcube.header or auto_rms:
+        elif rms or 'RMS' in subcube.header or 'RMS' in subcube.meta or auto_rms:
             if rms:
                 LOG.info('Using input rms: %s',
                         '{0.value:.3e} {0.unit}'.format(rms))
             elif 'RMS' in subcube.header:
-                rms = subcube.header['RMS'] * subcube.unit
+                rms = float(subcube.header['RMS']) * subcube.unit
                 LOG.info('Using header rms: %s',
+                        '{0.value:.3e} {0.unit}'.format(rms))
+            elif 'RMS' in subcube.meta:
+                rms = float(subcube.meta['RMS']) * subcube.unit
+                LOG.info('Using metadata rms: %s',
                         '{0.value:.3e} {0.unit}'.format(rms))
             else:
                 # Get rms from original cube
