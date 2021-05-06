@@ -122,15 +122,17 @@ def get_logger(name: str,
                backupCount: int = 5) -> logging.Logger:
     """Creates a new logger.
 
-    Verbose levels overwrite the other parameter values. Accepted verbose
+    Verbose levels overwrite the other parameter values. Accepted `verbose`
     values are:
-      - None: use the other keyword arguments.
-      - v: basic logging with INFO level for stdout and DEBUG level for file
+
+      - `None`: use the other keyword arguments.
+      - `v`: basic logging with `INFO` level for stdout and `DEBUG` level for file
         logging. 
-      - vv: looging with DEBUG level for stdout and file logging.
-      - vvv: same as verbose vv but add a timestamp to the file name and add
+      - `vv`: looging with `DEBUG` level for stdout and file logging.
+      - `vvv`: same as verbose `vv` but add a timestamp to the file name and add
         time to the stdout log.
-    Additional appereances of the character v will be ignored.
+
+    Additional appereances of the character `v` will be ignored.
 
     Args:
       name: name of the logger.

@@ -22,7 +22,7 @@ def validate_path(path: pathlib.Path,
     """Performs several checks on input path.
 
     Args:
-      filenames: path to check.
+      path: path to check.
       check_is_file: optional; check whether is file and exists.
       check_is_dir: optional; check whther is a directory and exists.
       mkdir: optional; make directories if they do not exist.

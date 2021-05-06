@@ -6,7 +6,7 @@ import astropy
 import astropy.units as u
 import numpy as np
 
-from ..math import quick_rms
+from ..maths import quick_rms
 
 Logger = TypeVar('Logger')
 Config = TypeVar('ConfigParserAdv')
@@ -14,7 +14,14 @@ Map = TypeVar('Projection')
 Path = TypeVar('Path', pathlib.Path, str)
 
 def get_restfreq(cube: SpectralCube) -> u.Quantity:
-    """Get rest frequency from cube header."""
+    """Get rest frequency from cube header.
+    
+    Args:
+      cube: `SpectralCube` object.
+
+    Returns:
+      The rest frequency from cube header as a `Quantity` object.
+    """
     try:
         restfreq = cube.header['RESTFRQ'] * u.Hz
     except KeyError:
@@ -22,7 +29,15 @@ def get_restfreq(cube: SpectralCube) -> u.Quantity:
     return restfreq
 
 def get_cube_rms(cube: SpectralCube, use_header: bool = False) -> u.Quantity:
-    """Do a quick calculation of the rms."""
+    """Do a quick calculation of the rms.
+    
+    Args:
+      cube: `SpectralCube` object.
+      use_header: optional; use rms value stored in header (if any)?
+
+    Returns:
+      The cube rms with units.
+    """
     if use_header and 'RMS' in cube.header:
         return cube.header['RMS'] * cube.unit
     try:
