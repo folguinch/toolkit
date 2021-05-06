@@ -13,9 +13,9 @@ def load_spectral_cube(args, cubename: Optional[str] = None):
     if cubename is None:
         cubename = args.cubename
     try:
-        args.cube = SpectralCube.read(cubename)
+        args.cube = SpectralCube.read(cubename, use_dask=True)
     except ValueError:
-        args.cube = SpectralCube.read(cubename[0])
+        args.cube = SpectralCube.read(cubename[0], use_dask=True)
 
 def load_config(args, config: Optional[str] = None):
     """Read a configuration file and store it in args.
