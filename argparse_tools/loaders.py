@@ -16,6 +16,7 @@ def load_spectral_cube(args, cubename: Optional[str] = None):
         args.cube = SpectralCube.read(cubename, use_dask=True)
     except ValueError:
         args.cube = SpectralCube.read(cubename[0], use_dask=True)
+    args.cube.use_dask_scheduler('threads', num_workers=10)
 
 def load_config(args, config: Optional[str] = None):
     """Read a configuration file and store it in args.
