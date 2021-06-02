@@ -1,4 +1,4 @@
-from typing import List, Optional, TypeVar, Tuple, Union
+from typing import Callable, List, Optional, TypeVar, Tuple, Union
 import pathlib
 
 from spectral_cube import SpectralCube
@@ -21,12 +21,35 @@ def get_restfreq(cube: SpectralCube) -> u.Quantity:
         restfreq = cube.header['RESTFREQ'] * u.Hz
     return restfreq
 
-def get_cube_rms(cube: SpectralCube, use_header: bool = False) -> u.Quantity:
-    """Do a quick calculation of the rms."""
+def get_cube_rms(cube: SpectralCube, use_header: bool = False, 
+                 sampled: bool = False, log: Callable = print) -> u.Quantity:
+    """Do a quick calculation of the rms.
+
+    The `sampled` calculation is recommended for big data cubes.
+
+    Args:
+      cube: spectral cube.
+      use_header: use value stored in header (if any).
+      sampled: optional; determine the rms from a sample of channels.
+      log: optional; logging function.
+    """
+    # From header
     if use_header and 'RMS' in cube.header:
+        log('Using cube rms in header')
         return cube.header['RMS'] * cube.unit
+    
+    # From cube
     try:
-        rms = quick_rms(cube.unmasked_data)
+        if not sampled:
+            log('Calculating rms from cube')
+            rms = quick_rms(cube.unmasked_data)
+        else:
+            log('Calculating rms from 20% of channels')
+            nchans = len(cube.spectral_axis)
+            fraction = int(0.2 * nchans)
+            chans = np.linspace(1, 9, fraction)
+            chans = (np.floor(chans / 10 * nchans)).astype(int)
+            rms = quick_rms(cube.unmasked_data[chans])
     except TypeError:
         rms = quick_rms(cube.unmasked_data[:])
     return rms
