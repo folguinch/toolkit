@@ -1,4 +1,5 @@
-from typing import Callable, List, Optional, TypeVar, Tuple, Union
+"""Tools for working with `SpectralCube` objects."""
+from typing import Callable, List, Optional, Sequence, TypeVar, Tuple, Union
 import pathlib
 
 from spectral_cube import SpectralCube
@@ -15,7 +16,7 @@ Path = TypeVar('Path', pathlib.Path, str)
 
 def get_restfreq(cube: SpectralCube) -> u.Quantity:
     """Get rest frequency from cube header.
-    
+
     Args:
       cube: `SpectralCube` object.
 
@@ -28,7 +29,7 @@ def get_restfreq(cube: SpectralCube) -> u.Quantity:
         restfreq = cube.header['RESTFREQ'] * u.Hz
     return restfreq
 
-def get_cube_rms(cube: SpectralCube, use_header: bool = False, 
+def get_cube_rms(cube: SpectralCube, use_header: bool = False,
                  sampled: bool = False, log: Callable = print) -> u.Quantity:
     """Do a quick calculation of the rms.
 
@@ -44,7 +45,7 @@ def get_cube_rms(cube: SpectralCube, use_header: bool = False,
     if use_header and 'RMS' in cube.header:
         log('Using cube rms in header')
         return cube.header['RMS'] * cube.unit
-    
+
     # From cube
     try:
         if not sampled:
@@ -61,8 +62,8 @@ def get_cube_rms(cube: SpectralCube, use_header: bool = False,
         rms = quick_rms(cube.unmasked_data[:])
     return rms
 
-def vel_axis(cube: SpectralCube, 
-             restfreq: Optional[u.Quantity] = None, 
+def vel_axis(cube: SpectralCube,
+             restfreq: Optional[u.Quantity] = None,
              vel_units: u.Unit = u.km/u.s) -> u.Quantity:
     """Get the spectral axis in velocity units.
 
@@ -85,13 +86,13 @@ def vel_axis(cube: SpectralCube,
         datarestfreq = get_restfreq(cube)
         spaxis = cube.with_spectral_unit(u.GHz, velocity_convention='radio',
                 rest_value=datarestfreq).spectral_axis
-    
+
     # Convert frequency to velocity
     rest_value = get_restfreq(cube) if restfreq is None else restfreq
     return cube.with_spectral_unit(vel_units, velocity_convention='radio',
                                    rest_value=rest_value).spectral_axis
 
-def freq_axis(cube: SpectralCube, 
+def freq_axis(cube: SpectralCube,
               freq_units: u.Unit = u.GHz) -> u.Quantity:
     """Get the spectral axis in frequency units.
 
@@ -111,49 +112,54 @@ def freq_axis(cube: SpectralCube,
         return cube.with_spectral_unit(freq_units, velocity_convention='radio',
                                        rest_value=rest_value).spectral_axis
 
-def moments01(cube: SpectralCube, 
-              low: Optional[u.Quantity] = None, 
-              up: Optional[u.Quantity] = None, 
-              filenames: List[Union[str, pathlib.Path]] = []) -> List[Map]:
+def moments01(cube: SpectralCube,
+              low: Optional[u.Quantity] = None,
+              up: Optional[u.Quantity] = None,
+              filenames: Sequence[Union[str, pathlib.Path]] = ()
+              )-> List[Map]:
     """Calculate zeroth and first moment maps from cube.
 
     Args:
       cube: spectral cube.
       low: optional; lower flux limit.
       up: optional; upper flux limit.
+
+    Returns:
+      A moment 0 and a moment 1 maps
     """
     # Moment 0
     mom0 = cube.moment(order=0)
-    
+
     # Moment1
     if 'low' is not None:
-        mask = cube.mask & (subcube>=low)
+        mask = cube.mask & (cube >= low)
     else:
         mask = cube.mask
     if 'up' is not None:
-        mask = mask & (subcube<=up)
+        mask = mask & (cube <= up)
     subcube = cube.with_mask(mask)
     mom1 = subcube.moment(order=1)
 
     if len(filenames) == 2:
         mom0.write(filenames[0], overwrite=True)
         mom1.write(filenames[1], overwrite=True)
-    elif basefilename:
+    elif filenames:
         for i, m in enumerate([mom0,mom1]):
-            m.write(basefilename % i, overwrite=True)
+            m.write(filenames[0] % i, overwrite=True)
     else:
         pass
 
     return mom0, mom1
 
-def get_spectral_limits(cube: SpectralCube, 
-                        freq_range: Optional[u.Quantity] = None, 
-                        vel_range: Optional[u.Quantity] = None, 
+def get_spectral_limits(cube: SpectralCube,
+                        freq_range: Optional[u.Quantity] = None,
+                        vel_range: Optional[u.Quantity] = None,
                         chan_range: Optional[List[int]] = None,
-                        chan_halfwidth: Optional[int] = None, 
-                        vlsr: Optional[u.Quantity] = None, 
+                        chan_halfwidth: Optional[int] = None,
+                        vlsr: Optional[u.Quantity] = None,
                         linefreq: Optional[u.Quantity] = None,
-                        log: Optional[Logger] = None) -> Union[u.Quantity, list]:
+                        log: Optional[Logger] = None
+                        ) -> Union[u.Quantity, list]:
     """Convert input ranges to ranges that can be applied to a spectral cube.
 
     For frequency and velocity ranges, it converts the values to the spectral
@@ -230,12 +236,12 @@ def get_spectral_limits(cube: SpectralCube,
             log.info('No spectral limit')
         return None, None
 
-def get_subcube(cube: SpectralCube, 
-                freq_range: Optional[u.Quantity] = None, 
-                vel_range: Optional[u.Quantity] = None, 
+def get_subcube(cube: SpectralCube,
+                freq_range: Optional[u.Quantity] = None,
+                vel_range: Optional[u.Quantity] = None,
                 chan_range: Optional[List[int]] = None,
-                chan_halfwidth: Optional[int] = None, 
-                vlsr: Optional[u.Quantity] = None, 
+                chan_halfwidth: Optional[int] = None,
+                vlsr: Optional[u.Quantity] = None,
                 linefreq: Optional[u.Quantity] = None,
                 blc_trc: Optional[List[int]] = None,
                 xy_ranges: Optional[List[int]] = None,
@@ -245,7 +251,7 @@ def get_subcube(cube: SpectralCube,
     """Extract a sub-spectral cube in any of the axes.
 
     The spectral cube can be saved by providing a filenamebase. The output
-    filename will replace the suffix (extension) of filenamebase with 
+    filename will replace the suffix (extension) of filenamebase with
     '.subcube.fits'.
 
     Args:
@@ -262,13 +268,12 @@ def get_subcube(cube: SpectralCube,
       filenamebase: optional; base of the output filename.
       log: optional; logging system.
     """
-              
     # Extract the spectral slab
-    low, high = get_spectral_limits(cube, 
-                                    freq_range=freq_range, 
+    low, high = get_spectral_limits(cube,
+                                    freq_range=freq_range,
                                     vel_range=vel_range,
-                                    chan_range=chan_range, 
-                                    chan_halfwidth=chan_halfwidth, 
+                                    chan_range=chan_range,
+                                    chan_halfwidth=chan_halfwidth,
                                     vlsr=vlsr,
                                     linefreq=linefreq,
                                     log=log)
@@ -283,12 +288,12 @@ def get_subcube(cube: SpectralCube,
     if blc_trc:
         xmin, ymin, xmax, ymax = blc_trc
     elif xy_ranges:
-        xmin, xmax, ymin, ymax = xy_range
+        xmin, xmax, ymin, ymax = xy_ranges
     else:
         xmin = ymin = xmax = ymax = None
     if xmin is not None:
         subcube = subcube[:, ymin:ymax+1, xmin:xmax+1]
-    
+
     # Copy RMS
     if 'RMS' in cube.header:
         subcube.meta['RMS'] = cube.header['RMS']
@@ -303,7 +308,7 @@ def get_subcube(cube: SpectralCube,
 
     # Save
     if filenamebase is not None:
-        filename = path.Path(filenamebase) 
+        filename = pathlib.Path(filenamebase)
         filename = filename.expanduser().resolve().with_suffix('.subcube.fits')
         if log is not None:
             log.info(f'Saving sub-cube: {filename}')
@@ -311,10 +316,10 @@ def get_subcube(cube: SpectralCube,
 
     return subcube
 
-def moment_from_config(cube: SpectralCube, 
-                       mom: int, 
-                       config: Config, 
-                       vlsr: Optional[u.Quantity] = None, 
+def moment_from_config(cube: SpectralCube,
+                       mom: int,
+                       config: Config,
+                       vlsr: Optional[u.Quantity] = None,
                        filenamebase: Optional[Path] = None,
                        filename: Optional[Path] = None) -> Map:
     """Calculate the moments with parameters from config file.
@@ -332,11 +337,11 @@ def moment_from_config(cube: SpectralCube,
     # Rest frequency
     try:
         linefreq = config.getquantity('freq')
-    except:
+    except KeyError:
         linefreq = config.getquantity('restfreq', fallback=None)
 
     # Read arguments for get_moment
-    kwargs = {'linefreq': linefreq, 
+    kwargs = {'linefreq': linefreq,
               'filenamebase': filenamebase,
               'filename': filename,
               'lower_limit': config.getquantity('lower_limit', fallback=None),
@@ -359,14 +364,14 @@ def moment_from_config(cube: SpectralCube,
 
     return get_moment(cube, mom, **kwargs)
 
-def get_moment(cube: SpectralCube, 
-               mom: int, 
-               linefreq: Optional[u.Quantity] = None, 
-               filenamebase: Optional[Path] = None, 
+def get_moment(cube: SpectralCube,
+               mom: int,
+               linefreq: Optional[u.Quantity] = None,
+               filenamebase: Optional[Path] = None,
                filename: Optional[Path] = None,
-               lower_limit: Optional[u.Quantity] = None, 
-               upper_limit: Optional[u.Quantity] = None, 
-               nsigma: float = 5., 
+               lower_limit: Optional[u.Quantity] = None,
+               upper_limit: Optional[u.Quantity] = None,
+               nsigma: float = 5.,
                rms: Optional[u.Quantity] = None,
                auto_rms: bool = False,
                log: Optional[Logger] = None,
@@ -428,10 +433,10 @@ def get_moment(cube: SpectralCube,
     if mom > 0:
         if lower_limit:
             if log is not None:
-                log.info('Using lower flux limit: %s', 
+                log.info('Using lower flux limit: %s',
                          f'{lower_limit.value:.3f} {lower_limit.unit}')
             mask = subcube >= lower_limit
-        elif (rms or 'RMS' in subcube.header or 
+        elif (rms or 'RMS' in subcube.header or
               'RMS' in subcube.meta or auto_rms):
             if rms:
                 if log is not None:
@@ -480,12 +485,12 @@ def get_moment(cube: SpectralCube,
         mmnt.write(filename)
     elif filename:
         if log is not None:
-            LOG.info(f'Saving moment: {filename}')
+            log.info(f'Saving moment: {filename}')
         mmnt.write(pathlib.Path(filename).expanduser().resolve())
 
     return mmnt
 
-def spectrum_at_position(cube: SpectralCube, 
+def spectrum_at_position(cube: SpectralCube,
                          position: astropy.coordinates.SkyCoord,
                          spectral_axis_unit: Optional[u.Unit] = None,
                          restfreq: Optional[u.Quantity] = None,
@@ -515,7 +520,7 @@ def spectrum_at_position(cube: SpectralCube,
 
     # Spectral axis
     if spectral_axis_unit.is_equivalent(u.km/u.s):
-        aux_cube = cube.with_spectral_unit(spectral_axis_unit, 
+        aux_cube = cube.with_spectral_unit(spectral_axis_unit,
                                            velocity_convention='radio',
                                            rest_value=restfreq)
     elif (spectral_axis_unit.is_equivalent(u.Hz) and  vlsr is not None and
@@ -525,17 +530,17 @@ def spectrum_at_position(cube: SpectralCube,
         flsr = vlsr.to(spectral_axis_unit, equivalencies=freq_to_vel)
 
         # Convert to velocity
-        aux_cube = cube.with_spectral_unit(u.km/u.s, 
+        aux_cube = cube.with_spectral_unit(u.km/u.s,
                                            velocity_convention='radio',
                                            rest_value=flsr)
 
         # Convert back
-        aux_cube = aux_cube.with_spectral_unit(spectral_axis_unit, 
+        aux_cube = aux_cube.with_spectral_unit(spectral_axis_unit,
                                                velocity_convention='radio',
                                                rest_value=restfreq)
     elif spectral_axis_unit.is_equivalent(u.Hz):
         # Convert to requested unit
-        aux_cube = cube.with_spectral_unit(spectral_axis_unit, 
+        aux_cube = cube.with_spectral_unit(spectral_axis_unit,
                                            velocity_convention='radio',
                                            rest_value=restfreq)
     else:
