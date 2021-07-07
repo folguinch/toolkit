@@ -1,5 +1,14 @@
+"""Functions for helping the processing of arguments."""
+from typing import Optional
 
-def positions_to_pos(args, wcs=None):
+def positions_to_pos(args: 'argparse.ArgumentParser',
+                     wcs: Optional['astropy.WCS'] = None) -> None:
+    """Store the positions in the `args` object.
+
+    Args:
+      args: argument parser.
+      wcs: optional; WCS to convert coordinates to pixels.
+    """
     # Get the positions
     if args.position:
         if len(args.position)%2 != 0:
@@ -13,7 +22,7 @@ def positions_to_pos(args, wcs=None):
     else:
         for src in args.source:
             args.pos += [src.position]
-    
+
     # Convert SkyCoords to pixels if wcs
     if wcs is not None:
         try:

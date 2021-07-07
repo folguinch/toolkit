@@ -1,9 +1,9 @@
+"""Collection of actions to process diferent command line inputs."""
 from typing import List, Union
 import argparse
 import os
 import pathlib
 
-from astropy import wcs
 from astropy.io import fits
 from configparseradv import configparser
 import astropy.coordinates as apycoord
@@ -14,10 +14,11 @@ from spectral_cube import SpectralCube
 from ..array_utils import load_mixed_struct_array, load_struct_array
 from ..classes.dust import Dust
 from ..logger import get_stdout_logger, update_logger
+from ..tables import Table
 
-def validate_path(path: pathlib.Path, 
+def validate_path(path: pathlib.Path,
                   check_is_file: bool = False,
-                  check_is_dir: bool = False, 
+                  check_is_dir: bool = False,
                   mkdir: bool = False):
     """Performs several checks on input path.
 
@@ -40,9 +41,9 @@ def validate_path(path: pathlib.Path,
 
     return path
 
-def validate_paths(filenames: Union[str, List[str]], 
-                   check_is_file: bool = False, 
-                   check_is_dir: bool = False, 
+def validate_paths(filenames: Union[str, List[str]],
+                   check_is_file: bool = False,
+                   check_is_dir: bool = False,
                    mkdir: bool = False):
     """Performs several checks on input list of file names.
 
@@ -77,7 +78,7 @@ class LoadConfig(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_paths(values, check_is_file=True)
         config = configparser.ConfigParserAdv()
-        aux = config.read(values)
+        config.read(values)
         setattr(namespace, self.dest, config)
 
 class LoadArray(argparse.Action):
@@ -134,7 +135,7 @@ class LoadTXTArray(argparse.Action):
     """Load an np.array from file."""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        array = np.loadtxt(validate_paths(values, check_is_file=True), 
+        array = np.loadtxt(validate_paths(values, check_is_file=True),
                            dtype=float)
         setattr(namespace, self.dest, array)
 
@@ -175,8 +176,6 @@ class LoadTable(argparse.Action):
     """Action for loading astropy Tables"""
 
     def __call__(self, parser, namespace, values, option_string=None):
-        from ..tables import Table
-
         try:
             tabname = ''+values
             #table_id = os.path.splitext(os.path.basename(tabname))[0]
@@ -199,8 +198,8 @@ class ListFromFile(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError("nargs not allowed")
-        super(ListFromFile, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError('nargs not allowed')
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         with open(values, 'r') as dat:
@@ -213,8 +212,8 @@ class ListFromRegex(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError("nargs not allowed")
-        super(ListFromRegex, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError('nargs not allowed')
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         from glob import glob
@@ -226,7 +225,7 @@ class ListFromRegex(argparse.Action):
 class ReadQuantity(argparse.Action):
     """Read quantity or a quantity list from the cmd line."""
 
-    def __init__(self, option_strings, dest, nargs=2, enforce_list=False, 
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
                  **kwargs):
         try:
             if nargs < 2:
@@ -295,7 +294,7 @@ class ReadSkyCoords(argparse.Action):
             if nargs%2 == 0:
                 kwargs.setdefault('metavar', ('RA Dec',)*nargs)
             else:
-                kwargs.setdefault('metavar', 
+                kwargs.setdefault('metavar',
                                   ('RA Dec ',)*(nargs-1) + ('FRAME',))
         except TypeError:
             kwargs.setdefault('metavar', ('RA Dec',)*2 + ('[FRAME]',))
@@ -340,7 +339,7 @@ class CheckFile(argparse.Action):
 # Logger actions
 class StartLogger(argparse.Action):
     """Create a logger.
-    
+
     If nargs=? (default), log to default or const if provided and flag used
     else log only to stdout.
     For verbose levels, the standard option_string values are:
@@ -351,12 +350,12 @@ class StartLogger(argparse.Action):
     Other values will create a normal logger.
     """
 
-    def __init__(self, option_strings, dest, nargs='?', metavar='LOGFILE', 
+    def __init__(self, option_strings, dest, nargs='?', metavar='LOGFILE',
                  const=None, default=None, **kwargs):
         # Cases from nargs
         if nargs not in ['?']:
-            raise ValueError("nargs value not allowed")
-            
+            raise ValueError('nargs value not allowed')
+
         # Default dest and default log file
         dest = 'log'
         self._logfile = const or default
@@ -365,7 +364,7 @@ class StartLogger(argparse.Action):
         const = None
         default = get_stdout_logger('__main__', verbose='v')
 
-        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar, 
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
                          const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):

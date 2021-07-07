@@ -13,6 +13,7 @@ Logger = TypeVar('Logger')
 Config = TypeVar('ConfigParserAdv')
 Map = TypeVar('Projection')
 Path = TypeVar('Path', pathlib.Path, str)
+Position = TypeVar('Position', astropy.coordinates.SkyCoord, Tuple[int, int])
 
 def get_restfreq(cube: SpectralCube) -> u.Quantity:
     """Get rest frequency from cube header.
@@ -491,7 +492,7 @@ def get_moment(cube: SpectralCube,
     return mmnt
 
 def spectrum_at_position(cube: SpectralCube,
-                         position: astropy.coordinates.SkyCoord,
+                         position: ,
                          spectral_axis_unit: Optional[u.Unit] = None,
                          restfreq: Optional[u.Quantity] = None,
                          vlsr: Optional[u.Quantity] = None,
@@ -501,7 +502,7 @@ def spectrum_at_position(cube: SpectralCube,
 
     Args:
       cube: spectral cube.
-      position: coordiante where to extract the spectrum from.
+      position: coordiante or pixel where to extract the spectrum from.
       spectral_axis_unit: optional; unit of the spectral axis.
       restfreq: optional; rest frequency.
       vlsr: optional; LSR velocity.
@@ -547,10 +548,13 @@ def spectrum_at_position(cube: SpectralCube,
         aux_cube = cube
 
     # Spectra position
-    wcs = cube.wcs.sub(['longitude', 'latitude'])
-    x, y = wcs.all_world2pix(
-        [[position.ra.degree, position.dec.degree]], 0)[0]
-    x, y = int(x), int(y)
+    try:
+        wcs = cube.wcs.sub(['longitude', 'latitude'])
+        x, y = wcs.all_world2pix(
+            [[position.ra.degree, position.dec.degree]], 0)[0]
+        x, y = int(x), int(y)
+    except AttributeError:
+        x, y = tuple(map(int, position))
 
     # Spectrum
     xaxis = aux_cube.spectral_axis
