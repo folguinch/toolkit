@@ -297,7 +297,7 @@ class ReadSkyCoords(argparse.Action):
                 kwargs.setdefault('metavar',
                                   ('RA Dec ',)*(nargs-1) + ('FRAME',))
         except TypeError:
-            kwargs.setdefault('metavar', ('RA Dec',)*2 + ('[FRAME]',))
+            kwargs.setdefault('metavar', ('RA Dec', 'RA Dec [FRAME]'))
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
