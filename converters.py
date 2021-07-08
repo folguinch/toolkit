@@ -4,9 +4,9 @@ import configparser
 
 def argparser_to_configparser(
     args: argparse.Namespace, 
-    config: configparser.ConfiParser,
+    config: configparser.ConfigParser,
     section: str,
-) -> configparser.ConfiParser:
+) -> configparser.ConfigParser:
     """Update a `configparser` object from the values in `args`.
 
     If option is not in 
