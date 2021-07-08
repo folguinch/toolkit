@@ -18,9 +18,12 @@ Path = Union[pathlib.Path, str]
 
 def astro_source(parser: argparse.ArgumentParser) -> None:
     """Read an `AstroSource`."""
-    parser.add_argument('--source',
-                        action=source.LoadSourcesfromConfig,
-                        help='Source(s) configuration file(s)')
+    try:
+        parser.add_argument('--source',
+                            action=source.LoadSourcesfromConfig,
+                            help='Source(s) configuration file(s)')
+    except NameError:
+        pass
 
 def source_position(
     required: bool = False,
