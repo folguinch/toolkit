@@ -492,7 +492,7 @@ def get_moment(cube: SpectralCube,
     return mmnt
 
 def spectrum_at_position(cube: SpectralCube,
-                         position: ,
+                         position: Position,
                          spectral_axis_unit: Optional[u.Unit] = None,
                          restfreq: Optional[u.Quantity] = None,
                          vlsr: Optional[u.Quantity] = None,
