@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
 <title>toolkit.argparse_tools.actions API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Collection of actions to process diferent command line inputs." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,16 +22,17 @@
 <h1 class="title">Module <code>toolkit.argparse_tools.actions</code></h1>
 </header>
 <section id="section-intro">
+<p>Collection of actions to process diferent command line inputs.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import List, Union
+<pre><code class="python">&#34;&#34;&#34;Collection of actions to process diferent command line inputs.&#34;&#34;&#34;
+from typing import List, Union
 import argparse
 import os
 import pathlib
 
-from astropy import wcs
 from astropy.io import fits
 from configparseradv import configparser
 import astropy.coordinates as apycoord
@@ -42,10 +43,11 @@ from spectral_cube import SpectralCube
 from ..array_utils import load_mixed_struct_array, load_struct_array
 from ..classes.dust import Dust
 from ..logger import get_stdout_logger, update_logger
+from ..tables import Table
 
-def validate_path(path: pathlib.Path, 
+def validate_path(path: pathlib.Path,
                   check_is_file: bool = False,
-                  check_is_dir: bool = False, 
+                  check_is_dir: bool = False,
                   mkdir: bool = False):
     &#34;&#34;&#34;Performs several checks on input path.
 
@@ -68,9 +70,9 @@ def validate_path(path: pathlib.Path,
 
     return path
 
-def validate_paths(filenames: Union[str, List[str]], 
-                   check_is_file: bool = False, 
-                   check_is_dir: bool = False, 
+def validate_paths(filenames: Union[str, List[str]],
+                   check_is_file: bool = False,
+                   check_is_dir: bool = False,
                    mkdir: bool = False):
     &#34;&#34;&#34;Performs several checks on input list of file names.
 
@@ -105,7 +107,7 @@ class LoadConfig(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_paths(values, check_is_file=True)
         config = configparser.ConfigParserAdv()
-        aux = config.read(values)
+        config.read(values)
         setattr(namespace, self.dest, config)
 
 class LoadArray(argparse.Action):
@@ -162,7 +164,7 @@ class LoadTXTArray(argparse.Action):
     &#34;&#34;&#34;Load an np.array from file.&#34;&#34;&#34;
 
     def __call__(self, parser, namespace, values, option_string=None):
-        array = np.loadtxt(validate_paths(values, check_is_file=True), 
+        array = np.loadtxt(validate_paths(values, check_is_file=True),
                            dtype=float)
         setattr(namespace, self.dest, array)
 
@@ -203,8 +205,6 @@ class LoadTable(argparse.Action):
     &#34;&#34;&#34;Action for loading astropy Tables&#34;&#34;&#34;
 
     def __call__(self, parser, namespace, values, option_string=None):
-        from ..tables import Table
-
         try:
             tabname = &#39;&#39;+values
             #table_id = os.path.splitext(os.path.basename(tabname))[0]
@@ -227,8 +227,8 @@ class ListFromFile(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError(&#34;nargs not allowed&#34;)
-        super(ListFromFile, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         with open(values, &#39;r&#39;) as dat:
@@ -241,8 +241,8 @@ class ListFromRegex(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError(&#34;nargs not allowed&#34;)
-        super(ListFromRegex, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         from glob import glob
@@ -254,7 +254,7 @@ class ListFromRegex(argparse.Action):
 class ReadQuantity(argparse.Action):
     &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
 
-    def __init__(self, option_strings, dest, nargs=2, enforce_list=False, 
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
                  **kwargs):
         try:
             if nargs &lt; 2:
@@ -323,10 +323,10 @@ class ReadSkyCoords(argparse.Action):
             if nargs%2 == 0:
                 kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*nargs)
             else:
-                kwargs.setdefault(&#39;metavar&#39;, 
+                kwargs.setdefault(&#39;metavar&#39;,
                                   (&#39;RA Dec &#39;,)*(nargs-1) + (&#39;FRAME&#39;,))
         except TypeError:
-            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*2 + (&#39;[FRAME]&#39;,))
+            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;, &#39;RA Dec [FRAME]&#39;))
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -368,7 +368,7 @@ class CheckFile(argparse.Action):
 # Logger actions
 class StartLogger(argparse.Action):
     &#34;&#34;&#34;Create a logger.
-    
+
     If nargs=? (default), log to default or const if provided and flag used
     else log only to stdout.
     For verbose levels, the standard option_string values are:
@@ -379,12 +379,12 @@ class StartLogger(argparse.Action):
     Other values will create a normal logger.
     &#34;&#34;&#34;
 
-    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;, 
+    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;,
                  const=None, default=None, **kwargs):
         # Cases from nargs
         if nargs not in [&#39;?&#39;]:
-            raise ValueError(&#34;nargs value not allowed&#34;)
-            
+            raise ValueError(&#39;nargs value not allowed&#39;)
+
         # Default dest and default log file
         dest = &#39;log&#39;
         self._logfile = const or default
@@ -393,7 +393,7 @@ class StartLogger(argparse.Action):
         const = None
         default = get_stdout_logger(&#39;__main__&#39;, verbose=&#39;v&#39;)
 
-        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar, 
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
                          const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):
@@ -443,9 +443,9 @@ class StartLogger(argparse.Action):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def validate_path(path: pathlib.Path, 
+<pre><code class="python">def validate_path(path: pathlib.Path,
                   check_is_file: bool = False,
-                  check_is_dir: bool = False, 
+                  check_is_dir: bool = False,
                   mkdir: bool = False):
     &#34;&#34;&#34;Performs several checks on input path.
 
@@ -491,9 +491,9 @@ class StartLogger(argparse.Action):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def validate_paths(filenames: Union[str, List[str]], 
-                   check_is_file: bool = False, 
-                   check_is_dir: bool = False, 
+<pre><code class="python">def validate_paths(filenames: Union[str, List[str]],
+                   check_is_file: bool = False,
+                   check_is_dir: bool = False,
                    mkdir: bool = False):
     &#34;&#34;&#34;Performs several checks on input list of file names.
 
@@ -609,8 +609,8 @@ class StartLogger(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError(&#34;nargs not allowed&#34;)
-        super(ListFromFile, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         with open(values, &#39;r&#39;) as dat:
@@ -639,8 +639,8 @@ class StartLogger(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError(&#34;nargs not allowed&#34;)
-        super(ListFromRegex, self).__init__(option_strings, dest, **kwargs)
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         from glob import glob
@@ -693,7 +693,7 @@ class StartLogger(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         values = validate_paths(values, check_is_file=True)
         config = configparser.ConfigParserAdv()
-        aux = config.read(values)
+        config.read(values)
         setattr(namespace, self.dest, config)</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -844,7 +844,7 @@ class StartLogger(argparse.Action):
     &#34;&#34;&#34;Load an np.array from file.&#34;&#34;&#34;
 
     def __call__(self, parser, namespace, values, option_string=None):
-        array = np.loadtxt(validate_paths(values, check_is_file=True), 
+        array = np.loadtxt(validate_paths(values, check_is_file=True),
                            dtype=float)
         setattr(namespace, self.dest, array)</code></pre>
 </details>
@@ -868,8 +868,6 @@ class StartLogger(argparse.Action):
     &#34;&#34;&#34;Action for loading astropy Tables&#34;&#34;&#34;
 
     def __call__(self, parser, namespace, values, option_string=None):
-        from ..tables import Table
-
         try:
             tabname = &#39;&#39;+values
             #table_id = os.path.splitext(os.path.basename(tabname))[0]
@@ -990,7 +988,7 @@ class StartLogger(argparse.Action):
 <pre><code class="python">class ReadQuantity(argparse.Action):
     &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
 
-    def __init__(self, option_strings, dest, nargs=2, enforce_list=False, 
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
                  **kwargs):
         try:
             if nargs &lt; 2:
@@ -1037,10 +1035,10 @@ class StartLogger(argparse.Action):
             if nargs%2 == 0:
                 kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*nargs)
             else:
-                kwargs.setdefault(&#39;metavar&#39;, 
+                kwargs.setdefault(&#39;metavar&#39;,
                                   (&#39;RA Dec &#39;,)*(nargs-1) + (&#39;FRAME&#39;,))
         except TypeError:
-            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*2 + (&#39;[FRAME]&#39;,))
+            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;, &#39;RA Dec [FRAME]&#39;))
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -1113,7 +1111,7 @@ Other values will create a normal logger.</p></div>
 </summary>
 <pre><code class="python">class StartLogger(argparse.Action):
     &#34;&#34;&#34;Create a logger.
-    
+
     If nargs=? (default), log to default or const if provided and flag used
     else log only to stdout.
     For verbose levels, the standard option_string values are:
@@ -1124,12 +1122,12 @@ Other values will create a normal logger.</p></div>
     Other values will create a normal logger.
     &#34;&#34;&#34;
 
-    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;, 
+    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;,
                  const=None, default=None, **kwargs):
         # Cases from nargs
         if nargs not in [&#39;?&#39;]:
-            raise ValueError(&#34;nargs value not allowed&#34;)
-            
+            raise ValueError(&#39;nargs value not allowed&#39;)
+
         # Default dest and default log file
         dest = &#39;log&#39;
         self._logfile = const or default
@@ -1138,7 +1136,7 @@ Other values will create a normal logger.</p></div>
         const = None
         default = get_stdout_logger(&#39;__main__&#39;, verbose=&#39;v&#39;)
 
-        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar, 
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
                          const=const, default=default, **kwargs)
 
     def __call__(self, parser, namespace, value, option_string=None):

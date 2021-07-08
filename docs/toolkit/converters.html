@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.2" />
-<title>toolkit.argparse_tools.functions API documentation</title>
-<meta name="description" content="Functions for helping the processing of arguments." />
+<title>toolkit.converters API documentation</title>
+<meta name="description" content="Convert between data types." />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -19,46 +19,48 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>toolkit.argparse_tools.functions</code></h1>
+<h1 class="title">Module <code>toolkit.converters</code></h1>
 </header>
 <section id="section-intro">
-<p>Functions for helping the processing of arguments.</p>
+<p>Convert between data types.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;Functions for helping the processing of arguments.&#34;&#34;&#34;
-from typing import Optional
+<pre><code class="python">&#34;&#34;&#34;Convert between data types.&#34;&#34;&#34;
+import argparse
+import configparser
 
-def positions_to_pos(args: &#39;argparse.ArgumentParser&#39;,
-                     wcs: Optional[&#39;astropy.WCS&#39;] = None) -&gt; None:
-    &#34;&#34;&#34;Store the positions in the `args` object.
+def argparser_to_configparser(
+    args: argparse.Namespace, 
+    config: configparser.ConfigParser,
+    section: str,
+) -&gt; configparser.ConfigParser:
+    &#34;&#34;&#34;Update a `configparser` object from the values in `args`.
+
+    If option is not in 
 
     Args:
-      args: argument parser.
-      wcs: optional; WCS to convert coordinates to pixels.
-    &#34;&#34;&#34;
-    # Get the positions
-    if args.position:
-        if len(args.position)%2 != 0:
-            raise ValueError(&#39;Odd number of position values&#39;)
-        for xy in zip(args.position[::2],args.position[1::2]):
-            args.pos += [xy]
-    elif args.reference:
-        args.pos = args.reference
-    elif args.coordinate:
-        args.pos = args.coordinate
-    else:
-        for src in args.source:
-            args.pos += [src.position]
+      args: argument parser object.
+      config: configuration parser.
+      section: section of `config` to update
 
-    # Convert SkyCoords to pixels if wcs
-    if wcs is not None:
-        try:
-            args.pos = [[p.ra.degree, p.dec.degree] for p in args.pos]
-            args.pos = wcs.all_world2pix(args.pos, 0)
-        except AttributeError:
-            pass</code></pre>
+    Returns:
+      An updated configuration parser.
+    &#34;&#34;&#34;
+    # Initial values
+    new_values = {}
+    args_dict = vars(args)
+
+    # Filter values
+    for key, val in args_dict.items():
+        if key in config.options(section):
+            new_values[key] = val
+
+    # Update config parser
+    config.read_dict({section: new_values})
+
+    return config</code></pre>
 </details>
 </section>
 <section>
@@ -68,51 +70,57 @@ def positions_to_pos(args: &#39;argparse.ArgumentParser&#39;,
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="toolkit.argparse_tools.functions.positions_to_pos"><code class="name flex">
-<span>def <span class="ident">positions_to_pos</span></span>(<span>args: argparse.ArgumentParser, wcs: Union[_ForwardRef('astropy.WCS'), NoneType] = None)</span>
+<dt id="toolkit.converters.argparser_to_configparser"><code class="name flex">
+<span>def <span class="ident">argparser_to_configparser</span></span>(<span>args: argparse.Namespace, config: configparser.ConfigParser, section: str) ‑> configparser.ConfigParser</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Store the positions in the <code>args</code> object.</p>
+<div class="desc"><p>Update a <code>configparser</code> object from the values in <code>args</code>.</p>
+<p>If option is not in </p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>args</code></strong></dt>
-<dd>argument parser.</dd>
-<dt><strong><code>wcs</code></strong></dt>
-<dd>optional; WCS to convert coordinates to pixels.</dd>
-</dl></div>
+<dd>argument parser object.</dd>
+<dt><strong><code>config</code></strong></dt>
+<dd>configuration parser.</dd>
+<dt><strong><code>section</code></strong></dt>
+<dd>section of <code>config</code> to update</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>An updated configuration parser.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def positions_to_pos(args: &#39;argparse.ArgumentParser&#39;,
-                     wcs: Optional[&#39;astropy.WCS&#39;] = None) -&gt; None:
-    &#34;&#34;&#34;Store the positions in the `args` object.
+<pre><code class="python">def argparser_to_configparser(
+    args: argparse.Namespace, 
+    config: configparser.ConfigParser,
+    section: str,
+) -&gt; configparser.ConfigParser:
+    &#34;&#34;&#34;Update a `configparser` object from the values in `args`.
+
+    If option is not in 
 
     Args:
-      args: argument parser.
-      wcs: optional; WCS to convert coordinates to pixels.
-    &#34;&#34;&#34;
-    # Get the positions
-    if args.position:
-        if len(args.position)%2 != 0:
-            raise ValueError(&#39;Odd number of position values&#39;)
-        for xy in zip(args.position[::2],args.position[1::2]):
-            args.pos += [xy]
-    elif args.reference:
-        args.pos = args.reference
-    elif args.coordinate:
-        args.pos = args.coordinate
-    else:
-        for src in args.source:
-            args.pos += [src.position]
+      args: argument parser object.
+      config: configuration parser.
+      section: section of `config` to update
 
-    # Convert SkyCoords to pixels if wcs
-    if wcs is not None:
-        try:
-            args.pos = [[p.ra.degree, p.dec.degree] for p in args.pos]
-            args.pos = wcs.all_world2pix(args.pos, 0)
-        except AttributeError:
-            pass</code></pre>
+    Returns:
+      An updated configuration parser.
+    &#34;&#34;&#34;
+    # Initial values
+    new_values = {}
+    args_dict = vars(args)
+
+    # Filter values
+    for key, val in args_dict.items():
+        if key in config.options(section):
+            new_values[key] = val
+
+    # Update config parser
+    config.read_dict({section: new_values})
+
+    return config</code></pre>
 </details>
 </dd>
 </dl>
@@ -128,12 +136,12 @@ def positions_to_pos(args: &#39;argparse.ArgumentParser&#39;,
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="toolkit.argparse_tools" href="index.html">toolkit.argparse_tools</a></code></li>
+<li><code><a title="toolkit" href="index.html">toolkit</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="toolkit.argparse_tools.functions.positions_to_pos" href="#toolkit.argparse_tools.functions.positions_to_pos">positions_to_pos</a></code></li>
+<li><code><a title="toolkit.converters.argparser_to_configparser" href="#toolkit.converters.argparser_to_configparser">argparser_to_configparser</a></code></li>
 </ul>
 </li>
 </ul>

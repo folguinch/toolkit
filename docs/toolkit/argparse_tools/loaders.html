@@ -31,20 +31,24 @@
 from configparseradv import configparser
 from spectral_cube import SpectralCube
 
-def load_spectral_cube(args, cubename: Optional[str] = None):
+def load_spectral_cube(args, cubename: Optional[str] = None, 
+                       use_dask: bool = False) -&gt; None:
     &#34;&#34;&#34;Read a spectral_cube object and store it in args.
 
     Args:
       args: NameSpace to store the cube.
       cubename: optional; spectral cube file name.
+      use_dask: optional; use dask?
     &#34;&#34;&#34;
     if cubename is None:
         cubename = args.cubename
     try:
-        args.cube = SpectralCube.read(cubename, use_dask=True)
+        args.cube = SpectralCube.read(cubename, use_dask=use_dask)
     except ValueError:
-        args.cube = SpectralCube.read(cubename[0], use_dask=True)
-    args.cube.use_dask_scheduler(&#39;threads&#39;, num_workers=10)
+        args.cube = SpectralCube.read(cubename[0], use_dask=use_dask)
+
+    if use_dask:
+        args.cube.use_dask_scheduler(&#39;threads&#39;, num_workers=10)
 
 def load_config(args, config: Optional[str] = None):
     &#34;&#34;&#34;Read a configuration file and store it in args.
@@ -96,7 +100,7 @@ def load_config(args, config: Optional[str] = None):
 </details>
 </dd>
 <dt id="toolkit.argparse_tools.loaders.load_spectral_cube"><code class="name flex">
-<span>def <span class="ident">load_spectral_cube</span></span>(<span>args, cubename: Union[str, NoneType] = None)</span>
+<span>def <span class="ident">load_spectral_cube</span></span>(<span>args, cubename: Union[str, NoneType] = None, use_dask: bool = False) ‑> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Read a spectral_cube object and store it in args.</p>
@@ -106,25 +110,31 @@ def load_config(args, config: Optional[str] = None):
 <dd>NameSpace to store the cube.</dd>
 <dt><strong><code>cubename</code></strong></dt>
 <dd>optional; spectral cube file name.</dd>
+<dt><strong><code>use_dask</code></strong></dt>
+<dd>optional; use dask?</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def load_spectral_cube(args, cubename: Optional[str] = None):
+<pre><code class="python">def load_spectral_cube(args, cubename: Optional[str] = None, 
+                       use_dask: bool = False) -&gt; None:
     &#34;&#34;&#34;Read a spectral_cube object and store it in args.
 
     Args:
       args: NameSpace to store the cube.
       cubename: optional; spectral cube file name.
+      use_dask: optional; use dask?
     &#34;&#34;&#34;
     if cubename is None:
         cubename = args.cubename
     try:
-        args.cube = SpectralCube.read(cubename, use_dask=True)
+        args.cube = SpectralCube.read(cubename, use_dask=use_dask)
     except ValueError:
-        args.cube = SpectralCube.read(cubename[0], use_dask=True)
-    args.cube.use_dask_scheduler(&#39;threads&#39;, num_workers=10)</code></pre>
+        args.cube = SpectralCube.read(cubename[0], use_dask=use_dask)
+
+    if use_dask:
+        args.cube.use_dask_scheduler(&#39;threads&#39;, num_workers=10)</code></pre>
 </details>
 </dd>
 </dl>
