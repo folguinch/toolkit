@@ -1,8 +1,8 @@
 """Functions for helping the processing of arguments."""
 from typing import Optional
 
-def positions_to_pos(args: 'argparse.ArgumentParser',
-                     wcs: Optional['astropy.WCS'] = None) -> None:
+def positions_to_pixels(args: 'argparse.ArgumentParser',
+                        wcs: Optional['astropy.WCS'] = None) -> None:
     """Store the positions in the `args` object.
 
     Args:
@@ -14,19 +14,27 @@ def positions_to_pos(args: 'argparse.ArgumentParser',
         if len(args.position)%2 != 0:
             raise ValueError('Odd number of position values')
         for xy in zip(args.position[::2],args.position[1::2]):
-            args.pos += [xy]
+            pos += [xy]
     elif args.reference:
-        args.pos = args.reference
+        pos = args.reference
     elif args.coordinate:
-        args.pos = args.coordinate
+        pos = args.coordinate
     else:
         for src in args.source:
-            args.pos += [src.position]
+            pos += [src.position]
 
     # Convert SkyCoords to pixels if wcs
     if wcs is not None:
         try:
-            args.pos = [[p.ra.degree, p.dec.degree] for p in args.pos]
-            args.pos = wcs.all_world2pix(args.pos, 0)
+            pos = [[p.ra.degree, p.dec.degree] for p in pos]
+            pos = wcs.all_world2pix(pos, 0)
         except AttributeError:
             pass
+
+    # Store the value
+    try:
+        # This should be deleted in the future
+        args.pos = pos
+    except AttributeError:
+        pass
+    args.position = args.coordinate = args.reference = pos

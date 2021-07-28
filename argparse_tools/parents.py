@@ -2,6 +2,7 @@
 from typing import Callable, Optional, Union
 import argparse
 import pathlib
+import warnings
 
 try:
     import astroSource.source as source
@@ -9,7 +10,7 @@ except ImportError:
     print('astroSource not available')
     pass
 
-from .functions import positions_to_pos
+from .functions import positions_to_pixels
 import toolkit.argparse_tools.actions as actions
 
 # Typing
@@ -27,7 +28,7 @@ def astro_source(parser: argparse.ArgumentParser) -> None:
 
 def source_position(
     required: bool = False,
-    function: PosFunction = positions_to_pos
+    function: PosFunction = positions_to_pixels,
 ) -> argparse.ArgumentParser:
     """Parent for reading a source position.
 
@@ -52,6 +53,9 @@ def source_position(
                         action=actions.PeakPosition,
                         help='Reference image to get position from peak')
     astro_source(group1)
+    warnings.warn(('The values pos and position_fn will be removed from')
+                  ('the parser in future versions of this parent'),
+                  FutureWarning)
     parser.set_defaults(position_fn=function, pos=[])
 
     return parser
