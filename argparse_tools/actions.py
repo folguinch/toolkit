@@ -301,6 +301,8 @@ class ReadSkyCoords(argparse.Action):
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
+        if len(values) == 1:
+            values = values[0].split()
         if len(values) < 2:
             raise ValueError('Could not read sky coordinate')
         elif len(values)%2 == 0:
