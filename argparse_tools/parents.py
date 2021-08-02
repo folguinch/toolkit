@@ -53,8 +53,8 @@ def source_position(
                         action=actions.PeakPosition,
                         help='Reference image to get position from peak')
     astro_source(group1)
-    warnings.warn(('The values pos and position_fn will be removed from')
-                  ('the parser in future versions of this parent'),
+    warnings.warn(('The values pos and position_fn will be removed from'
+                   'the parser in future versions of this parent'),
                   FutureWarning)
     parser.set_defaults(position_fn=function, pos=[])
 
