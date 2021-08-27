@@ -1,5 +1,6 @@
 from typing import Optional
 
+from astropy.io.registry import IORegistryError
 from configparseradv import configparser
 from spectral_cube import SpectralCube
 
@@ -16,7 +17,7 @@ def load_spectral_cube(args, cubename: Optional[str] = None,
         cubename = args.cubename
     try:
         args.cube = SpectralCube.read(cubename, use_dask=use_dask)
-    except ValueError:
+    except ValueError, IORegistryError:
         args.cube = SpectralCube.read(cubename[0], use_dask=use_dask)
 
     if use_dask:
