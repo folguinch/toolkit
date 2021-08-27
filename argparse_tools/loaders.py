@@ -1,10 +1,11 @@
+"""Loader functions for `argparsers`."""
 from typing import Optional
 
 from astropy.io.registry import IORegistryError
 from configparseradv import configparser
 from spectral_cube import SpectralCube
 
-def load_spectral_cube(args, cubename: Optional[str] = None, 
+def load_spectral_cube(args, cubename: Optional[str] = None,
                        use_dask: bool = False) -> None:
     """Read a spectral_cube object and store it in args.
 
