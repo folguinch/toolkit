@@ -17,7 +17,7 @@ def load_spectral_cube(args, cubename: Optional[str] = None,
         cubename = args.cubename
     try:
         args.cube = SpectralCube.read(cubename, use_dask=use_dask)
-    except ValueError, IORegistryError:
+    except (ValueError, IORegistryError):
         args.cube = SpectralCube.read(cubename[0], use_dask=use_dask)
 
     if use_dask:
