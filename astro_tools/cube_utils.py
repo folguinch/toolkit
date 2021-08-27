@@ -220,7 +220,7 @@ def get_spectral_limits(cube: SpectralCube,
 
         # Closest value to vlsr
         ind = np.nanargmin(np.abs(spaxis.value))
-        chmin = ind-chan_halfwidth
+        chmin = ind - chan_halfwidth
         chmax = ind + chan_halfwidth
         if chmin < 0:
             chmin = 0
@@ -274,10 +274,12 @@ def get_subcube(cube: SpectralCube,
                                     linefreq=linefreq,
                                     log=log)
     if hasattr(low, 'unit'):
+        log('Applying spectral slab')
         subcube = cube.spectral_slab(low, high)
     elif low is None:
         subcube = cube
     else:
+        log('Applying channel range')
         subcube = cube[low:high+1, :, :]
 
     # Extract spatial box
@@ -288,16 +290,21 @@ def get_subcube(cube: SpectralCube,
     else:
         xmin = ymin = xmax = ymax = None
     if xmin is not None:
+        log(f'Selecting spatial box: {xmin}:{xmax}, {ymin}:{ymax}')
         subcube = subcube[:, ymin:ymax+1, xmin:xmax+1]
 
     # Copy RMS
     if 'RMS' in cube.header:
         subcube.meta['RMS'] = cube.header['RMS']
+        log("RMS in cube header: {cube.header['RMS']} {cube.unit}")
     elif put_rms:
         # Use original cube to measure rms
         rms = get_cube_rms(cube, log=log)
         if hasattr(rms, 'unit'):
+            log(f'Cube rms = {rms.value} {rms.unit}')
             rms = rms.value
+        else:
+            log(f'Cube rms = {rms}')
         subcube.meta['RMS'] = rms
     else:
         pass
@@ -306,8 +313,7 @@ def get_subcube(cube: SpectralCube,
     if filenamebase is not None:
         filename = pathlib.Path(filenamebase)
         filename = filename.expanduser().resolve().with_suffix('.subcube.fits')
-        if log is not None:
-            log.info(f'Saving sub-cube: {filename}')
+        log(f'Saving sub-cube: {filename}')
         subcube.write(filename, overwrite=True)
 
     return subcube
