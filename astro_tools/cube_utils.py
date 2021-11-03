@@ -487,6 +487,7 @@ def spectrum_at_position(cube: SpectralCube,
                          spectral_axis_unit: Optional[u.Unit] = None,
                          restfreq: Optional[u.Quantity] = None,
                          vlsr: Optional[u.Quantity] = None,
+                         radius: Optional[u.Quantity] = None,
                          filename: Optional[Union[pathlib.Path, str]] = None,
                          ) -> Tuple[u.Quantity]:
     """Extract spectrum at position.
@@ -497,6 +498,7 @@ def spectrum_at_position(cube: SpectralCube,
       spectral_axis_unit: optional; unit of the spectral axis.
       restfreq: optional; rest frequency.
       vlsr: optional; LSR velocity.
+      radius: optional; average pixels around this radius.
       filename: optional; output filename.
     Returns:
       xaxis: an array with the spectral axis.
@@ -549,7 +551,20 @@ def spectrum_at_position(cube: SpectralCube,
 
     # Spectrum
     xaxis = aux_cube.spectral_axis
-    spec = aux_cube[:, y, x]
+    if radius is not None:
+        wcs = cube.wcs.sub(['longitude', 'latitude'])
+        pixsize = np.sqrt(np.abs(np.linalg.det(wcs.pixel_scale_matrix)))
+        pixsize = pixsize * u.Unit(wcs.world_axis_units[0])
+        radius_pix = radius / pixsize
+        radius_pix = radius_pix.decompose().value
+        shape = aux_cube.shape[-2:]
+        yy, xx = np.indices(shape)
+        mask = ((yy - y)**2 + (xx - x)**2)**0.5
+        mask = mask <= radius_pix
+        masked_cube = aux_cube.with_mask(mask)
+        spec = masked_cube.mean(axis=(1, 2))
+    else:
+        spec = aux_cube[:, y, x]
 
     # Shift velocity
     if xaxis.unit.is_equivalent(u.km/u.s) and vlsr is not None:

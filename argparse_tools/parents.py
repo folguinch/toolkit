@@ -83,7 +83,7 @@ def verify_files(*args, **kwargs) -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(add_help=False)
     for opt in args:
-        parser.add_argument(f'--{opt}', action=actions.CheckFile,
+        parser.add_argument(f'{opt}', action=actions.CheckFile,
                             **kwargs[opt])
 
     return parser
