@@ -83,8 +83,12 @@ def verify_files(*args, **kwargs) -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(add_help=False)
     for opt in args:
+        if opt.startswith('-'):
+            key = opt.strip('-')
+        else:
+            key = opt
         parser.add_argument(f'{opt}', action=actions.CheckFile,
-                            **kwargs[opt])
+                            **kwargs[key])
 
     return parser
 

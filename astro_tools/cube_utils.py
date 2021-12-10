@@ -488,7 +488,10 @@ def spectrum_at_position(cube: SpectralCube,
                          restfreq: Optional[u.Quantity] = None,
                          vlsr: Optional[u.Quantity] = None,
                          radius: Optional[u.Quantity] = None,
+                         size: Optional[u.Quantity] = None,
+                         area_pix: Optional[u.Quantity] = None,
                          filename: Optional[Union[pathlib.Path, str]] = None,
+                         log: Optional[Callable] = print,
                          ) -> Tuple[u.Quantity]:
     """Extract spectrum at position.
 
@@ -499,7 +502,10 @@ def spectrum_at_position(cube: SpectralCube,
       restfreq: optional; rest frequency.
       vlsr: optional; LSR velocity.
       radius: optional; average pixels around this radius.
+      size: optional; use ellipse major and minor axes to get radius.
+      area_pix: optional; source area in pixels.
       filename: optional; output filename.
+      log: optional; logging function.
     Returns:
       xaxis: an array with the spectral axis.
       spec: the spectrum.
@@ -551,12 +557,18 @@ def spectrum_at_position(cube: SpectralCube,
 
     # Spectrum
     xaxis = aux_cube.spectral_axis
-    if radius is not None:
-        wcs = cube.wcs.sub(['longitude', 'latitude'])
-        pixsize = np.sqrt(np.abs(np.linalg.det(wcs.pixel_scale_matrix)))
-        pixsize = pixsize * u.Unit(wcs.world_axis_units[0])
-        radius_pix = radius / pixsize
-        radius_pix = radius_pix.decompose().value
+    if radius is not None or size is not None or area_pix is not None:
+        if size is not None:
+            radius = np.sqrt(size[0] * size[1]) / 2
+        if radius is not None:
+            wcs = cube.wcs.sub(['longitude', 'latitude'])
+            pixsize = np.sqrt(np.abs(np.linalg.det(wcs.pixel_scale_matrix)))
+            pixsize = pixsize * u.Unit(wcs.world_axis_units[0])
+            radius_pix = radius / pixsize
+            radius_pix = radius_pix.decompose().value
+        else:
+            radius_pix = np.sqrt(area_pix / np.pi)
+        log(f'Source radius: {radius_pix} pixels')
         shape = aux_cube.shape[-2:]
         yy, xx = np.indices(shape)
         mask = ((yy - y)**2 + (xx - x)**2)**0.5

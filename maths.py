@@ -24,7 +24,7 @@ def rms(x):
 
 def quick_rms(data):
     return 1.482602219 * apystats.median_absolute_deviation(data,
-            ignore_nan=True)
+                                                            ignore_nan=True)
 
 def chi2(obs, mod, err=None, mask=None, dof=1, logger=None):
     """Calculate the chi2 between two arrays.
