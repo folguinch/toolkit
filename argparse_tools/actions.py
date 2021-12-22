@@ -81,7 +81,7 @@ def split_values(values: list):
     for val in values:
         vals += val.split()
     
-    return values
+    return vals
 
 # Loader actions
 class LoadConfig(argparse.Action):
