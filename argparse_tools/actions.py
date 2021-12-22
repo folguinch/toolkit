@@ -71,6 +71,18 @@ def validate_paths(filenames: Union[str, List[str]],
 
     return validated
 
+def split_values(values: list):
+    """Split the input values when quotations are used in `bash`.
+
+    Args:
+      values: list of values.
+    """
+    vals = []
+    for val in values:
+        vals += val.split()
+    
+    return values
+
 # Loader actions
 class LoadConfig(argparse.Action):
     """Action class for loading a configuration file in argparse."""
@@ -301,6 +313,7 @@ class ReadSkyCoords(argparse.Action):
         super().__init__(option_strings, dest, nargs=nargs, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
+        values = split_values(values)
         if len(values) == 1:
             values = values[0].split()
         if len(values) < 2:
