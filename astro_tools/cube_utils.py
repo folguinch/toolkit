@@ -4,6 +4,7 @@ import pathlib
 
 from spectral_cube import SpectralCube
 import astropy
+import astropy.wcs.utils as aputils
 import astropy.units as u
 import numpy as np
 
@@ -549,10 +550,12 @@ def spectrum_at_position(cube: SpectralCube,
     # Spectra position
     try:
         wcs = cube.wcs.sub(['longitude', 'latitude'])
-        x, y = wcs.all_world2pix(
-            [[position.ra.degree, position.dec.degree]], 0)[0]
+        #x, y = wcs.all_world2pix(
+        #    [[position.ra.degree, position.dec.degree]], 0)[0]
+        #x, y = int(x), int(y)
+        x, y = aputils.skycoord_to_pixel(position, wcs)
         x, y = int(x), int(y)
-    except AttributeError:
+    except TypeError:
         x, y = tuple(map(int, position))
 
     # Spectrum
