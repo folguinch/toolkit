@@ -577,6 +577,7 @@ def spectrum_at_position(cube: SpectralCube,
         mask = ((yy - y)**2 + (xx - x)**2)**0.5
         mask = mask <= radius_pix
         masked_cube = aux_cube.with_mask(mask)
+        masked_cube.allow_huge_operations = True
         spec = masked_cube.mean(axis=(1, 2))
     else:
         spec = aux_cube[:, y, x]
