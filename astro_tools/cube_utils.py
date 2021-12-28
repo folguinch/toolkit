@@ -567,8 +567,10 @@ def spectrum_at_position(cube: SpectralCube,
             wcs = cube.wcs.sub(['longitude', 'latitude'])
             pixsize = np.sqrt(np.abs(np.linalg.det(wcs.pixel_scale_matrix)))
             pixsize = pixsize * u.Unit(wcs.world_axis_units[0])
-            radius_pix = radius / pixsize
+            radius_pix = radius.to(pixsize.unit) / pixsize
             radius_pix = radius_pix.decompose().value
+            log(f'Source radius: {radius.value:.1f} {radius.unit}')
+            log(f'Pixel size: {pixsize.value} {pixsize.unit}')
         else:
             radius_pix = np.sqrt(area_pix / np.pi)
         log(f'Source radius: {radius_pix} pixels')
