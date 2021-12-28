@@ -157,7 +157,7 @@ def get_logger(name: str,
 
     # Create logger
     logger = logging.getLogger(name)
-    if len(logger.handlers) > 0:
+    if len(logger.handlers) == 0:
         logger.setLevel(levels['file'])
 
         # File handler
