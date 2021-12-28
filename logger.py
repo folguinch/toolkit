@@ -1,17 +1,23 @@
+"""Logging tools and classes.
+
+This is a compilation of functions for loading and configuring the logging
+system. It also implements a `LoggedObject` class that can be inherited in
+order to implement logging for the class.
+"""
 from datetime import datetime
 from typing import Optional, Union
 import logging
 import logging.handlers as handlers
-import os
 import pathlib
 
-def get_level():
-    numeric_level = getattr(logging, args.loglevel[0].upper(), None)
+def get_level(loglevel):
+    """Convert to numeric logging level."""
+    numeric_level = getattr(logging, loglevel.upper(), None)
     if not isinstance(numeric_level, int):
-        raise ValueError('Invalid log level: %s' % args.loglevel[0])
+        raise ValueError(f'Invalid log level: {loglevel}')
     return numeric_level
 
-def get_stdout_format(level: int = logging.INFO, 
+def get_stdout_format(level: int = logging.INFO,
                       timestamp: bool = False) -> str:
     """Determines the stdout format.
 
@@ -33,7 +39,7 @@ def get_stdout_format(level: int = logging.INFO,
     return fmt
 
 
-def get_stdout_handler(level: int, timestamp: bool = False, 
+def get_stdout_handler(level: int, timestamp: bool = False,
                        fmt: Optional[str] = None) -> logging.StreamHandler:
     """Create an standard output handler with the given log level.
 
@@ -50,9 +56,9 @@ def get_stdout_handler(level: int, timestamp: bool = False,
 
     return sh
 
-def get_file_handler(level: int, filename: Union[str, pathlib.Path], 
-                     timestamp: bool = False, maxBytes: int = 5242880, 
-                     backupCount: int = 5, 
+def get_file_handler(level: int, filename: Union[str, pathlib.Path],
+                     timestamp: bool = False, max_bytes: int = 5242880,
+                     backup_count: int = 5,
                      fmt: Optional = None) -> handlers.RotatingFileHandler:
     """Create a file logging handler.
 
@@ -67,23 +73,23 @@ def get_file_handler(level: int, filename: Union[str, pathlib.Path],
     if fmt is None:
         fmt = ('%(asctime)s [%(levelname)s] - %(filename)s '
                '(%(funcName)s:%(lineno)s): %(message)s')
-    fh = handlers.RotatingFileHandler(filename, maxBytes=maxBytes,
-                                      backupCount=backupCount)
+    fh = handlers.RotatingFileHandler(filename, maxBytes=max_bytes,
+                                      backupCount=backup_count)
     fh.setLevel(level)
     fh.setFormatter(logging.Formatter(fmt))
 
     return fh
 
-def _levels_from_verbose(verbose: str, 
-                         stdoutlevel: int = logging.INFO, 
-                         filelevel: int = logging.DEBUG, 
+def _levels_from_verbose(verbose: str,
+                         stdoutlevel: int = logging.INFO,
+                         filelevel: int = logging.DEBUG,
                          timestamp: bool = False) -> dict:
     """Return logging levels depending on the verbose value.
 
     Accepted verbose values are:
       - None: use the defaults in stdoutlevel and filelevel.
       - v: basic logging with INFO level for stdout and DEBUG level for file
-        logging. 
+        logging.
       - vv: looging with DEBUG level for stdout and file logging.
       - vvv: same as verbose vv but add a timestamp to the file name and add
         time to the stdout log.
@@ -94,6 +100,7 @@ def _levels_from_verbose(verbose: str,
       stdoutlevel: optional; default value for stdout level.
       filelevel: optional; default value for file level.
       timestamp: optional; include a log timestamp.
+
     Returns:
       Dictionary with the values of stdoutlevel and filelevel
     """
@@ -112,22 +119,22 @@ def _levels_from_verbose(verbose: str,
 
     return levels
 
-def get_logger(name: str, 
+def get_logger(name: str,
                filename: Union[None, str, pathlib.Path] = None,
-               verbose: Optional[str] = None, 
+               verbose: Optional[str] = None,
                timestamp: bool = False,
-               stdoutlevel: int = logging.INFO, 
+               stdoutlevel: int = logging.INFO,
                filelevel: int = logging.DEBUG,
-               maxBytes: int = 5242880, 
-               backupCount: int = 5) -> logging.Logger:
+               max_bytes: int = 5242880,
+               backup_count: int = 5) -> logging.Logger:
     """Creates a new logger.
 
     Verbose levels overwrite the other parameter values. Accepted `verbose`
     values are:
 
       - `None`: use the other keyword arguments.
-      - `v`: basic logging with `INFO` level for stdout and `DEBUG` level for file
-        logging. 
+      - `v`: basic logging with `INFO` level for stdout and `DEBUG` level for
+        file logging.
       - `vv`: looging with `DEBUG` level for stdout and file logging.
       - `vvv`: same as verbose `vv` but add a timestamp to the file name and add
         time to the stdout log.
@@ -141,8 +148,8 @@ def get_logger(name: str,
       timestamp: optional; add timestamp to log file name.
       stdoutlevel: optional; logging level fot std output logging.
       filelevel: optional; logging level for file logging.
-      maxBytes: optional; maximum size of logging file in bytes.
-      backupCount: optional; maximum number of log files to rotate.
+      max_bytes: optional; maximum size of logging file in bytes.
+      backup_count: optional; maximum number of log files to rotate.
     """
     # Filter verbose
     levels = _levels_from_verbose(verbose, stdoutlevel=stdoutlevel,
@@ -150,20 +157,20 @@ def get_logger(name: str,
 
     # Create logger
     logger = logging.getLogger(name)
-    if not len(logger.handlers):
+    if len(logger.handlers) > 0:
         logger.setLevel(levels['file'])
 
         # File handler
         if filename is not None:
-            fh = get_file_handler(levels['file'], filename, 
-                                  timestamp=levels['timestamp'], 
-                                  maxBytes=maxBytes, 
-                                  backupCount=backupCount)
+            fh = get_file_handler(levels['file'], filename,
+                                  timestamp=levels['timestamp'],
+                                  max_bytes=max_bytes,
+                                  backup_count=backup_count)
         else:
             fh = None
 
         # Stream handler
-        sh = get_stdout_handler(levels['stdout'], 
+        sh = get_stdout_handler(levels['stdout'],
                                 timestamp=levels['timestamp'])
 
         # Register handlers
@@ -173,8 +180,8 @@ def get_logger(name: str,
 
     return logger
 
-def get_stdout_logger(name: str, 
-                      verbose: Optional[str] = None, 
+def get_stdout_logger(name: str,
+                      verbose: Optional[str] = None,
                       timestamp: bool = False,
                       level: int = logging.INFO) -> logging.Logger:
     """Creates a new standard output logger.
@@ -188,14 +195,14 @@ def get_stdout_logger(name: str,
     return get_logger(name, filename=None, verbose=verbose,
                       timestamp=timestamp, stdoutlevel=level)
 
-def update_logger(logger: logging.Logger, 
+def update_logger(logger: logging.Logger,
                   filename: Union[None, str, pathlib.Path] = None,
                   verbose: Optional[str] = None,
                   timestamp: bool = False,
-                  stdoutlevel: int = logging.INFO, 
+                  stdoutlevel: int = logging.INFO,
                   filelevel: int = logging.DEBUG,
-                  maxBytes: int = 5242880, 
-                  backupCount: int = 5) -> logging.Logger:
+                  max_bytes: int = 5242880,
+                  backup_count: int = 5) -> logging.Logger:
     """Update logger handlers.
 
     Args:
@@ -205,8 +212,9 @@ def update_logger(logger: logging.Logger,
       timestamp: optional; default timestamp values for new/updated handlers.
       stdoutlevel: optional; change standard output level.
       filelevel: optional; change file level.
-      maxBytes: optional; maximum size of logging file in bytes.
-      backupCount: optional; maximum number of log files to rotate.
+      max_bytes: optional; maximum size of logging file in bytes.
+      backup_count: optional; maximum number of log files to rotate.
+
     Returns:
       An updated logger instance.
     """
@@ -225,17 +233,57 @@ def update_logger(logger: logging.Logger,
             handler.setLevel(levels['stdout'])
 
             # Update format
-            fmt = get_stdout_format(level=levels['stdout'], 
+            fmt = get_stdout_format(level=levels['stdout'],
                                     timestamp=levels['timestamp'])
             handler.setFormatter(logging.Formatter(fmt))
 
     # Create file handler if needed
     if nfilehandlers == 0 and filename is not None:
-        fh = get_file_handler(levels['file'], filename, 
-                              timestamp=levels['timestamp'], 
-                              maxBytes=maxBytes, 
-                              backupCount=backupCount)
+        fh = get_file_handler(levels['file'], filename,
+                              timestamp=levels['timestamp'],
+                              max_bytes=max_bytes,
+                              backup_count=backup_count)
         logger.addHandler(fh)
 
     return logger
 
+class LoggedObject:
+    """Object for logging information to stdout.
+
+    The attribute `log` can be updated and change the verbose level and other
+    options by initializing the object. Else the `log` will print to the
+    standard output. The logging can be disable if the `enabled` attribute is
+    set to `False`.
+
+    Attribute:
+      enabled: enable or disable logging.
+      _log: logger object.
+    """
+    enabled = True
+    _log = get_stdout_logger('LoggedObject')
+
+    def __init__(self, name, **kwargs):
+        """Initialize the object and apply options."""
+        self._log = get_logger(name, **kwargs)
+
+    def _log_message(self, message: str,
+                     log_level: int = logging.INFO) -> None:
+        """Log a message with the given level."""
+        if self.enabled:
+            self._log.log(log_level, message)
+
+    def info(self, message: str) -> None:
+        """Log an `INFO` message."""
+        self._log_message(message, logging.INFO)
+
+    def debug(self, message: str) -> None:
+        """Lof a `DEBUG` message."""
+        self._log_message(message, logging.DEBUG)
+
+    def warn(self, message: str) -> None:
+        """Lof a `DEBUG` message."""
+        self._log_message(message, logging.WARN)
+
+    def error(self, message: str) -> None:
+        """Lof a `DEBUG` message."""
+        self._log_message(message, logging.ERROR)
