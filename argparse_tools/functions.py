@@ -19,11 +19,15 @@ def positions_to_pixels(args: 'argparse.ArgumentParser',
         pos = args.reference
     elif args.coordinate:
         pos = args.coordinate
-    elif args.source:
-        for src in args.source:
-            pos += [src.position]
     else:
-        pos = None
+        try:
+            if args.source:
+                for src in args.source:
+                    pos += [src.position]
+            else:
+                pos = None
+        except AttributeError:
+            pos = None
 
     # Convert SkyCoords to pixels if wcs
     if wcs is not None and pos is not None:

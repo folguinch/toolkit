@@ -555,7 +555,7 @@ def spectrum_at_position(cube: SpectralCube,
         #x, y = int(x), int(y)
         x, y = aputils.skycoord_to_pixel(position, wcs)
         x, y = int(x), int(y)
-    except TypeError:
+    except (TypeError, AttributeError):
         x, y = tuple(map(int, position))
 
     # Spectrum
