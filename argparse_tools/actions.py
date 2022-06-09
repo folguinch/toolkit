@@ -6,10 +6,11 @@ import pathlib
 
 from astropy.io import fits
 from configparseradv import configparser
+from spectral_cube import SpectralCube
 import astropy.coordinates as apycoord
 import astropy.units as u
+import astropy.wcs as apwcs
 import numpy as np
-from spectral_cube import SpectralCube
 
 from ..array_utils import load_mixed_struct_array, load_struct_array
 from ..classes.dust import Dust
@@ -239,14 +240,19 @@ class ReadQuantity(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
                  **kwargs):
+        metavar = kwargs.get('metavar')
         try:
             if nargs < 2:
                 raise ValueError('nargs cannot be < 2')
+            elif metavar is None:
+                metavar = ('VAL',) * (nargs - 1) + ('UNIT',)
         except TypeError:
-            pass
+            if metavar is None:
+                metavar = ('VAL', 'VAL UNIT')
         self.enforce_list = enforce_list
 
-        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
+                         **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         if len(values) < 2:
@@ -274,7 +280,7 @@ class ReadUnit(argparse.Action):
 
 # Advanced processing actions
 class PeakPosition(argparse.Action):
-    """Load FITS file and get peak postion."""
+    """Load FITS file and get peak position as `SkyCoord`."""
 
     def __init__(self, option_strings, dest, nargs='*', **kwargs):
         if nargs not in ['*', '?', '+']:
@@ -288,11 +294,14 @@ class PeakPosition(argparse.Action):
         for val in values:
             # Data
             imgi = fits.open(val)[0]
+            wcs = apwcs.WCS(imgi.header, naxis=['longitude', 'latitude'])
 
             # Maximum
             data = np.squeeze(imgi.data)
             ymax, xmax = np.unravel_index(np.nanargmax(data), data.shape)
-            positions += [(xmax, ymax)]
+
+            # Store as skycoord in case it is used in image with different size
+            positions += [apwcs.utils.pixel_to_skycoord(xmax, ymax, wcs)]
 
         setattr(namespace, self.dest, positions)
 

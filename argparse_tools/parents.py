@@ -5,9 +5,9 @@ import pathlib
 import warnings
 
 try:
-    import astroSource.source as source
+    import astro_source.source as source
 except ImportError:
-    print('astroSource not available')
+    print('astro_source not available')
     pass
 
 from .functions import positions_to_pixels
@@ -18,10 +18,10 @@ PosFunction = Callable[[argparse.Namespace], None]
 Path = Union[pathlib.Path, str]
 
 def astro_source(parser: argparse.ArgumentParser) -> None:
-    """Read an `AstroSource`."""
+    """Read an `astro_source.Source`."""
     try:
         parser.add_argument('--source',
-                            action=source.LoadSourcesfromConfig,
+                            action=source.LoadSources,
                             help='Source(s) configuration file(s)')
     except NameError:
         pass
