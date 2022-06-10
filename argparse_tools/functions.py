@@ -48,9 +48,9 @@ def positions_to_pixels(args: 'argparse.ArgumentParser',
         pass
     args.position = args.coordinate = args.reference = pos
 
-def positions_to_pixels(args: 'argparse.ArgumentParser',
+def pixels_to_positions(args: 'argparse.ArgumentParser',
                         wcs: Optional['astropy.WCS'] = None) -> None:
-    """Store the positions in the `args` object as `SkyCoords`.
+    """Store the positions in `args` as `SkyCoords`.
 
     Args:
       args: argument parser.
