@@ -5,13 +5,12 @@ import pathlib
 import warnings
 
 try:
-    import astro_source.source as source
+    from astro_source import source
 except ImportError:
     print('astro_source not available')
-    pass
-
 from .functions import positions_to_pixels
-import toolkit.argparse_tools.actions as actions
+
+import actions
 
 # Typing
 PosFunction = Callable[[argparse.Namespace], None]

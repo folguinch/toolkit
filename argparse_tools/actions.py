@@ -1,4 +1,5 @@
 """Collection of actions to process diferent command line inputs."""
+from glob import glob
 from typing import List, Union
 import argparse
 import os
@@ -81,7 +82,7 @@ def split_values(values: list):
     vals = []
     for val in values:
         vals += val.split()
-    
+
     return vals
 
 # Loader actions
@@ -193,7 +194,7 @@ class LoadTable(argparse.Action):
             tabname = ''+values
             #table_id = os.path.splitext(os.path.basename(tabname))[0]
             table = Table(tabname)
-        except TypeError:
+        except TypeError as exc:
             if len(values) == 2:
                 table = Table(values[0], table_id=values[1])
             elif len(values) == 1:
@@ -201,7 +202,7 @@ class LoadTable(argparse.Action):
                 #table_id = os.path.splitext(os.path.basename(tabname))[0]
                 table = Table(tabname)
             else:
-                raise ValueError('Number of values not allowed.')
+                raise ValueError('Number of values not allowed.') from exc
 
         setattr(namespace, self.dest, table)
 
@@ -215,7 +216,7 @@ class ListFromFile(argparse.Action):
         super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        with open(values, 'r') as dat:
+        with open(values, 'r', encoding='utf-8') as dat:
             flist = dat.readlines()
 
         setattr(namespace, self.dest, flist)
@@ -229,7 +230,6 @@ class ListFromRegex(argparse.Action):
         super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        from glob import glob
         flist = sorted(glob(os.path.expanduser(values)))
 
         setattr(namespace, self.dest, flist)
