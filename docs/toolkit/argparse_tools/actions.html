@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>toolkit.argparse_tools.actions API documentation</title>
+<meta name="description" content="Collection of actions to process diferent command line inputs." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>toolkit.argparse_tools.actions</code></h1>
+</header>
+<section id="section-intro">
+<p>Collection of actions to process diferent command line inputs.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Collection of actions to process diferent command line inputs.&#34;&#34;&#34;
+from typing import List, Union
+import argparse
+import os
+import pathlib
+
+from astropy.io import fits
+from configparseradv import configparser
+import astropy.coordinates as apycoord
+import astropy.units as u
+import numpy as np
+from spectral_cube import SpectralCube
+
+from ..array_utils import load_mixed_struct_array, load_struct_array
+from ..classes.dust import Dust
+from ..logger import get_stdout_logger, update_logger
+from ..tables import Table
+
+def validate_path(path: pathlib.Path,
+                  check_is_file: bool = False,
+                  check_is_dir: bool = False,
+                  mkdir: bool = False):
+    &#34;&#34;&#34;Performs several checks on input path.
+
+    Args:
+      path: path to check.
+      check_is_file: optional; check whether is file and exists.
+      check_is_dir: optional; check whther is a directory and exists.
+      mkdir: optional; make directories if they do not exist.
+    Returns:
+      A validated resolved pathlib.Path object
+    &#34;&#34;&#34;
+    path = path.expanduser().resolve()
+    if check_is_file and not path.is_file():
+        raise IOError(f&#39;{path} does not exist&#39;)
+    elif check_is_dir or mkdir:
+        if not path.is_dir() and not mkdir:
+            raise IOError(f&#39;{path} directory does not exist&#39;)
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+
+    return path
+
+def validate_paths(filenames: Union[str, List[str]],
+                   check_is_file: bool = False,
+                   check_is_dir: bool = False,
+                   mkdir: bool = False):
+    &#34;&#34;&#34;Performs several checks on input list of file names.
+
+    Args:
+      filenames: list of filenames to check.
+      check_is_file: optional; check whether is file and exists.
+      check_is_dir: optional; check whther is a directory and exists.
+      mkdir: optional; make directories if they do not exist.
+    Returns:
+      Validate path.Path from the input strings.
+    &#34;&#34;&#34;
+    try:
+        # Case single string file name
+        validated = pathlib.Path(filenames)
+        validated = validate_path(validated, check_is_file=check_is_file,
+                                  check_is_dir=check_is_dir, mkdir=mkdir)
+    except TypeError:
+        # Case multiple file names
+        validated = []
+        for filename in filenames:
+            aux = pathlib.Path(filename)
+            aux = validate_path(aux, check_is_file=check_is_file,
+                                check_is_dir=check_is_dir, mkdir=mkdir)
+            validated.append(aux)
+
+    return validated
+
+# Loader actions
+class LoadConfig(argparse.Action):
+    &#34;&#34;&#34;Action class for loading a configuration file in argparse.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        config = configparser.ConfigParserAdv()
+        config.read(values)
+        setattr(namespace, self.dest, config)
+
+class LoadArray(argparse.Action):
+    &#34;&#34;&#34;Action class for loading a np.array from command line.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = np.array(values, dtype=float)
+        setattr(namespace, self.dest, array)
+
+class ArrayFromRange(argparse.Action):
+    &#34;&#34;&#34;Action class for creating a np.array with linspace from command line&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        if nargs not in range(2, 5):
+            raise ValueError(&#39;only 2, 3 or 4 nargs allowed&#39;)
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        start, stop = float(values[0]), float(values[1])
+        if len(values) == 4:
+            n = int(values[2])
+            if values[-1] == &#39;linear&#39;:
+                fn = np.linspace
+            elif values[-1] == &#39;log&#39;:
+                fn = np.logspace
+                start = np.log10(start)
+                stop = np.log10(stop)
+            else:
+                raise NotImplementedError(f&#39;{values[-1]} not implemented&#39;)
+        elif len(values) == 3:
+            fn = np.linspace
+            n = int(values[2])
+        else:
+            fn = np.linspace
+        value = fn(start, stop, n)
+        setattr(namespace, self.dest, value)
+
+class LoadStructArray(argparse.Action):
+    &#34;&#34;&#34;Load an structured np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = load_struct_array(validate_paths(values, check_is_file=True))
+        setattr(namespace, self.dest, array)
+
+class LoadMixedStructArray(argparse.Action):
+    &#34;&#34;&#34;Load a mixed structured np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = load_mixed_struct_array(
+            validate_paths(values, check_is_file=True))
+        setattr(namespace, self.dest, array)
+
+class LoadTXTArray(argparse.Action):
+    &#34;&#34;&#34;Load an np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = np.loadtxt(validate_paths(values, check_is_file=True),
+                           dtype=float)
+        setattr(namespace, self.dest, array)
+
+class LoadFITS(argparse.Action):
+    &#34;&#34;&#34;Action for loading a FITS file with astropy&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        try:
+            vals = fits.open(values.resolve())[0]
+        except AttributeError:
+            vals = []
+            for val in values:
+                vals += [fits.open(val)[0]]
+        setattr(namespace, self.dest, vals)
+
+class LoadCube(argparse.Action):
+    &#34;&#34;&#34;Action for loading an SpectralCube&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        try:
+            vals = SpectralCube.read(values.resolve())
+        except AttributeError:
+            vals = []
+            for val in values:
+                vals += [SpectralCube.read(val)]
+        setattr(namespace, self.dest, vals)
+
+class LoadDust(argparse.Action):
+    &#34;&#34;&#34;Action for loading dust files&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        dust = Dust(values)
+        setattr(namespace, self.dest, dust)
+
+class LoadTable(argparse.Action):
+    &#34;&#34;&#34;Action for loading astropy Tables&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            tabname = &#39;&#39;+values
+            #table_id = os.path.splitext(os.path.basename(tabname))[0]
+            table = Table(tabname)
+        except TypeError:
+            if len(values) == 2:
+                table = Table(values[0], table_id=values[1])
+            elif len(values) == 1:
+                tabname = values[0]
+                #table_id = os.path.splitext(os.path.basename(tabname))[0]
+                table = Table(tabname)
+            else:
+                raise ValueError(&#39;Number of values not allowed.&#39;)
+
+        setattr(namespace, self.dest, table)
+
+# Lists actions
+class ListFromFile(argparse.Action):
+    &#34;&#34;&#34;Load a list of strings from file.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        with open(values, &#39;r&#39;) as dat:
+            flist = dat.readlines()
+
+        setattr(namespace, self.dest, flist)
+
+class ListFromRegex(argparse.Action):
+    &#34;&#34;&#34;Load a list of files from a regular expression.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from glob import glob
+        flist = sorted(glob(os.path.expanduser(values)))
+
+        setattr(namespace, self.dest, flist)
+
+# Quantity actions
+class ReadQuantity(argparse.Action):
+    &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
+                 **kwargs):
+        try:
+            if nargs &lt; 2:
+                raise ValueError(&#39;nargs cannot be &lt; 2&#39;)
+        except TypeError:
+            pass
+        self.enforce_list = enforce_list
+
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if len(values) &lt; 2:
+            raise ValueError(f&#39;Cannot read quantity from values: {values}&#39;)
+        vals = np.array(values[:-1], dtype=float)
+        unit = u.Unit(values[-1])
+        if len(vals) == 1 and not self.enforce_list:
+            vals = vals[0]
+        vals = vals * unit
+        setattr(namespace, self.dest, vals)
+
+class ReadUnit(argparse.Action):
+    &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        vals = []
+        try:
+            for val in values:
+                vals.append(u.Unit(val))
+            if len(vals) == 1:
+                vals = vals[0]
+        except ValueError:
+            vals = u.Unit(values)
+        setattr(namespace, self.dest, vals)
+
+# Advanced processing actions
+class PeakPosition(argparse.Action):
+    &#34;&#34;&#34;Load FITS file and get peak postion.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=&#39;*&#39;, **kwargs):
+        if nargs not in [&#39;*&#39;, &#39;?&#39;, &#39;+&#39;]:
+            raise ValueError(f&#39;nargs={nargs} not accepted for PeakPosition&#39;)
+        kwargs.setdefault(&#39;metavar&#39;, (&#39;FITSFILE&#39;,)*2)
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        positions = []
+        values = validate_paths(values, check_is_file=True)
+        for val in values:
+            # Data
+            imgi = fits.open(val)[0]
+
+            # Maximum
+            data = np.squeeze(imgi.data)
+            ymax, xmax = np.unravel_index(np.nanargmax(data), data.shape)
+            positions += [(xmax, ymax)]
+
+        setattr(namespace, self.dest, positions)
+
+class ReadSkyCoords(argparse.Action):
+    &#34;&#34;&#34;Read one or more sky coordinates.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        try:
+            if nargs &lt; 2:
+                raise ValueError(&#39;Only nargs values &gt;= 2 accepted&#39;)
+            if nargs%2 == 0:
+                kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*nargs)
+            else:
+                kwargs.setdefault(&#39;metavar&#39;,
+                                  (&#39;RA Dec &#39;,)*(nargs-1) + (&#39;FRAME&#39;,))
+        except TypeError:
+            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;, &#39;RA Dec [FRAME]&#39;))
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if len(values) &lt; 2:
+            raise ValueError(&#39;Could not read sky coordinate&#39;)
+        elif len(values)%2 == 0:
+            frame = &#39;icrs&#39;
+        else:
+            frame = values[-1]
+            values = values[:-1]
+        vals = []
+        for ra, dec in zip(values[::2], values[1::2]):
+            vals.append(apycoord.SkyCoord(ra, dec, frame=frame))
+
+        setattr(namespace, self.dest, vals)
+
+# Path actions
+class NormalizePath(argparse.Action):
+    &#34;&#34;&#34;Normalizes a path or filename.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values)
+        setattr(namespace, self.dest, values)
+
+class MakePath(argparse.Action):
+    &#34;&#34;&#34;Check and create directory if needed.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, mkdir=True)
+        setattr(namespace, self.dest, values)
+
+class CheckFile(argparse.Action):
+    &#34;&#34;&#34;Validates files and check if they exist.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        setattr(namespace, self.dest, values)
+
+# Logger actions
+class StartLogger(argparse.Action):
+    &#34;&#34;&#34;Create a logger.
+
+    If nargs=? (default), log to default or const if provided and flag used
+    else log only to stdout.
+    For verbose levels, the standard option_string values are:
+      -v, --vv, --vvv, --log, --info, --debug, --fulldebug
+    With: -v = --log = --info
+          --vv = --debug
+          --vvv = --fulldebug
+    Other values will create a normal logger.
+    &#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;,
+                 const=None, default=None, **kwargs):
+        # Cases from nargs
+        if nargs not in [&#39;?&#39;]:
+            raise ValueError(&#39;nargs value not allowed&#39;)
+
+        # Default dest and default log file
+        dest = &#39;log&#39;
+        self._logfile = const or default
+
+        # Set default to stdout
+        const = None
+        default = get_stdout_logger(&#39;__main__&#39;, verbose=&#39;v&#39;)
+
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
+                         const=const, default=default, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        if value is None:
+            value = self._logfile
+
+        # Determine verbose
+        if option_string in [&#39;-v&#39;, &#39;--log&#39;, &#39;--info&#39;]:
+            verbose = &#39;v&#39;
+        elif option_string in [&#39;--vv&#39;, &#39;--debug&#39;]:
+            verbose = &#39;vv&#39;
+        elif option_string in [&#39;--vvv&#39;, &#39;--fulldebug&#39;]:
+            verbose = &#39;vvv&#39;
+        else:
+            verbose = None
+
+        logger = update_logger(self.default, filename=value, verbose=verbose)
+        setattr(namespace, self.dest, logger)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="toolkit.argparse_tools.actions.validate_path"><code class="name flex">
+<span>def <span class="ident">validate_path</span></span>(<span>path: pathlib.Path, check_is_file: bool = False, check_is_dir: bool = False, mkdir: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Performs several checks on input path.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong></dt>
+<dd>path to check.</dd>
+<dt><strong><code>check_is_file</code></strong></dt>
+<dd>optional; check whether is file and exists.</dd>
+<dt><strong><code>check_is_dir</code></strong></dt>
+<dd>optional; check whther is a directory and exists.</dd>
+<dt><strong><code>mkdir</code></strong></dt>
+<dd>optional; make directories if they do not exist.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A validated resolved pathlib.Path object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_path(path: pathlib.Path,
+                  check_is_file: bool = False,
+                  check_is_dir: bool = False,
+                  mkdir: bool = False):
+    &#34;&#34;&#34;Performs several checks on input path.
+
+    Args:
+      path: path to check.
+      check_is_file: optional; check whether is file and exists.
+      check_is_dir: optional; check whther is a directory and exists.
+      mkdir: optional; make directories if they do not exist.
+    Returns:
+      A validated resolved pathlib.Path object
+    &#34;&#34;&#34;
+    path = path.expanduser().resolve()
+    if check_is_file and not path.is_file():
+        raise IOError(f&#39;{path} does not exist&#39;)
+    elif check_is_dir or mkdir:
+        if not path.is_dir() and not mkdir:
+            raise IOError(f&#39;{path} directory does not exist&#39;)
+        else:
+            path.mkdir(parents=True, exist_ok=True)
+
+    return path</code></pre>
+</details>
+</dd>
+<dt id="toolkit.argparse_tools.actions.validate_paths"><code class="name flex">
+<span>def <span class="ident">validate_paths</span></span>(<span>filenames: Union[str, List[str]], check_is_file: bool = False, check_is_dir: bool = False, mkdir: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Performs several checks on input list of file names.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filenames</code></strong></dt>
+<dd>list of filenames to check.</dd>
+<dt><strong><code>check_is_file</code></strong></dt>
+<dd>optional; check whether is file and exists.</dd>
+<dt><strong><code>check_is_dir</code></strong></dt>
+<dd>optional; check whther is a directory and exists.</dd>
+<dt><strong><code>mkdir</code></strong></dt>
+<dd>optional; make directories if they do not exist.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Validate path.Path from the input strings.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def validate_paths(filenames: Union[str, List[str]],
+                   check_is_file: bool = False,
+                   check_is_dir: bool = False,
+                   mkdir: bool = False):
+    &#34;&#34;&#34;Performs several checks on input list of file names.
+
+    Args:
+      filenames: list of filenames to check.
+      check_is_file: optional; check whether is file and exists.
+      check_is_dir: optional; check whther is a directory and exists.
+      mkdir: optional; make directories if they do not exist.
+    Returns:
+      Validate path.Path from the input strings.
+    &#34;&#34;&#34;
+    try:
+        # Case single string file name
+        validated = pathlib.Path(filenames)
+        validated = validate_path(validated, check_is_file=check_is_file,
+                                  check_is_dir=check_is_dir, mkdir=mkdir)
+    except TypeError:
+        # Case multiple file names
+        validated = []
+        for filename in filenames:
+            aux = pathlib.Path(filename)
+            aux = validate_path(aux, check_is_file=check_is_file,
+                                check_is_dir=check_is_dir, mkdir=mkdir)
+            validated.append(aux)
+
+    return validated</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="toolkit.argparse_tools.actions.ArrayFromRange"><code class="flex name class">
+<span>class <span class="ident">ArrayFromRange</span></span>
+<span>(</span><span>option_strings, dest, nargs=2, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action class for creating a np.array with linspace from command line</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ArrayFromRange(argparse.Action):
+    &#34;&#34;&#34;Action class for creating a np.array with linspace from command line&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        if nargs not in range(2, 5):
+            raise ValueError(&#39;only 2, 3 or 4 nargs allowed&#39;)
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        start, stop = float(values[0]), float(values[1])
+        if len(values) == 4:
+            n = int(values[2])
+            if values[-1] == &#39;linear&#39;:
+                fn = np.linspace
+            elif values[-1] == &#39;log&#39;:
+                fn = np.logspace
+                start = np.log10(start)
+                stop = np.log10(stop)
+            else:
+                raise NotImplementedError(f&#39;{values[-1]} not implemented&#39;)
+        elif len(values) == 3:
+            fn = np.linspace
+            n = int(values[2])
+        else:
+            fn = np.linspace
+        value = fn(start, stop, n)
+        setattr(namespace, self.dest, value)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.CheckFile"><code class="flex name class">
+<span>class <span class="ident">CheckFile</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Validates files and check if they exist.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CheckFile(argparse.Action):
+    &#34;&#34;&#34;Validates files and check if they exist.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        setattr(namespace, self.dest, values)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.ListFromFile"><code class="flex name class">
+<span>class <span class="ident">ListFromFile</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load a list of strings from file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ListFromFile(argparse.Action):
+    &#34;&#34;&#34;Load a list of strings from file.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        with open(values, &#39;r&#39;) as dat:
+            flist = dat.readlines()
+
+        setattr(namespace, self.dest, flist)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.ListFromRegex"><code class="flex name class">
+<span>class <span class="ident">ListFromRegex</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load a list of files from a regular expression.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ListFromRegex(argparse.Action):
+    &#34;&#34;&#34;Load a list of files from a regular expression.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        if nargs is not None:
+            raise ValueError(&#39;nargs not allowed&#39;)
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        from glob import glob
+        flist = sorted(glob(os.path.expanduser(values)))
+
+        setattr(namespace, self.dest, flist)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadArray"><code class="flex name class">
+<span>class <span class="ident">LoadArray</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action class for loading a np.array from command line.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadArray(argparse.Action):
+    &#34;&#34;&#34;Action class for loading a np.array from command line.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = np.array(values, dtype=float)
+        setattr(namespace, self.dest, array)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadConfig"><code class="flex name class">
+<span>class <span class="ident">LoadConfig</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action class for loading a configuration file in argparse.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadConfig(argparse.Action):
+    &#34;&#34;&#34;Action class for loading a configuration file in argparse.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        config = configparser.ConfigParserAdv()
+        config.read(values)
+        setattr(namespace, self.dest, config)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadCube"><code class="flex name class">
+<span>class <span class="ident">LoadCube</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action for loading an SpectralCube</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadCube(argparse.Action):
+    &#34;&#34;&#34;Action for loading an SpectralCube&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        try:
+            vals = SpectralCube.read(values.resolve())
+        except AttributeError:
+            vals = []
+            for val in values:
+                vals += [SpectralCube.read(val)]
+        setattr(namespace, self.dest, vals)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadDust"><code class="flex name class">
+<span>class <span class="ident">LoadDust</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action for loading dust files</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadDust(argparse.Action):
+    &#34;&#34;&#34;Action for loading dust files&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        dust = Dust(values)
+        setattr(namespace, self.dest, dust)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadFITS"><code class="flex name class">
+<span>class <span class="ident">LoadFITS</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action for loading a FITS file with astropy</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadFITS(argparse.Action):
+    &#34;&#34;&#34;Action for loading a FITS file with astropy&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, check_is_file=True)
+        try:
+            vals = fits.open(values.resolve())[0]
+        except AttributeError:
+            vals = []
+            for val in values:
+                vals += [fits.open(val)[0]]
+        setattr(namespace, self.dest, vals)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadMixedStructArray"><code class="flex name class">
+<span>class <span class="ident">LoadMixedStructArray</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load a mixed structured np.array from file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadMixedStructArray(argparse.Action):
+    &#34;&#34;&#34;Load a mixed structured np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = load_mixed_struct_array(
+            validate_paths(values, check_is_file=True))
+        setattr(namespace, self.dest, array)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadStructArray"><code class="flex name class">
+<span>class <span class="ident">LoadStructArray</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load an structured np.array from file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadStructArray(argparse.Action):
+    &#34;&#34;&#34;Load an structured np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = load_struct_array(validate_paths(values, check_is_file=True))
+        setattr(namespace, self.dest, array)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadTXTArray"><code class="flex name class">
+<span>class <span class="ident">LoadTXTArray</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load an np.array from file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadTXTArray(argparse.Action):
+    &#34;&#34;&#34;Load an np.array from file.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        array = np.loadtxt(validate_paths(values, check_is_file=True),
+                           dtype=float)
+        setattr(namespace, self.dest, array)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.LoadTable"><code class="flex name class">
+<span>class <span class="ident">LoadTable</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Action for loading astropy Tables</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LoadTable(argparse.Action):
+    &#34;&#34;&#34;Action for loading astropy Tables&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        try:
+            tabname = &#39;&#39;+values
+            #table_id = os.path.splitext(os.path.basename(tabname))[0]
+            table = Table(tabname)
+        except TypeError:
+            if len(values) == 2:
+                table = Table(values[0], table_id=values[1])
+            elif len(values) == 1:
+                tabname = values[0]
+                #table_id = os.path.splitext(os.path.basename(tabname))[0]
+                table = Table(tabname)
+            else:
+                raise ValueError(&#39;Number of values not allowed.&#39;)
+
+        setattr(namespace, self.dest, table)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.MakePath"><code class="flex name class">
+<span>class <span class="ident">MakePath</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check and create directory if needed.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MakePath(argparse.Action):
+    &#34;&#34;&#34;Check and create directory if needed.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values, mkdir=True)
+        setattr(namespace, self.dest, values)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.NormalizePath"><code class="flex name class">
+<span>class <span class="ident">NormalizePath</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Normalizes a path or filename.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NormalizePath(argparse.Action):
+    &#34;&#34;&#34;Normalizes a path or filename.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        values = validate_paths(values)
+        setattr(namespace, self.dest, values)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.PeakPosition"><code class="flex name class">
+<span>class <span class="ident">PeakPosition</span></span>
+<span>(</span><span>option_strings, dest, nargs='*', **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load FITS file and get peak postion.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PeakPosition(argparse.Action):
+    &#34;&#34;&#34;Load FITS file and get peak postion.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=&#39;*&#39;, **kwargs):
+        if nargs not in [&#39;*&#39;, &#39;?&#39;, &#39;+&#39;]:
+            raise ValueError(f&#39;nargs={nargs} not accepted for PeakPosition&#39;)
+        kwargs.setdefault(&#39;metavar&#39;, (&#39;FITSFILE&#39;,)*2)
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        positions = []
+        values = validate_paths(values, check_is_file=True)
+        for val in values:
+            # Data
+            imgi = fits.open(val)[0]
+
+            # Maximum
+            data = np.squeeze(imgi.data)
+            ymax, xmax = np.unravel_index(np.nanargmax(data), data.shape)
+            positions += [(xmax, ymax)]
+
+        setattr(namespace, self.dest, positions)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.ReadQuantity"><code class="flex name class">
+<span>class <span class="ident">ReadQuantity</span></span>
+<span>(</span><span>option_strings, dest, nargs=2, enforce_list=False, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read quantity or a quantity list from the cmd line.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ReadQuantity(argparse.Action):
+    &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
+                 **kwargs):
+        try:
+            if nargs &lt; 2:
+                raise ValueError(&#39;nargs cannot be &lt; 2&#39;)
+        except TypeError:
+            pass
+        self.enforce_list = enforce_list
+
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if len(values) &lt; 2:
+            raise ValueError(f&#39;Cannot read quantity from values: {values}&#39;)
+        vals = np.array(values[:-1], dtype=float)
+        unit = u.Unit(values[-1])
+        if len(vals) == 1 and not self.enforce_list:
+            vals = vals[0]
+        vals = vals * unit
+        setattr(namespace, self.dest, vals)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.ReadSkyCoords"><code class="flex name class">
+<span>class <span class="ident">ReadSkyCoords</span></span>
+<span>(</span><span>option_strings, dest, nargs=2, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read one or more sky coordinates.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ReadSkyCoords(argparse.Action):
+    &#34;&#34;&#34;Read one or more sky coordinates.&#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=2, **kwargs):
+        try:
+            if nargs &lt; 2:
+                raise ValueError(&#39;Only nargs values &gt;= 2 accepted&#39;)
+            if nargs%2 == 0:
+                kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;,)*nargs)
+            else:
+                kwargs.setdefault(&#39;metavar&#39;,
+                                  (&#39;RA Dec &#39;,)*(nargs-1) + (&#39;FRAME&#39;,))
+        except TypeError:
+            kwargs.setdefault(&#39;metavar&#39;, (&#39;RA Dec&#39;, &#39;RA Dec [FRAME]&#39;))
+        super().__init__(option_strings, dest, nargs=nargs, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if len(values) &lt; 2:
+            raise ValueError(&#39;Could not read sky coordinate&#39;)
+        elif len(values)%2 == 0:
+            frame = &#39;icrs&#39;
+        else:
+            frame = values[-1]
+            values = values[:-1]
+        vals = []
+        for ra, dec in zip(values[::2], values[1::2]):
+            vals.append(apycoord.SkyCoord(ra, dec, frame=frame))
+
+        setattr(namespace, self.dest, vals)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.ReadUnit"><code class="flex name class">
+<span>class <span class="ident">ReadUnit</span></span>
+<span>(</span><span>option_strings, dest, nargs=None, const=None, default=None, type=None, choices=None, required=False, help=None, metavar=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read quantity or a quantity list from the cmd line.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ReadUnit(argparse.Action):
+    &#34;&#34;&#34;Read quantity or a quantity list from the cmd line.&#34;&#34;&#34;
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        vals = []
+        try:
+            for val in values:
+                vals.append(u.Unit(val))
+            if len(vals) == 1:
+                vals = vals[0]
+        except ValueError:
+            vals = u.Unit(values)
+        setattr(namespace, self.dest, vals)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+<dt id="toolkit.argparse_tools.actions.StartLogger"><code class="flex name class">
+<span>class <span class="ident">StartLogger</span></span>
+<span>(</span><span>option_strings, dest, nargs='?', metavar='LOGFILE', const=None, default=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a logger.</p>
+<p>If nargs=? (default), log to default or const if provided and flag used
+else log only to stdout.
+For verbose levels, the standard option_string values are:
+-v, &ndash;vv, &ndash;vvv, &ndash;log, &ndash;info, &ndash;debug, &ndash;fulldebug
+With: -v = &ndash;log = &ndash;info
+&ndash;vv = &ndash;debug
+&ndash;vvv = &ndash;fulldebug
+Other values will create a normal logger.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StartLogger(argparse.Action):
+    &#34;&#34;&#34;Create a logger.
+
+    If nargs=? (default), log to default or const if provided and flag used
+    else log only to stdout.
+    For verbose levels, the standard option_string values are:
+      -v, --vv, --vvv, --log, --info, --debug, --fulldebug
+    With: -v = --log = --info
+          --vv = --debug
+          --vvv = --fulldebug
+    Other values will create a normal logger.
+    &#34;&#34;&#34;
+
+    def __init__(self, option_strings, dest, nargs=&#39;?&#39;, metavar=&#39;LOGFILE&#39;,
+                 const=None, default=None, **kwargs):
+        # Cases from nargs
+        if nargs not in [&#39;?&#39;]:
+            raise ValueError(&#39;nargs value not allowed&#39;)
+
+        # Default dest and default log file
+        dest = &#39;log&#39;
+        self._logfile = const or default
+
+        # Set default to stdout
+        const = None
+        default = get_stdout_logger(&#39;__main__&#39;, verbose=&#39;v&#39;)
+
+        super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
+                         const=const, default=default, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        if value is None:
+            value = self._logfile
+
+        # Determine verbose
+        if option_string in [&#39;-v&#39;, &#39;--log&#39;, &#39;--info&#39;]:
+            verbose = &#39;v&#39;
+        elif option_string in [&#39;--vv&#39;, &#39;--debug&#39;]:
+            verbose = &#39;vv&#39;
+        elif option_string in [&#39;--vvv&#39;, &#39;--fulldebug&#39;]:
+            verbose = &#39;vvv&#39;
+        else:
+            verbose = None
+
+        logger = update_logger(self.default, filename=value, verbose=verbose)
+        setattr(namespace, self.dest, logger)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>argparse.Action</li>
+<li>argparse._AttributeHolder</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="toolkit.argparse_tools" href="index.html">toolkit.argparse_tools</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="toolkit.argparse_tools.actions.validate_path" href="#toolkit.argparse_tools.actions.validate_path">validate_path</a></code></li>
+<li><code><a title="toolkit.argparse_tools.actions.validate_paths" href="#toolkit.argparse_tools.actions.validate_paths">validate_paths</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ArrayFromRange" href="#toolkit.argparse_tools.actions.ArrayFromRange">ArrayFromRange</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.CheckFile" href="#toolkit.argparse_tools.actions.CheckFile">CheckFile</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ListFromFile" href="#toolkit.argparse_tools.actions.ListFromFile">ListFromFile</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ListFromRegex" href="#toolkit.argparse_tools.actions.ListFromRegex">ListFromRegex</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadArray" href="#toolkit.argparse_tools.actions.LoadArray">LoadArray</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadConfig" href="#toolkit.argparse_tools.actions.LoadConfig">LoadConfig</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadCube" href="#toolkit.argparse_tools.actions.LoadCube">LoadCube</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadDust" href="#toolkit.argparse_tools.actions.LoadDust">LoadDust</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadFITS" href="#toolkit.argparse_tools.actions.LoadFITS">LoadFITS</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadMixedStructArray" href="#toolkit.argparse_tools.actions.LoadMixedStructArray">LoadMixedStructArray</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadStructArray" href="#toolkit.argparse_tools.actions.LoadStructArray">LoadStructArray</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadTXTArray" href="#toolkit.argparse_tools.actions.LoadTXTArray">LoadTXTArray</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.LoadTable" href="#toolkit.argparse_tools.actions.LoadTable">LoadTable</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.MakePath" href="#toolkit.argparse_tools.actions.MakePath">MakePath</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.NormalizePath" href="#toolkit.argparse_tools.actions.NormalizePath">NormalizePath</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.PeakPosition" href="#toolkit.argparse_tools.actions.PeakPosition">PeakPosition</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ReadQuantity" href="#toolkit.argparse_tools.actions.ReadQuantity">ReadQuantity</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ReadSkyCoords" href="#toolkit.argparse_tools.actions.ReadSkyCoords">ReadSkyCoords</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.ReadUnit" href="#toolkit.argparse_tools.actions.ReadUnit">ReadUnit</a></code></h4>
+</li>
+<li>
+<h4><code><a title="toolkit.argparse_tools.actions.StartLogger" href="#toolkit.argparse_tools.actions.StartLogger">StartLogger</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

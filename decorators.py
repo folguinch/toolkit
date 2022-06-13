@@ -24,7 +24,7 @@ def logged_class(name, filename):
 
         def __init__(self, cls, name=name, filename=filename):
             self.cls = cls
-            print name, filename
+            print(name, filename)
             self.logger = get_logger(name, filename)
 
         def __call__(self, *args, **kwargs):
