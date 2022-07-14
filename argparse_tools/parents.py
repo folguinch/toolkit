@@ -8,9 +8,10 @@ try:
     from astro_source import source
 except ImportError:
     print('astro_source not available')
-from .functions import positions_to_pixels
 
-import actions
+from .functions import positions_to_pixels
+from .actions import (ReadSkyCoords, PeakPosition, StartLogger, CheckFile,
+                      MakePath)
 
 # Typing
 PosFunction = Callable[[argparse.Namespace], None]
@@ -44,12 +45,12 @@ def source_position(
     parser = argparse.ArgumentParser(add_help=False)
     group1 = parser.add_mutually_exclusive_group(required=required)
     group1.add_argument('--coordinate', nargs='*',
-                        action=actions.ReadSkyCoords,
+                        action=ReadSkyCoords,
                         help='Sky coordinates with units or : separator')
     group1.add_argument('--position', metavar=('X Y',)*2, nargs='*', type=int,
                         help='Positions')
     group1.add_argument('--reference', metavar='IMG',
-                        action=actions.PeakPosition,
+                        action=PeakPosition,
                         help='Reference image to get position from peak')
     astro_source(group1)
     warnings.warn(('The values pos and position_fn will be removed from'
@@ -67,7 +68,7 @@ def logger(filename: Optional[Path] = None) -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-v', '--vv', '--vvv', default=filename,
-                        action=actions.StartLogger,
+                        action=StartLogger,
                         help='Logging setup')
 
     return parser
@@ -86,7 +87,7 @@ def verify_files(*args, **kwargs) -> argparse.ArgumentParser:
             key = opt.strip('-')
         else:
             key = opt
-        parser.add_argument(f'{opt}', action=actions.CheckFile,
+        parser.add_argument(f'{opt}', action=CheckFile,
                             **kwargs[key])
 
     return parser
@@ -100,7 +101,7 @@ def paths(*args, **kwargs) -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(add_help=False)
     for opt in args:
-        parser.add_argument(f'--{opt}', action=actions.MakePath,
+        parser.add_argument(f'--{opt}', action=MakePath,
                             **kwargs[opt])
 
     return parser
