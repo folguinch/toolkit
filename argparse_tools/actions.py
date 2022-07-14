@@ -240,7 +240,7 @@ class ReadQuantity(argparse.Action):
 
     def __init__(self, option_strings, dest, nargs=2, enforce_list=False,
                  **kwargs):
-        metavar = kwargs.pop('metavar')
+        metavar = kwargs.pop('metavar', None)
         try:
             if nargs < 2:
                 raise ValueError('nargs cannot be < 2')
