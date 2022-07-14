@@ -437,9 +437,9 @@ def get_moment(cube: SpectralCube,
             log('Using lower flux limit: %s',
                 f'{lower_limit.value:.3f} {lower_limit.unit}')
             mask = subcube >= lower_limit
-        elif (rms or 'RMS' in subcube.header or
+        elif (rms  is not None or 'RMS' in subcube.header or
               'RMS' in subcube.meta or auto_rms):
-            if rms:
+            if rms is not None:
                 log(f'Using input rms: {rms.value:.3e} {rms.unit}')
             elif 'RMS' in subcube.header:
                 rms = float(subcube.header['RMS']) * subcube.unit
