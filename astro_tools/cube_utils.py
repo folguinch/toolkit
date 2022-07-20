@@ -51,7 +51,7 @@ def get_cube_rms(cube: SpectralCube, use_header: bool = False,
     try:
         if not sampled:
             log('Calculating rms from cube')
-            rms = quick_rms(cube.unmasked_data)
+            rms = quick_rms(cube.unmasked_data[:])
         else:
             log('Calculating rms from 20% of channels')
             nchans = len(cube.spectral_axis)
@@ -327,7 +327,7 @@ def moment_from_config(cube: SpectralCube,
                        filename: Optional[Path] = None) -> Map:
     """Calculate the moments with parameters from config file.
 
-    The parameters are passed to the get_moment function.
+    The parameters are passed to the `get_moment` function.
 
     Args:
       cube: spectral cube.
@@ -377,6 +377,7 @@ def get_moment(cube: SpectralCube,
                nsigma: float = 5.,
                rms: Optional[u.Quantity] = None,
                auto_rms: bool = False,
+               skip_beam_error: bool = False,
                log: Callable = print,
                **kwargs) -> Map:
     """ Calculate a moment map.
@@ -387,6 +388,10 @@ def get_moment(cube: SpectralCube,
     Note that if the linefreq is not given, the rest frequency value in the
     cube header will be used, so the velocity values will be calculated with
     respect to that value.
+
+    If beams differ more than 1% `spectral_cube` will raise `ValueError`. The
+    moment calculation can be skipped in this case by setting `skip_beam_error`
+    to `True`.
 
     Args:
       cube: spectral cube.
@@ -399,6 +404,7 @@ def get_moment(cube: SpectralCube,
       nsigma: determine lower_limit from number of sigma (rms) values.
       rms: optional; cube rms.
       auto_rms: optional; calculate the cube rms.
+      skip_beam_error: optional; raise exception if beams differ more than 1%?
       log: optional; logging function.
       kwargs: additional parameters for get_subcube function.
     """
@@ -461,10 +467,16 @@ def get_moment(cube: SpectralCube,
         subcube = subcube.with_mask(mask)
 
     # Moment
-    if mom == 2:
-        mmnt = subcube.linewidth_fwhm()
-    else:
-        mmnt = subcube.moment(order=mom)
+    try:
+        if mom == 2:
+            mmnt = subcube.linewidth_fwhm()
+        else:
+            mmnt = subcube.moment(order=mom)
+    except ValueError as exc:
+        if skip_beam_error:
+            log('Beams differ more than 1%, skipping moment calculation')
+        else:
+            raise ValueError from exc
 
     # RMS of moment 0
     if mom == 0:
