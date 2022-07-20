@@ -475,6 +475,7 @@ def get_moment(cube: SpectralCube,
     except ValueError as exc:
         if skip_beam_error:
             log('Beams differ more than 1%, skipping moment calculation')
+            return None
         else:
             raise ValueError from exc
 
