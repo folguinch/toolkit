@@ -362,7 +362,7 @@ order to implement logging for the class.</p>
 </span><span id="L-255"><a href="#L-255"><span class="linenos">255</span></a><span class="sd">    standard output. The logging can be disable if the `enabled` attribute is</span>
 </span><span id="L-256"><a href="#L-256"><span class="linenos">256</span></a><span class="sd">    set to `False`.</span>
 </span><span id="L-257"><a href="#L-257"><span class="linenos">257</span></a>
-</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">    Attribute:</span>
+</span><span id="L-258"><a href="#L-258"><span class="linenos">258</span></a><span class="sd">    Attributes:</span>
 </span><span id="L-259"><a href="#L-259"><span class="linenos">259</span></a><span class="sd">      log: logger object.</span>
 </span><span id="L-260"><a href="#L-260"><span class="linenos">260</span></a><span class="sd">      enabled: enable or disable logging.</span>
 </span><span id="L-261"><a href="#L-261"><span class="linenos">261</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -384,15 +384,15 @@ order to implement logging for the class.</p>
 </span><span id="L-277"><a href="#L-277"><span class="linenos">277</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </span><span id="L-278"><a href="#L-278"><span class="linenos">278</span></a>
 </span><span id="L-279"><a href="#L-279"><span class="linenos">279</span></a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="L-280"><a href="#L-280"><span class="linenos">280</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="L-281"><a href="#L-281"><span class="linenos">281</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 </span><span id="L-282"><a href="#L-282"><span class="linenos">282</span></a>
 </span><span id="L-283"><a href="#L-283"><span class="linenos">283</span></a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="L-284"><a href="#L-284"><span class="linenos">284</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="L-285"><a href="#L-285"><span class="linenos">285</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
 </span><span id="L-286"><a href="#L-286"><span class="linenos">286</span></a>
 </span><span id="L-287"><a href="#L-287"><span class="linenos">287</span></a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="L-288"><a href="#L-288"><span class="linenos">288</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="L-289"><a href="#L-289"><span class="linenos">289</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 </span></pre></div>
 
@@ -817,7 +817,7 @@ time to the stdout log.</li>
 </span><span id="LoggedObject-256"><a href="#LoggedObject-256"><span class="linenos">256</span></a><span class="sd">    standard output. The logging can be disable if the `enabled` attribute is</span>
 </span><span id="LoggedObject-257"><a href="#LoggedObject-257"><span class="linenos">257</span></a><span class="sd">    set to `False`.</span>
 </span><span id="LoggedObject-258"><a href="#LoggedObject-258"><span class="linenos">258</span></a>
-</span><span id="LoggedObject-259"><a href="#LoggedObject-259"><span class="linenos">259</span></a><span class="sd">    Attribute:</span>
+</span><span id="LoggedObject-259"><a href="#LoggedObject-259"><span class="linenos">259</span></a><span class="sd">    Attributes:</span>
 </span><span id="LoggedObject-260"><a href="#LoggedObject-260"><span class="linenos">260</span></a><span class="sd">      log: logger object.</span>
 </span><span id="LoggedObject-261"><a href="#LoggedObject-261"><span class="linenos">261</span></a><span class="sd">      enabled: enable or disable logging.</span>
 </span><span id="LoggedObject-262"><a href="#LoggedObject-262"><span class="linenos">262</span></a><span class="sd">    &quot;&quot;&quot;</span>
@@ -839,15 +839,15 @@ time to the stdout log.</li>
 </span><span id="LoggedObject-278"><a href="#LoggedObject-278"><span class="linenos">278</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </span><span id="LoggedObject-279"><a href="#LoggedObject-279"><span class="linenos">279</span></a>
 </span><span id="LoggedObject-280"><a href="#LoggedObject-280"><span class="linenos">280</span></a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject-281"><a href="#LoggedObject-281"><span class="linenos">281</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject-281"><a href="#LoggedObject-281"><span class="linenos">281</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject-282"><a href="#LoggedObject-282"><span class="linenos">282</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 </span><span id="LoggedObject-283"><a href="#LoggedObject-283"><span class="linenos">283</span></a>
 </span><span id="LoggedObject-284"><a href="#LoggedObject-284"><span class="linenos">284</span></a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject-285"><a href="#LoggedObject-285"><span class="linenos">285</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject-285"><a href="#LoggedObject-285"><span class="linenos">285</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject-286"><a href="#LoggedObject-286"><span class="linenos">286</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
 </span><span id="LoggedObject-287"><a href="#LoggedObject-287"><span class="linenos">287</span></a>
 </span><span id="LoggedObject-288"><a href="#LoggedObject-288"><span class="linenos">288</span></a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject-289"><a href="#LoggedObject-289"><span class="linenos">289</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject-289"><a href="#LoggedObject-289"><span class="linenos">289</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject-290"><a href="#LoggedObject-290"><span class="linenos">290</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 </span></pre></div>
 
@@ -859,12 +859,12 @@ options by initializing the object. Else the <code><a href="#LoggedObject.log">l
 standard output. The logging can be disable if the <code><a href="#LoggedObject.enabled">enabled</a></code> attribute is
 set to <code>False</code>.</p>
 
-<h6 id="attribute">Attribute</h6>
+<h6 id="attributes">Attributes</h6>
 
-<blockquote>
-  <p>log: logger object.
-  enabled: enable or disable logging.</p>
-</blockquote>
+<ul>
+<li><strong>log:</strong>  logger object.</li>
+<li><strong>enabled:</strong>  enable or disable logging.</li>
+</ul>
 </div>
 
 
@@ -945,12 +945,12 @@ set to <code>False</code>.</p>
     </div>
     <a class="headerlink" href="#LoggedObject.debug"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="LoggedObject.debug-280"><a href="#LoggedObject.debug-280"><span class="linenos">280</span></a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject.debug-281"><a href="#LoggedObject.debug-281"><span class="linenos">281</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject.debug-281"><a href="#LoggedObject.debug-281"><span class="linenos">281</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject.debug-282"><a href="#LoggedObject.debug-282"><span class="linenos">282</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Lof a <code>DEBUG</code> message.</p>
+            <div class="docstring"><p>Log a <code>DEBUG</code> message.</p>
 </div>
 
 
@@ -967,12 +967,12 @@ set to <code>False</code>.</p>
     </div>
     <a class="headerlink" href="#LoggedObject.warn"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="LoggedObject.warn-284"><a href="#LoggedObject.warn-284"><span class="linenos">284</span></a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject.warn-285"><a href="#LoggedObject.warn-285"><span class="linenos">285</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject.warn-285"><a href="#LoggedObject.warn-285"><span class="linenos">285</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject.warn-286"><a href="#LoggedObject.warn-286"><span class="linenos">286</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Lof a <code>DEBUG</code> message.</p>
+            <div class="docstring"><p>Log a <code>DEBUG</code> message.</p>
 </div>
 
 
@@ -989,12 +989,12 @@ set to <code>False</code>.</p>
     </div>
     <a class="headerlink" href="#LoggedObject.error"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="LoggedObject.error-288"><a href="#LoggedObject.error-288"><span class="linenos">288</span></a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="LoggedObject.error-289"><a href="#LoggedObject.error-289"><span class="linenos">289</span></a>        <span class="sd">&quot;&quot;&quot;Lof a `DEBUG` message.&quot;&quot;&quot;</span>
+</span><span id="LoggedObject.error-289"><a href="#LoggedObject.error-289"><span class="linenos">289</span></a>        <span class="sd">&quot;&quot;&quot;Log a `DEBUG` message.&quot;&quot;&quot;</span>
 </span><span id="LoggedObject.error-290"><a href="#LoggedObject.error-290"><span class="linenos">290</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_log_message</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Lof a <code>DEBUG</code> message.</p>
+            <div class="docstring"><p>Log a <code>DEBUG</code> message.</p>
 </div>
 
 
