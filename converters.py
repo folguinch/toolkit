@@ -3,7 +3,7 @@ import argparse
 import configparser
 
 def argparser_to_configparser(
-    args: argparse.Namespace, 
+    args: argparse.Namespace,
     config: configparser.ConfigParser,
     section: str,
 ) -> configparser.ConfigParser:

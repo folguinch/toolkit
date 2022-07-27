@@ -5,9 +5,9 @@ system. It also implements a `LoggedObject` class that can be inherited in
 order to implement logging for the class.
 """
 from datetime import datetime
+from logging import handlers
 from typing import Optional, Union
 import logging
-import logging.handlers as handlers
 import pathlib
 
 def get_level(loglevel):

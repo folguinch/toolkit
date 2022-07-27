@@ -1,7 +1,4 @@
 """Maths tools."""
-from scipy.stats import binned_statistic
-from scipy.ndimage import map_coordinates
-from scipy.interpolate import interp1d
 import astropy.stats as apystats
 import numpy as np
 

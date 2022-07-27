@@ -10,8 +10,8 @@ import numpy as np
 
 from ..maths import quick_rms
 
-Config = TypeVar('ConfigParserAdv')
-Map = TypeVar('Projection')
+ConfigParserAdv = TypeVar('ConfigParserAdv')
+Projection = TypeVar('Projection')
 Path = TypeVar('Path', pathlib.Path, str)
 Position = TypeVar('Position', astropy.coordinates.SkyCoord, Tuple[int, int])
 
@@ -118,7 +118,7 @@ def moments01(cube: SpectralCube,
               low: Optional[u.Quantity] = None,
               up: Optional[u.Quantity] = None,
               filenames: Sequence[Union[str, pathlib.Path]] = ()
-              )-> List[Map]:
+              )-> List[Projection]:
     """Calculate zeroth and first moment maps from cube.
 
     Args:
@@ -133,11 +133,11 @@ def moments01(cube: SpectralCube,
     mom0 = cube.moment(order=0)
 
     # Moment1
-    if 'low' is not None:
+    if low is not None:
         mask = cube.mask & (cube >= low)
     else:
         mask = cube.mask
-    if 'up' is not None:
+    if up is not None:
         mask = mask & (cube <= up)
     subcube = cube.with_mask(mask)
     mom1 = subcube.moment(order=1)
@@ -223,10 +223,8 @@ def get_spectral_limits(cube: SpectralCube,
         ind = np.nanargmin(np.abs(spaxis.value))
         chmin = ind - chan_halfwidth
         chmax = ind + chan_halfwidth
-        if chmin < 0:
-            chmin = 0
-        if chmax >= len(spaxis):
-            chmax = len(spaxis)-1
+        chmin = max(chmin, 0)
+        chmax = min(chmax, len(spaxis)-1)
         log(f'Using channel range = {chmin} {chmax}')
         return chmin, chmax
     else:
@@ -321,10 +319,10 @@ def get_subcube(cube: SpectralCube,
 
 def moment_from_config(cube: SpectralCube,
                        mom: int,
-                       config: Config,
+                       config: ConfigParserAdv,
                        vlsr: Optional[u.Quantity] = None,
                        filenamebase: Optional[Path] = None,
-                       filename: Optional[Path] = None) -> Map:
+                       filename: Optional[Path] = None) -> Projection:
     """Calculate the moments with parameters from config file.
 
     The parameters are passed to the `get_moment` function.
@@ -379,7 +377,7 @@ def get_moment(cube: SpectralCube,
                auto_rms: bool = False,
                skip_beam_error: bool = False,
                log: Callable = print,
-               **kwargs) -> Map:
+               **kwargs) -> Projection:
     """ Calculate a moment map.
 
     If filenamebase is given, the final file name will be filenamebase with
@@ -603,10 +601,10 @@ def spectrum_at_position(cube: SpectralCube,
 
     if filename is not None:
         filename = pathlib.Path(filename).expanduser().resolve()
-        with filename.open('w') as out:
+        with filename.open('w', encoding='utf-8') as out:
             out.write('#v\tF\n')
-            out.write('#{0.unit}\t{1.unit}\n'.format(xaxis, spec))
+            out.write(f'#{xaxis.unit}\t{spec.unit}\n')
             for dt in zip(xaxis, spec[:]):
-                out.write('{0.value:f}\t{1.value:f}\n'.format(*dt))
+                out.write(f'{dt[0].value:f}\t{dt[1].value:f}\n')
 
     return xaxis, spec
