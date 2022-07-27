@@ -9,7 +9,7 @@ def argparser_to_configparser(
 ) -> configparser.ConfigParser:
     """Update a `configparser` object from the values in `args`.
 
-    If option is not in 
+    If option is in `args` but not in `config`, then it is skipped.
 
     Args:
       args: argument parser object.

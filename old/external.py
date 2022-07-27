@@ -58,7 +58,7 @@ def run_casa(script, *args, **kwargs):
             opts += '-%s %s' % (key, val)
     inp = ('%s '*len(args)).strip() % args
     cmd = '%s %s -c %s %s %s' % (casa, casa_opts, script, opts.strip(), inp)
-    print cmd
+    print(cmd)
     run_bash(cmd)
 
 def run_bash(cmd, logger=None):
@@ -68,4 +68,4 @@ def run_bash(cmd, logger=None):
     if logger:
         logger.info(stderr)
     else:
-        print stderr
+        print(stderr)

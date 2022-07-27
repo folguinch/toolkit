@@ -4,13 +4,13 @@ from astropy.stats import gaussian_fwhm_to_sigma
 import astropy.units as u
 import numpy as np
 
-import myutils.logger as logger
+import toolkit.logger as logger
 
 # Start settings
 if os.path.isdir('logs'):
-    LOG = logger.get_logger(__name__, file_name='logs/myutils_mask.log')
+    LOG = logger.get_logger(__name__, filename='logs/myutils_mask.log')
 else:
-    LOG = logger.get_logger(__name__, file_name='mytils_masks.log')
+    LOG = logger.get_logger(__name__, filename='mytils_masks.log')
 
 def circular_mask(array=None, shape=None, xy=None, ij=None, r=None, true_inside=True):
     # Check input

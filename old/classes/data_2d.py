@@ -3,7 +3,7 @@ from itertools import product
 import numpy as np
 from astropy.io import fits
 import astropy.units as u
-from myutils.logger import get_logger
+from toolkit.logger import get_logger
 
 from .data import Data
 
