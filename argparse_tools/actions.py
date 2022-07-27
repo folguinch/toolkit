@@ -14,7 +14,7 @@ import astropy.wcs as apwcs
 import numpy as np
 
 from ..array_utils import load_mixed_struct_array, load_struct_array
-from ..classes.dust import Dust
+#from ..classes.dust import Dust
 from ..logger import get_stdout_logger, update_logger
 from ..tables import Table
 
@@ -179,12 +179,12 @@ class LoadCube(argparse.Action):
                 vals += [SpectralCube.read(val)]
         setattr(namespace, self.dest, vals)
 
-class LoadDust(argparse.Action):
-    """Action for loading dust files"""
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        dust = Dust(values)
-        setattr(namespace, self.dest, dust)
+#class LoadDust(argparse.Action):
+#    """Action for loading dust files"""
+#
+#    def __call__(self, parser, namespace, values, option_string=None):
+#        dust = Dust(values)
+#        setattr(namespace, self.dest, dust)
 
 class LoadTable(argparse.Action):
     """Action for loading astropy Tables"""
