@@ -16,7 +16,7 @@ import numpy as np
 from ..array_utils import load_mixed_struct_array, load_struct_array
 #from ..classes.dust import Dust
 from ..logger import get_stdout_logger, update_logger
-from ..tables import Table
+#from ..tables import Table
 
 def validate_path(path: pathlib.Path,
                   check_is_file: bool = False,
@@ -186,25 +186,25 @@ class LoadCube(argparse.Action):
 #        dust = Dust(values)
 #        setattr(namespace, self.dest, dust)
 
-class LoadTable(argparse.Action):
-    """Action for loading astropy Tables"""
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        try:
-            tabname = ''+values
-            #table_id = os.path.splitext(os.path.basename(tabname))[0]
-            table = Table(tabname)
-        except TypeError as exc:
-            if len(values) == 2:
-                table = Table(values[0], table_id=values[1])
-            elif len(values) == 1:
-                tabname = values[0]
-                #table_id = os.path.splitext(os.path.basename(tabname))[0]
-                table = Table(tabname)
-            else:
-                raise ValueError('Number of values not allowed.') from exc
-
-        setattr(namespace, self.dest, table)
+#class LoadTable(argparse.Action):
+#    """Action for loading astropy Tables"""
+#
+#    def __call__(self, parser, namespace, values, option_string=None):
+#        try:
+#            tabname = ''+values
+#            #table_id = os.path.splitext(os.path.basename(tabname))[0]
+#            table = Table(tabname)
+#        except TypeError as exc:
+#            if len(values) == 2:
+#                table = Table(values[0], table_id=values[1])
+#            elif len(values) == 1:
+#                tabname = values[0]
+#                #table_id = os.path.splitext(os.path.basename(tabname))[0]
+#                table = Table(tabname)
+#            else:
+#                raise ValueError('Number of values not allowed.') from exc
+#
+#        setattr(namespace, self.dest, table)
 
 # Lists actions
 class ListFromFile(argparse.Action):
