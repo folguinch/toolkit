@@ -4,7 +4,7 @@ from typing import Optional
 from astropy.wcs.utils import pixel_to_skycoord
 
 def positions_to_pixels(args: 'argparse.ArgumentParser',
-                        wcs: Optional['astropy.WCS'] = None) -> None:
+                        wcs: Optional['astropy.wcs.WCS'] = None) -> None:
     """Store the positions in the `args` object as pixels.
 
     Args:
@@ -49,7 +49,7 @@ def positions_to_pixels(args: 'argparse.ArgumentParser',
     args.position = args.coordinate = args.reference = pos
 
 def pixels_to_positions(args: 'argparse.ArgumentParser',
-                        wcs: Optional['astropy.WCS'] = None) -> None:
+                        wcs: Optional['astropy.wcs.WCS'] = None) -> None:
     """Store the positions in `args` as `SkyCoords`.
 
     Args:
