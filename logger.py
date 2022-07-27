@@ -255,7 +255,7 @@ class LoggedObject:
     standard output. The logging can be disable if the `enabled` attribute is
     set to `False`.
 
-    Attribute:
+    Attributes:
       log: logger object.
       enabled: enable or disable logging.
     """
@@ -277,13 +277,13 @@ class LoggedObject:
         self._log_message(message, logging.INFO)
 
     def debug(self, message: str) -> None:
-        """Lof a `DEBUG` message."""
+        """Log a `DEBUG` message."""
         self._log_message(message, logging.DEBUG)
 
     def warn(self, message: str) -> None:
-        """Lof a `DEBUG` message."""
+        """Log a `DEBUG` message."""
         self._log_message(message, logging.WARN)
 
     def error(self, message: str) -> None:
-        """Lof a `DEBUG` message."""
+        """Log a `DEBUG` message."""
         self._log_message(message, logging.ERROR)
