@@ -17,7 +17,7 @@ from .actions import (ReadSkyCoords, PeakPosition, StartLogger, CheckFile,
 PosFunction = Callable[[argparse.Namespace], None]
 Path = Union[pathlib.Path, str]
 
-def astro_source(parser: argparse.ArgumentParser) -> None:
+def _astro_source(parser: argparse.ArgumentParser) -> None:
     """Read an `astro_source.Source`."""
     try:
         parser.add_argument('--source',
@@ -25,6 +25,12 @@ def astro_source(parser: argparse.ArgumentParser) -> None:
                             help='Source(s) configuration file(s)')
     except NameError:
         pass
+
+def astro_source() -> argparse.ArgumentParser:
+    """Read an `astro_source.Source` and return it in parser."""
+    parser = argparse.ArgumentParser(add_help=False)
+    astro_source(parser)
+    return parser
 
 def source_position(
     required: bool = False,
@@ -52,7 +58,7 @@ def source_position(
     group1.add_argument('--reference', metavar='IMG',
                         action=PeakPosition,
                         help='Reference image to get position from peak')
-    astro_source(group1)
+    _astro_source(group1)
     warnings.warn(('The values pos and position_fn will be removed from'
                    'the parser in future versions of this parent'),
                   FutureWarning)
