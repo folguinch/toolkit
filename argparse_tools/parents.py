@@ -29,7 +29,7 @@ def _astro_source(parser: argparse.ArgumentParser) -> None:
 def astro_source() -> argparse.ArgumentParser:
     """Read an `astro_source.Source` and return it in parser."""
     parser = argparse.ArgumentParser(add_help=False)
-    astro_source(parser)
+    _astro_source(parser)
     return parser
 
 def source_position(
