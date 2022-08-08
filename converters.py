@@ -1,6 +1,12 @@
 """Convert between data types."""
+from typing import Dict, Union, Optional
 import argparse
 import configparser
+
+from astropy import wcs
+from astropy.io import fits
+import astropy.units as u
+import numpy as np
 
 def argparser_to_configparser(
     args: argparse.Namespace,
@@ -32,3 +38,53 @@ def argparser_to_configparser(
     config.read_dict({section: new_values})
 
     return config
+
+def array_to_hdu(array: Union[np.array, u.Quantity],
+                 reference: Union[fits.PrimaryHDU, Dict],
+                 unit: Optional[u.Unit] = None) -> fits.PrimaryHDU:
+    """Convert a `np.array` to a `PrimaryHDU`.
+
+    If `array` is a `Quantity` array and `unit` is given, then `array` is
+    converted to unit. Otherwise, if `unit` is given then it assumed to be the
+    unit of `array`.
+
+    Args:
+      array: data to convert.
+      reference: reference image to obtain WCS information.
+      unit: optional; unit or output unit of the data.
+    """
+    # Get header
+    if hasattr(reference, 'wcs'):
+        header = reference.wcs.to_header()
+    else:
+        header = wcs.WCS(reference, naxis=['longitude', 'latitude']).to_header()
+
+    # Convert data
+    if hasattr(array, 'unit'):
+        if unit is None:
+            data = np.squeeze(array.value)
+            unit = array.unit
+        else:
+            data = np.squeeze(array.to(unit).value)
+        header['BUNIT'] = f'{unit:FITS}'
+    else:
+        if unit is not None:
+            header['BUNIT'] = f'{unit:FITS}'
+        data = np.squeeze(array)
+
+    return fits.PrimaryHDU(data=data, header=header)
+
+def quantity_from_hdu(hdu: fits.PrimaryHDU,
+                      unit: Optional[u.Unit] = None) -> u.Quantity:
+    """Convert a `PrimaryHDU` to a `Quantity`."""
+    # Data
+    data = np.squeeze(hdu.data)
+
+    # Unit
+    bunit = u.Unit(hdu.header['BUNIT'])
+    data = data * bunit
+    if unit is not None:
+        data = data.to(unit)
+
+    return data
+
