@@ -52,7 +52,7 @@ def emission_mask(*images: fits.PrimaryHDU,
     # Iterate over images
     for i, image in enumerate(images):
         # Check shapes
-        if np.sqeeze(image.data).shape != mask.shape:
+        if np.squeeze(image.data).shape != mask.shape:
             log('Image cannot be combined into mask')
             continue
 
