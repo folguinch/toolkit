@@ -65,9 +65,9 @@ def emission_mask(*images: fits.PrimaryHDU,
             thresh = threshold[i].to(data_unit).value
 
         # Update mask
-        mask = mask and (np.squeeze(image.data) > thresh)
+        mask = mask & (np.squeeze(image.data) > thresh)
 
-    return array_to_hdu(mask, images[0])
+    return mask
 
 def mask_structures(mask: np.array, min_area: Optional = None) -> Tuple:
     """Identify mask structures and index them.

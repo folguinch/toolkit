@@ -1,4 +1,4 @@
-"""Tools for extracting information from `PrimaryHDU` images."""
+"""Tools for extracting information from 2-D images."""
 from typing import Optional, Union, Sequence, List, Callable, Tuple
 
 from astropy.coordinates import SkyCoord
@@ -18,7 +18,7 @@ def squeeze_image(image: fits.PrimaryHDU) -> fits.PrimaryHDU:
     """Reduce number of axes not used in input image."""
     header = WCS(image, naxis=['longitude', 'latitude']).to_header()
 
-    return fits.PrimaryHDU(data=image.data, header=header)
+    return fits.PrimaryHDU(data=np.squeeze(image.data), header=header)
 
 def pixels_per_beam(image: fits.PrimaryHDU):
     """Number of pixels in the beam area."""
