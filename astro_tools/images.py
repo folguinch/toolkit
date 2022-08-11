@@ -196,13 +196,14 @@ def intensity_gradient(image: fits.PrimaryHDU,
     # Calculate modulus and direction
     data = quantity_from_hdu(image)
     grow, gcol = np.gradient(np.squeeze(data.value))
-    mod = np.sqrt(grow**2 + gcol**2) * data.unit / u.pix
+    mod = np.sqrt(grow**2 + gcol**2) * data.unit / u.pixel
     drc = np.degrees(np.arctan2(grow, gcol)) * u.deg
 
     # Convert pixels
     wcs = WCS(image, naxis=['longitude', 'latitude'])
     pixsize = np.sqrt(wcs.proj_plane_pixel_area())
-    pixel_scale = u.pixel_scale(pixsize / u.pix)
+    print(pixsize.to(u.arcec))
+    pixel_scale = u.pixel_scale(pixsize / u.pixel)
     mod = mod.to(data.unit / u.arcsec, equivalencies=pixel_scale)
     if distance is not None:
         mod = mod.to(data.unit / u.au,
