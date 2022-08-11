@@ -162,7 +162,7 @@ def emission_peaks(image: fits.PrimaryHDU,
     radii = []
     for label in range(1, nlabels+1):
         # Masked data
-        masked_data = np.ma.array(image.data, mask=labels != label)
+        masked_data = np.ma.array(np.squeeze(image.data), mask=labels != label)
 
         # Get max
         ymax, xmax = np.unravel_index(np.nanargmax(masked_data),
