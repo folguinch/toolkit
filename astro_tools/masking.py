@@ -98,9 +98,9 @@ def mask_structures(mask: np.array, min_area: Optional = None) -> Tuple:
     return mask, labels, nlabels
 
 def position_in_mask(position: 'astropy.coordinates.SkyCoord',
-                     mask: fits.PrimaryHDU) -> bool:
+                     mask: np.array,
+                     wcs: wcs.WCS) -> bool:
     """Returns value of position in mask."""
-    mask_wcs = wcs.WCS(mask)
-    x, y = skycoord_to_pixel(position, mask_wcs)
+    x, y = skycoord_to_pixel(position, wcs)
 
-    return mask.data[y, x]
+    return mask[y, x]
