@@ -146,7 +146,6 @@ def emission_peaks(image: fits.PrimaryHDU,
     if mask is None:
         mask = emission_mask(image, threshold=[threshold], nsigma=nsigma,
                              log=log)
-        mask = mask.data
 
     # Fiter small masks
     if ('BMIN' in image.header and

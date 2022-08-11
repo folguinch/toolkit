@@ -15,7 +15,7 @@ def emission_mask(*images: fits.PrimaryHDU,
                   initial_mask: Optional[np.array] = None,
                   threshold: Optional[Sequence[u.Quantity]] = None,
                   nsigma: float = 5,
-                  log: Callable = print) -> fits.PrimaryHDU:
+                  log: Callable = print) -> np.array:
     """Generate a mask from images with emission over a threshold.
 
     An inital mask with the same dimessions as the data in args can be given.
