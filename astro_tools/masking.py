@@ -103,4 +103,4 @@ def position_in_mask(position: 'astropy.coordinates.SkyCoord',
     """Returns value of position in mask."""
     x, y = skycoord_to_pixel(position, wcs)
 
-    return mask[y, x]
+    return mask[int(y), int(x)]
