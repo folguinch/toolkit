@@ -49,7 +49,7 @@ def stats_at_position(image: fits.PrimaryHDU,
       stats: optional; statistical functions.
     """
     # Get distance map
-    data = quantity_from_hdu(image.data)
+    data = quantity_from_hdu(image)
     wcs = WCS(image, naxis=['longitude', 'latitude'])
     pixsize = np.sqrt(wcs.proj_plane_pixel_area())
     x, y = skycoord_to_pixel(position, wcs)
