@@ -158,7 +158,8 @@ def identify_structures(
     threshold: Optional[u.Quantity] = None,
     nsigma: float = 5,
     min_area: float = 9,
-    log: Callable = print
+    plot: Optional['pathlib.Path'] = None,
+    log: Callable = print,
 ) -> Tuple[List[SkyCoord], List[SkyCoord], List[u.Quantity]]:
     """Find valid emission structures in input image.
 
@@ -216,6 +217,12 @@ def identify_structures(
     # Convert to physical quantities
     centroids_coord = []
     lengths = []
+    if plot is not None:
+        fig, ax = plt.subplots(1, 1, layout='tight')
+        ax.imshow(mask.astype(int), vmin=0, vmax=1, cmap='inferno',
+                  origin='lower')
+        ax.set_xlabel('x (pix)')
+        ax.set_ylabel('y (pix)')
     for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
         centroids_coord.append(SkyCoord.from_pixel(cenx, ceny, wcs))
         lengths.append((abs(slcy.start - slcy.stop) * pixsize,
@@ -223,6 +230,16 @@ def identify_structures(
         log(f'Structure centroid: {cenx}, {ceny}')
         log(f'Centroid coordinate: {centroids_coord[-1]}')
         log(f'Structure size: {lengths[-1][1]} x {lengths[-1][0]}')
+        if plot is not None:
+            ax.scatter(cenx, ceny, s=50, c='m', marker='o')
+            ax.text(cenx, ceny,
+                    f('{centroids_coord[-1].ra.deg}, '
+                      '{centroids_coord[-1].dec.deg}'),
+                    color='c', ha='center', va='bottom')
+
+    # Save plot
+    if plot is not None:
+        fig.savefig(plot)
 
     #positions = []
     #lengths = []
