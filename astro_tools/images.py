@@ -9,6 +9,7 @@ from astropy.wcs.utils import skycoord_to_pixel
 from radio_beam import Beam
 from scipy import ndimage
 import astropy.units as u
+import matplotlib.pyplot as plt
 import numpy as np
 
 from .masking import emission_mask, mask_structures
@@ -233,8 +234,8 @@ def identify_structures(
         if plot is not None:
             ax.scatter(cenx, ceny, s=50, c='m', marker='o')
             ax.text(cenx, ceny,
-                    f('{centroids_coord[-1].ra.deg}, '
-                      '{centroids_coord[-1].dec.deg}'),
+                    (f'{centroids_coord[-1].ra.deg:.6f}, '
+                     f'{centroids_coord[-1].dec.deg:.6f}'),
                     color='c', ha='center', va='bottom')
 
     # Save plot
