@@ -217,7 +217,7 @@ def identify_structures(
     centroids_coord = []
     lengths = []
     for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
-        centroids_coord.append(SkyCoord.from_pixel(ceny, cenx, wcs))
+        centroids_coord.append(SkyCoord.from_pixel(cenx, ceny, wcs))
         lengths.append((abs(slcy.start - slcy.stop) * pixsize,
                         abs(slcx.start - slcx.stop) * pixsize))
         log(f'Structure centroid: {cenx}, {ceny}')
