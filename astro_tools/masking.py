@@ -1,5 +1,5 @@
 """Tools for generating masks from image data."""
-from typing import Optional, Callable, Sequence, Tuple
+from typing import Optional, Callable, Sequence, Tuple, Dict
 
 from astropy.wcs import WCS
 from astropy.io import fits
@@ -103,3 +103,37 @@ def position_in_mask(position: 'astropy.coordinates.SkyCoord',
     x, y = skycoord_to_pixel(position, wcs)
 
     return mask[int(y), int(x)]
+
+def plot_mask(
+    mask: np.array,
+    scatter: Optional[Sequence['astropy.coordinates.SkyCoord']] = None,
+    wcs: Optional[WCS] = None,
+    scatter_kwds: Dict = {},
+    **kwargs,
+) -> Tuple['matplotlib.Figure', 'matplotlib.Axes']:
+    """Create a plot of `mask`.
+    
+    The `kwargs` are passed to `plt.subplot`.
+    """
+    # Create figure
+    figkwds = {'figsize'; (15, 15), 'layout': 'tight'}
+    figkwds.update(kwargs)
+    fig, ax = plt.subplots(1, 1, **figkwds)
+    ax.imshow(mask.astype(int), vmin=0, vmax=1, cmap='inferno',
+              origin='lower')
+    ax.set_xlabel('x (pix)')
+    ax.set_ylabel('y (pix)')
+    
+    # Scatters
+    if scatter is not None and wcs is not None:
+        scatter_kwds_defaults = {'s': 25, 'c': 'm', 'marker': 'o'}
+        scatter_kwds_defaults.update(scatter_kwds)
+        for scat in scatter:
+            x, y = skycoord_to_pixel(scat, wcs)
+            ax.scatter(x, y, **scatter_kwds_defaults)
+            ax.text(x, y,
+                    (f'{scat.ra.deg:.6f}, '
+                     f'{scat.dec.deg:.6f}'),
+                    color='c', ha='center', va='bottom')
+
+    return fig, ax

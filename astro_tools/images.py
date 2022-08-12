@@ -12,7 +12,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .masking import emission_mask, mask_structures
+from .masking import emission_mask, mask_structures, plot_mask
 from ..maths import distance_array
 from ..converters import quantity_from_hdu, array_to_hdu
 
@@ -219,11 +219,7 @@ def identify_structures(
     centroids_coord = []
     lengths = []
     if plot is not None:
-        fig, ax = plt.subplots(1, 1, layout='tight')
-        ax.imshow(mask.astype(int), vmin=0, vmax=1, cmap='inferno',
-                  origin='lower')
-        ax.set_xlabel('x (pix)')
-        ax.set_ylabel('y (pix)')
+        fig, ax = plot_mask(mask, figsize=(15, 15), layout='tight')
     for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
         centroids_coord.append(SkyCoord.from_pixel(cenx, ceny, wcs))
         lengths.append((abs(slcy.start - slcy.stop) * pixsize,
@@ -232,7 +228,7 @@ def identify_structures(
         log(f'Centroid coordinate: {centroids_coord[-1]}')
         log(f'Structure size: {lengths[-1][1]} x {lengths[-1][0]}')
         if plot is not None:
-            ax.scatter(cenx, ceny, s=50, c='m', marker='o')
+            ax.scatter(cenx, ceny, s=25, c='m', marker='o')
             ax.text(cenx, ceny,
                     (f'{centroids_coord[-1].ra.deg:.6f}, '
                      f'{centroids_coord[-1].dec.deg:.6f}'),
