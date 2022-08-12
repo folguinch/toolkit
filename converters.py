@@ -59,6 +59,11 @@ def array_to_hdu(array: Union[np.array, u.Quantity],
     else:
         header = wcs.WCS(reference, naxis=['longitude', 'latitude']).to_header()
 
+    # Beam data
+    for key in ['BMIN', 'BMAJ', 'BPA']:
+        if key in reference.header:
+            header[key] = reference.header[key]
+
     # Convert data
     if hasattr(array, 'unit'):
         if unit is None:

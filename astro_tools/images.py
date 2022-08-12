@@ -1,5 +1,5 @@
 """Tools for extracting information from 2-D images."""
-from typing import Optional, Union, Sequence, List, Callable, Tuple
+from typing import Optional, Union, Sequence, List, Callable, Tuple, Dict
 
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
@@ -7,12 +7,23 @@ from astropy.nddata import Cutout2D
 from astropy.wcs import WCS
 from astropy.wcs.utils import skycoord_to_pixel
 from radio_beam import Beam
+from scipy import ndimage
 import astropy.units as u
 import numpy as np
 
 from .masking import emission_mask, mask_structures
 from ..maths import distance_array
 from ..converters import quantity_from_hdu, array_to_hdu
+
+def copy_header_keys(ref_header: Dict,
+                     new_header: Dict,
+                     keys: Sequence = ('BUNIT', 'BMIN', 'BMAJ', 'BPA')
+                     ) -> Dict:
+    """Copy selected keys from one header into another header."""
+    for key in keys:
+        new_header[key] = ref_header[key]
+
+    return new_header
 
 def squeeze_image(image: fits.PrimaryHDU) -> fits.PrimaryHDU:
     """Reduce number of axes not used in input image."""
@@ -34,6 +45,35 @@ def pixels_per_beam(image: fits.PrimaryHDU):
     npix = npix.to(u.one).value
 
     return npix
+
+def get_peak(image: fits.PrimaryHDU) -> Tuple[SkyCoord, u.Quantity]:
+    """Get the coordinate of the peak and peak value."""
+    data = quantity_from_hdu(image)
+    wcs = WCS(image, naxis=['longitude', 'latitude'])
+    ymax, xmax = np.unravel_index(np.nanargmax(data), data.shape)
+    position = SkyCoord.from_pixel(xmax, ymax, wcs)
+
+    return position, data[ymax, xmax]
+
+def position_in_image(position: SkyCoord, image: fits.PrimaryHDU) -> bool:
+    """Is the `position` in the `image`?"""
+    wcs = WCS(image, naxis=['longitude', 'latitude'])
+    x, y = skycoord_to_pixel(position, wcs)
+
+    try:
+        return image.data[y, x] is not None
+    except IndexError:
+        return False
+
+def positions_in_image(positions: Sequence[SkyCoord],
+                       image: fits.PrimaryHDU) -> List[SkyCoord]:
+    """Filter positions present in an image."""
+    filtered = []
+    for position in positions:
+        if position_in_image(position, image):
+            filtered.append(position)
+
+    return filtered
 
 def stats_at_position(image: fits.PrimaryHDU,
                       position: SkyCoord,
@@ -104,27 +144,31 @@ def image_cutout(image: fits.PrimaryHDU, position: SkyCoord,
 
     # Save
     header = cutout.wcs.to_header()
-    header['BUNIT'] = image.header['BUNIT']
+    header = copy_header_keys(image.header, header)
     cutout = fits.PrimaryHDU(data=cutout.data, header=header)
     if filename is not None:
         cutout.writeto(filename, overwrite=True)
 
     return cutout
 
-def emission_peaks(image: fits.PrimaryHDU,
-                   mask: Optional[np.array] = None,
-                   threshold: Optional[u.Quantity] = None,
-                   nsigma: float = 5,
-                   min_area: float = 9,
-                   log: Callable = print
-                   ) -> Union[List[SkyCoord], List[u.Quantity]]:
-    """Find emission peaks in input image.
+def identify_structures(
+    image: fits.PrimaryHDU,
+    mask: Optional[np.array] = None,
+    calcmask: bool = False,
+    threshold: Optional[u.Quantity] = None,
+    nsigma: float = 5,
+    min_area: float = 9,
+    log: Callable = print
+) -> Tuple[List[SkyCoord], List[SkyCoord], List[u.Quantity]]:
+    """Find valid emission structures in input image.
 
-    First it creates a threshold mask from `threshold` or `nsigma*rms` with
+    If `mask` is not given, it first it creates a mask with valid (non-NaN)
+    data. This mask can be combined with a threshold mask if `calcmask` is set
+    to `True`. This mask is generated from `threshold` or `nsigma*rms` with
     `rms` estimated from the median absolute deviation of the data. Then it
     identifies connected structures in the mask and filters out structures with
-    small areas. Finally it looks at the position of the peaks at each
-    structure.
+    small areas. Finally it looks for the centroid and lenghts along each axes
+    for each structure.
 
     If the input image has beam parameters in the header, then `min_area` is
     the minimum number of beam areas for mask structures. Otherwise it is the
@@ -133,21 +177,24 @@ def emission_peaks(image: fits.PrimaryHDU,
     Args:
       images: input image.
       mask: optional; peak mask.
+      calcmask: optional; calculate a threshold mask?
       threshold: optional; emission threshold for mask.
       nsigma: optional; number of rms levels for threshold mask.
       min_area: optional; number of beam areas or pixels.
       log: optional; logging function.
 
     Returns:
-      A list of coordinates of the peaks in the input image.
-      The radius containing the mask structure
+      A list of coordinates of the centroids of structures in the input image.
+      The length along x and y axes of each structure.
     """
     # Create mask
     if mask is None:
-        mask = emission_mask(image, threshold=[threshold], nsigma=nsigma,
-                             log=log)
+        mask = ~np.isnan(image.data)
+        if calcmask:
+            mask = mask & emission_mask(image, threshold=[threshold],
+                                        nsigma=nsigma, log=log)
 
-    # Fiter small masks
+    # Label mask structures
     if ('BMIN' in image.header and
         'BMAJ' in image.header and
         'BPA' in image.header):
@@ -155,28 +202,48 @@ def emission_peaks(image: fits.PrimaryHDU,
     mask, labels, nlabels = mask_structures(mask, min_area=min_area)
     log(f'{nlabels} structures detected in mask')
 
-    # Find max per each structure
+    # Find centroid
     wcs = WCS(image, naxis=['longitude', 'latitude'])
     pixsize = np.sqrt(wcs.proj_plane_pixel_area())
-    positions = []
-    radii = []
-    for label in range(1, nlabels+1):
-        # Masked data
-        masked_data = np.ma.array(np.squeeze(image.data), mask=labels != label)
+    centroids = ndimage.center_of_mass(mask, labels=labels,
+                                       index=np.arange(1, nlabels+1))
 
-        # Get max
-        ymax, xmax = np.unravel_index(np.nanargmax(masked_data),
-                                      masked_data.shape)
-        positions.append(SkyCoord.from_pixel(xmax, ymax, wcs))
-        log(f'Found peak at pixel: {xmax}, {ymax}')
-        log(f'Peak position: {positions[-1]}')
+    # Find objects
+    objects = ndimage.find_objects(labels)
+    if len(objects) != len(centroids):
+        raise ValueError('Objects and centroids do not coincide')
 
-        # Get radius
-        distance = np.ma.array(distance_array(masked_data.shape, (xmax, ymax)),
-                               mask=masked_data.mask)
-        radii.append(np.nanmax(distance) * pixsize)
+    # Convert to physical quantities
+    centroids_coord = []
+    lengths = []
+    for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
+        centroids_coord.append(SkyCoord.from_pixel(ceny, cenx, wcs))
+        lengths.append((abs(slcy.start - slcy.stop) * pixsize,
+                        abs(slcx.start - slcx.stop) * pixsize))
+        log(f'Structure centroid: {cenx}, {ceny}')
+        log(f'Centroid coordinate: {centroids_coord[-1]}')
+        log(f'Structure size: {lengths[-1][1]} x {lengths[-1][0]}')
 
-    return positions, radii
+    #positions = []
+    #lengths = []
+    #for label in range(1, nlabels+1):
+    #    # Masked data
+    #    masked_data = np.ma.array(np.squeeze(image.data), mask=labels != label)
+
+    #    # Get max
+    #    ymax, xmax = np.unravel_index(np.nanargmax(masked_data),
+    #                                  masked_data.shape)
+    #    positions.append(SkyCoord.from_pixel(xmax, ymax, wcs))
+    #    log(f'Found peak at pixel: {xmax}, {ymax}')
+    #    log(f'Peak position: {positions[-1]}')
+
+    #    # Get minimal radius
+    #    distance = np.ma.array(distance_array(masked_data.shape, (xmax, ymax)),
+    #                           mask=masked_data.mask)
+    #    radii.append(np.nanmax(distance) * pixsize)
+
+    #return positions, radii
+    return centroids_coord, lengths
 
 def intensity_gradient(image: fits.PrimaryHDU,
                        distance: Optional[u.Quantity] = None

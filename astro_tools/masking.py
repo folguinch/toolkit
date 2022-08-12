@@ -1,7 +1,7 @@
 """Tools for generating masks from image data."""
 from typing import Optional, Callable, Sequence, Tuple
 
-from astropy import wcs
+from astropy.wcs import WCS
 from astropy.io import fits
 from astropy.wcs.utils import skycoord_to_pixel
 import astropy.units as u
@@ -9,7 +9,6 @@ import numpy as np
 import scipy.ndimage as ndimg
 
 from ..maths import quick_rms
-from ..converters import array_to_hdu
 
 def emission_mask(*images: fits.PrimaryHDU,
                   initial_mask: Optional[np.array] = None,
@@ -32,7 +31,7 @@ def emission_mask(*images: fits.PrimaryHDU,
       log: optional; logging function.
 
     Returns:
-      A new `PrimaryHDU` with the mask.
+      A mask array.
     """
     # Initial mask
     if initial_mask is not None:
@@ -99,7 +98,7 @@ def mask_structures(mask: np.array, min_area: Optional = None) -> Tuple:
 
 def position_in_mask(position: 'astropy.coordinates.SkyCoord',
                      mask: np.array,
-                     wcs: wcs.WCS) -> bool:
+                     wcs: WCS) -> bool:
     """Returns value of position in mask."""
     x, y = skycoord_to_pixel(position, wcs)
 
