@@ -77,7 +77,10 @@ def array_to_hdu(array: Union[np.array, u.Quantity],
             header['BUNIT'] = f'{unit:FITS}'
         data = np.squeeze(array)
 
-    return fits.PrimaryHDU(data=data, header=header)
+    try:
+        return fits.PrimaryHDU(data=data, header=header)
+    except KeyError:
+        return fits.PrimaryHDU(data=data.astype(float), header=header)
 
 def quantity_from_hdu(hdu: fits.PrimaryHDU,
                       unit: Optional[u.Unit] = None) -> u.Quantity:
