@@ -6,6 +6,7 @@ from astropy.io import fits
 from astropy.wcs.utils import skycoord_to_pixel
 import astropy.units as u
 import numpy as np
+import matplotlib.pyplot as plt
 import scipy.ndimage as ndimg
 
 from ..maths import quick_rms
@@ -116,7 +117,7 @@ def plot_mask(
     The `kwargs` are passed to `plt.subplot`.
     """
     # Create figure
-    figkwds = {'figsize'; (15, 15), 'layout': 'tight'}
+    figkwds = {'figsize': (15, 15), 'layout': 'tight'}
     figkwds.update(kwargs)
     fig, ax = plt.subplots(1, 1, **figkwds)
     ax.imshow(mask.astype(int), vmin=0, vmax=1, cmap='inferno',

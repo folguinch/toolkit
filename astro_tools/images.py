@@ -9,7 +9,6 @@ from astropy.wcs.utils import skycoord_to_pixel
 from radio_beam import Beam
 from scipy import ndimage
 import astropy.units as u
-import matplotlib.pyplot as plt
 import numpy as np
 
 from .masking import emission_mask, mask_structures, plot_mask
