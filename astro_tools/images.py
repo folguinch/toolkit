@@ -211,8 +211,8 @@ def identify_structures(
 
     # Find objects
     objects = ndimage.find_objects(labels)
-    if len(objects) != len(centroids):
-        raise ValueError('Objects and centroids do not coincide')
+    #if len(objects) != len(centroids):
+    #    raise ValueError('Objects and centroids do not coincide')
 
     # Convert to physical quantities
     centroids_coord = []
