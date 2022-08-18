@@ -127,7 +127,7 @@ def plot_mask(
     
     # Scatters
     if scatter is not None and wcs is not None:
-        scatter_kwds_defaults = {'s': 25, 'c': 'm', 'marker': 'o'}
+        scatter_kwds_defaults = {'s': 25, 'c': 'm', 'marker': 'x'}
         scatter_kwds_defaults.update(scatter_kwds)
         for scat in scatter:
             x, y = skycoord_to_pixel(scat, wcs)

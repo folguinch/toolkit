@@ -206,8 +206,8 @@ def identify_structures(
     # Find centroid
     wcs = WCS(image, naxis=['longitude', 'latitude'])
     pixsize = np.sqrt(wcs.proj_plane_pixel_area())
-    centroids = ndimage.center_of_mass(mask, labels=labels,
-                                       index=np.arange(1, nlabels+1))
+    #centroids = ndimage.center_of_mass(mask, labels=labels,
+    #                                   index=np.arange(1, nlabels+1))
 
     # Find objects
     objects = ndimage.find_objects(labels)
@@ -219,7 +219,10 @@ def identify_structures(
     lengths = []
     if plot is not None:
         fig, ax = plot_mask(mask, figsize=(15, 15), layout='tight')
-    for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
+    #for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
+    for slcy, slcx in objects:
+        cenx = (slcx.start + slcx.stop) / 2
+        ceny = (slcy.start + slcy.stop) / 2
         centroids_coord.append(SkyCoord.from_pixel(cenx, ceny, wcs))
         lengths.append((abs(slcy.start - slcy.stop) * pixsize,
                         abs(slcx.start - slcx.stop) * pixsize))
