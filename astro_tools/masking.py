@@ -111,7 +111,7 @@ def plot_mask(
     wcs: Optional[WCS] = None,
     scatter_kwds: Optional[Dict] = None,
     **kwargs,
-) -> Tuple['matplotlib..figure.Figure', 'matplotlib.Axes']:
+) -> Tuple['matplotlib.figure.Figure', 'matplotlib.Axes']:
     """Create a plot of `mask`.
 
     Args:
