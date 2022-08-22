@@ -185,7 +185,7 @@ def identify_structures(
       log: optional; logging function.
 
     Returns:
-      A list of coordinates of the centroids of structures in the input image.
+      A list of coordinates of the centers of structures in the input image.
       The length along x and y axes of each structure.
     """
     # Create mask
@@ -205,21 +205,16 @@ def identify_structures(
 
     # Find centroid
     wcs = WCS(image, naxis=['longitude', 'latitude'])
-    pixsize = np.sqrt(wcs.proj_plane_pixel_area())
-    #centroids = ndimage.center_of_mass(mask, labels=labels,
-    #                                   index=np.arange(1, nlabels+1))
+    pixsize = np.sqrt(wcs.proj_plane_pixel_area()).to(u.arcsec)
 
     # Find objects
     objects = ndimage.find_objects(labels)
-    #if len(objects) != len(centroids):
-    #    raise ValueError('Objects and centroids do not coincide')
 
     # Convert to physical quantities
     centroids_coord = []
     lengths = []
     if plot is not None:
         fig, ax = plot_mask(mask, figsize=(15, 15), layout='tight')
-    #for (ceny, cenx), (slcy, slcx) in zip(centroids, objects):
     for slcy, slcx in objects:
         cenx = (slcx.start + slcx.stop) / 2
         ceny = (slcy.start + slcy.stop) / 2
@@ -240,25 +235,6 @@ def identify_structures(
     if plot is not None:
         fig.savefig(plot)
 
-    #positions = []
-    #lengths = []
-    #for label in range(1, nlabels+1):
-    #    # Masked data
-    #    masked_data = np.ma.array(np.squeeze(image.data), mask=labels != label)
-
-    #    # Get max
-    #    ymax, xmax = np.unravel_index(np.nanargmax(masked_data),
-    #                                  masked_data.shape)
-    #    positions.append(SkyCoord.from_pixel(xmax, ymax, wcs))
-    #    log(f'Found peak at pixel: {xmax}, {ymax}')
-    #    log(f'Peak position: {positions[-1]}')
-
-    #    # Get minimal radius
-    #    distance = np.ma.array(distance_array(masked_data.shape, (xmax, ymax)),
-    #                           mask=masked_data.mask)
-    #    radii.append(np.nanmax(distance) * pixsize)
-
-    #return positions, radii
     return centroids_coord, lengths
 
 def intensity_gradient(image: fits.PrimaryHDU,

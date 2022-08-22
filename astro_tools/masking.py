@@ -109,12 +109,20 @@ def plot_mask(
     mask: np.array,
     scatter: Optional[Sequence['astropy.coordinates.SkyCoord']] = None,
     wcs: Optional[WCS] = None,
-    scatter_kwds: Dict = {},
+    scatter_kwds: Optional[Dict] = None,
     **kwargs,
-) -> Tuple['matplotlib.Figure', 'matplotlib.Axes']:
+) -> Tuple['matplotlib..figure.Figure', 'matplotlib.Axes']:
     """Create a plot of `mask`.
-    
-    The `kwargs` are passed to `plt.subplot`.
+
+    Args:
+      mask: mask array.
+      scatter: optional; sky coordinates of scatter points.
+      wcs: optional; coordiante system to interpret the scatter points.
+      scatter_kwds: optional; keywords for `plt.scatter`.
+      kwargs: keywords for `plt.subplots`.
+
+    Returns:
+      A tuple with the figure and axis.
     """
     # Create figure
     figkwds = {'figsize': (15, 15), 'layout': 'tight'}
@@ -124,7 +132,7 @@ def plot_mask(
               origin='lower')
     ax.set_xlabel('x (pix)')
     ax.set_ylabel('y (pix)')
-    
+
     # Scatters
     if scatter is not None and wcs is not None:
         scatter_kwds_defaults = {'s': 25, 'c': 'm', 'marker': 'x'}
