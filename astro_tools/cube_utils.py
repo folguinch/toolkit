@@ -241,6 +241,7 @@ def get_subcube(cube: SpectralCube,
                 blc_trc: Optional[List[int]] = None,
                 xy_ranges: Optional[List[int]] = None,
                 put_rms: bool = False,
+                common_beam: bool = False,
                 filenamebase: Optional[Union[str, pathlib.Path]] = None,
                 log: Callable = print) -> SpectralCube:
     """Extract a sub-spectral cube in any of the axes.
@@ -259,7 +260,8 @@ def get_subcube(cube: SpectralCube,
       linefreq: required by chan_halfwidth; line frequency.
       blc_trc: optional; positions of the bottom left and top right corners.
       xy_ranges: optional; ranges in x and y axes.
-      put_rms: put the rms in the header.
+      put_rms: optional; put the rms in the header?
+      common_beam: optional; calculate and convolve sub-cube to common beam?
       filenamebase: optional; base of the output filename.
       log: optional; logging function.
     """
@@ -291,6 +293,14 @@ def get_subcube(cube: SpectralCube,
     if xmin is not None:
         log(f'Selecting spatial box: {xmin}:{xmax}, {ymin}:{ymax}')
         subcube = subcube[:, ymin:ymax+1, xmin:xmax+1]
+
+    # Minimal subcube
+    subcube = subcube.minimal_subcube()
+
+    # Common beam
+    if common_beam:
+        common_beam = subcube.beams.common_beam()
+        subcube = subcube.convolve_to(common_beam)
 
     # Copy RMS
     if 'RMS' in cube.header:
@@ -420,12 +430,15 @@ def get_moment(cube: SpectralCube,
             subcube = SpectralCube.read(subcube)
         else:
             log('Obtaining sub-cube')
-            subcube = get_subcube(cube, filenamebase=filenamebase, **kwargs)
+            subcube = get_subcube(cube, filenamebase=filenamebase,
+                                  common_beam=True, **kwargs)
         if filenamebase:
             filenamebase = Path(filenamebase).expanduser().resolve()
             filenamebase = filenamebase.with_suffix('.subcube.fits')
     else:
-        subcube = cube
+        subcube = cube.minimal_subcube()
+        common_beam = subcube.beams.common_beam()
+        subcube = subcube.convolve_to(common_beam)
 
     # Convert to velocity
     if linefreq is None:
