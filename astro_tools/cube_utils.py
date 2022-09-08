@@ -307,6 +307,7 @@ def get_subcube(cube: SpectralCube,
                 f'{subcube.beams.largest_beam()}'))
             common_beam = subcube.beams.common_beam()
             log(f'Common beam: {common_beam}')
+            subcube.allow_huge_operations = True
             subcube = subcube.convolve_to(common_beam)
         except AttributeError:
             log('Already with single beam')
