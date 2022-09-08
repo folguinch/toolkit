@@ -296,11 +296,21 @@ def get_subcube(cube: SpectralCube,
 
     # Minimal subcube
     subcube = subcube.minimal_subcube()
+    log(f'New sub cube shape: {subcube.shape}')
 
     # Common beam
     if common_beam:
-        common_beam = subcube.beams.common_beam()
-        subcube = subcube.convolve_to(common_beam)
+        log(f'Convolving to common beam:')
+        try:
+            log(('Beam extrema: '
+                f'{subcube.beams.smallest_beam()} --'
+                f'{subcube.beams.largest_beam()}'))
+            common_beam = subcube.beams.common_beam()
+            log(f'Common beam: {common_beam}')
+            subcube = subcube.convolve_to(common_beam)
+        except AttributeError:
+            log('Already with single beam')
+
 
     # Copy RMS
     if 'RMS' in cube.header:
@@ -437,8 +447,11 @@ def get_moment(cube: SpectralCube,
             filenamebase = filenamebase.with_suffix('.subcube.fits')
     else:
         subcube = cube.minimal_subcube()
-        common_beam = subcube.beams.common_beam()
-        subcube = subcube.convolve_to(common_beam)
+        try:
+            common_beam = subcube.beams.common_beam()
+            subcube = subcube.convolve_to(common_beam)
+        except AttributeError:
+            pass
 
     # Convert to velocity
     if linefreq is None:
