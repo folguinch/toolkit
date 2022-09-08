@@ -302,11 +302,19 @@ def get_subcube(cube: SpectralCube,
     if common_beam:
         log(f'Convolving to common beam:')
         try:
+            smallest = subcube.beams.smallest_beam()
+            sm_maj = smallest.major.to(u.arcsec).value
+            sm_min = smallest.minor.to(u.arcsec).value
+            largest = subcube.beams.largest_beam()
+            la_maj = largest.major.to(u.arcsec).value
+            la_min = largest.minor.to(u.arcsec).value
             log(('Beam extrema: '
-                f'{subcube.beams.smallest_beam()} --'
-                f'{subcube.beams.largest_beam()}'))
+                 f"{sm_maj:.2f}'' x {sm_min:.2f}'' -- "
+                 f"{la_maj:.2f}'' x {la_min:.2f}''"))
             common_beam = subcube.beams.common_beam()
-            log(f'Common beam: {common_beam}')
+            cb_maj = common_beam.major.to(u.arcsec).value
+            cb_min = common_beam.minor.to(u.arcsec).value
+            log(f"Common beam: {cb_maj:.2f}'' x {cb_min:.2f}''")
             subcube.allow_huge_operations = True
             subcube = subcube.convolve_to(common_beam)
         except AttributeError:
