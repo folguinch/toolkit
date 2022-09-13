@@ -311,7 +311,8 @@ def get_subcube(cube: SpectralCube,
             log(('Beam extrema: '
                  f"{sm_maj:.4f}'' x {sm_min:.4f}'' -- "
                  f"{la_maj:.4f}'' x {la_min:.4f}''"))
-            common_beam = subcube.beams.common_beam(auto_increase_epsilon=True)
+            common_beam = subcube.beams.common_beam(auto_increase_epsilon=True,
+                                                    tolerance=5e-5)
             cb_maj = common_beam.major.to(u.arcsec).value
             cb_min = common_beam.minor.to(u.arcsec).value
             log(f"Common beam: {cb_maj:.4f}'' x {cb_min:.4f}''")
