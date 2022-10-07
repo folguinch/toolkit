@@ -31,6 +31,21 @@ def squeeze_image(image: fits.PrimaryHDU) -> fits.PrimaryHDU:
 
     return fits.PrimaryHDU(data=np.squeeze(image.data), header=header)
 
+def get_coord_axes(image: fits.PrimaryHDU) -> Tuple[u.Quantity]:
+    """Get the coordinate axes from header."""
+    wcs = WCS(img.header)
+
+    nx = img.data.shape[1]
+    ny = img.data.shape[0]
+
+    xaxis = wcs.wcs_pix2world(np.arange(nx), np.zeros(nx), 0)[0]
+    yaxis = wcs.wcs_pix2world(np.zeros(ny), np.arange(ny), 0)[1]
+
+    xunit = u.Unit(img.header.get('CUNIT1'))
+    yunit = u.Unit(img.header.get('CUNIT2'))
+
+    return xaxis*xunit, yaxis*yunit
+
 def pixels_per_beam(image: fits.PrimaryHDU):
     """Number of pixels in the beam area."""
     # Beam
