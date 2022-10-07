@@ -33,7 +33,7 @@ def squeeze_image(image: fits.PrimaryHDU) -> fits.PrimaryHDU:
 
 def get_coord_axes(image: fits.PrimaryHDU) -> Tuple[u.Quantity]:
     """Get the coordinate axes from header."""
-    wcs = WCS(img.header)
+    wcs = WCS(image.header)
 
     nx = image.data.shape[1]
     ny = image.data.shape[0]
