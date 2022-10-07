@@ -1,7 +1,8 @@
 """Functions for working with numpy arrays."""
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Sequence
 import pathlib
 
+from numpy.lib import recfunctions as rfn
 import numpy as np
 import astropy.units as u
 
@@ -216,3 +217,24 @@ def save_struct_array(file_name: pathlib.Path, data: np.array, units: dict,
         lines += '\n'.join(fmt.strip() % tuple(d) for d in data)
     file_name.write_text(lines)
 
+def to_struct_array(*arrays, names: Optional[Sequence] = None
+                    ) -> Tuple[np.array, dict]:
+    """Stores the input arrays in a numpy structured array table.
+
+    Args:
+      arrays: the input individual arrays.
+      names: optional; the name of each array.
+    
+    Returns:
+      The array table.
+      A metadata dictionary with units.
+    """
+    # Create table
+    array_values = tuple(arr.value for arr in arrays)
+    array_units = dict(zip(names, [arr.unit for arr in arrays]))
+    array = rfn.merge_arrays(array_values, asrecarray=True)
+    if names is not None:
+        aux = rfn.get_names(array.dtype)
+        array = rfn.rename_fields(array, dict(zip(aux, names)))
+
+    return array, {'units': array_units}
