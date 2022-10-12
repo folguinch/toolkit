@@ -114,6 +114,30 @@ def freq_axis(cube: SpectralCube,
         return cube.with_spectral_unit(freq_units, velocity_convention='radio',
                                        rest_value=rest_value).spectral_axis
 
+def to_common_beam(cube: SpectralCube, log: Callable = print):
+    """Convolve input cube to common beam."""
+    log(f'Convolving to common beam:')
+    try:
+        smallest = cube.beams.smallest_beam()
+        sm_maj = smallest.major.to(u.arcsec).value
+        sm_min = smallest.minor.to(u.arcsec).value
+        largest = cube.beams.largest_beam()
+        la_maj = largest.major.to(u.arcsec).value
+        la_min = largest.minor.to(u.arcsec).value
+        log(('Beam extrema: '
+             f"{sm_maj:.4f}'' x {sm_min:.4f}'' -- "
+             f"{la_maj:.4f}'' x {la_min:.4f}''"))
+        common_beam = cube.beams.common_beam(auto_increase_epsilon=True,
+                                             tolerance=5e-5)
+        cb_maj = common_beam.major.to(u.arcsec).value
+        cb_min = common_beam.minor.to(u.arcsec).value
+        log(f"Common beam: {cb_maj:.4f}'' x {cb_min:.4f}''")
+        cube.allow_huge_operations = True
+        return cube.convolve_to(common_beam)
+    except AttributeError:
+        log('Already with single beam')
+        return cube
+
 def moments01(cube: SpectralCube,
               low: Optional[u.Quantity] = None,
               up: Optional[u.Quantity] = None,
@@ -300,27 +324,7 @@ def get_subcube(cube: SpectralCube,
 
     # Common beam
     if common_beam:
-        log(f'Convolving to common beam:')
-        try:
-            smallest = subcube.beams.smallest_beam()
-            sm_maj = smallest.major.to(u.arcsec).value
-            sm_min = smallest.minor.to(u.arcsec).value
-            largest = subcube.beams.largest_beam()
-            la_maj = largest.major.to(u.arcsec).value
-            la_min = largest.minor.to(u.arcsec).value
-            log(('Beam extrema: '
-                 f"{sm_maj:.4f}'' x {sm_min:.4f}'' -- "
-                 f"{la_maj:.4f}'' x {la_min:.4f}''"))
-            common_beam = subcube.beams.common_beam(auto_increase_epsilon=True,
-                                                    tolerance=5e-5)
-            cb_maj = common_beam.major.to(u.arcsec).value
-            cb_min = common_beam.minor.to(u.arcsec).value
-            log(f"Common beam: {cb_maj:.4f}'' x {cb_min:.4f}''")
-            subcube.allow_huge_operations = True
-            subcube = subcube.convolve_to(common_beam)
-        except AttributeError:
-            log('Already with single beam')
-
+        subcube = to_common_beam(subcube, log=log)
 
     # Copy RMS
     if 'RMS' in cube.header:
