@@ -133,7 +133,7 @@ def to_common_beam(cube: SpectralCube, log: Callable = print):
         cb_min = common_beam.minor.to(u.arcsec).value
         log(f"Common beam: {cb_maj:.4f}'' x {cb_min:.4f}''")
         cube.allow_huge_operations = True
-        return cube.convolve_to(common_beam)
+        return cube.convolve_to(common_beam, allow_huge=True)
     except AttributeError:
         log('Already with single beam')
         return cube
