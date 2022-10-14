@@ -76,7 +76,6 @@ def pixels_to_positions(args: 'argparse.ArgumentParser',
                 pos = None
         except ValueError:
             pos.append(args.source.position)
-            args.source = [args.source]
         except AttributeError:
             pos = None
 
