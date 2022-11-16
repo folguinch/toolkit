@@ -5,12 +5,13 @@ from astropy.io.registry import IORegistryError
 from configparseradv import configparser
 from spectral_cube import SpectralCube
 
-def load_spectral_cube(args, cubename: Optional[str] = None,
+def load_spectral_cube(args: 'argparse.Namespace',
+                       cubename: Optional[str] = None,
                        use_dask: bool = False) -> None:
     """Read a spectral_cube object and store it in args.
 
     Args:
-      args: NameSpace to store the cube.
+      args: `Namespace` to store the cube.
       cubename: optional; spectral cube file name.
       use_dask: optional; use dask?
     """

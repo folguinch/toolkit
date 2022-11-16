@@ -177,11 +177,58 @@ def moments01(cube: SpectralCube,
 
     return mom0, mom1
 
+def limits_to_chan_range(cube: SpectralCube,
+                         freq_range: Optional[u.Quantity] = None,
+                         vel_range: Optional[u.Quantity] = None,
+                         chan_range: Optional[List[int]] = None,
+                         win_halfwidth: Optional[int] = None,
+                         vlsr: Optional[u.Quantity] = None,
+                         linefreq: Optional[u.Quantity] = None,
+                         log: Callable = print,
+                         ) -> Tuple[int, int]:
+    """Convert specral limits to channel range.
+
+    Args:
+      cube: spectral cube.
+      freq_range: frequency range.
+      vel_range: velocity range.
+      chan_range: channel range.
+      win_halfwidth: number of channel in half the spectral range.
+      vlsr: required by win_halfwidth; vlsr velocity.
+      linefreq: required by win_halfwidth; line frequency.
+      log: optional; logging function.
+    """
+    if chan_range is not None or win_halfwidth is not None:
+        return get_spectral_limits(cube, chan_range=chan_range,
+                                   win_halfwidth=win_halfwidth, vlsr=vlsr,
+                                   linefreq=linefreq, log=log)
+    elif freq_range is not None or vel_range is not None:
+        spectral = cube.spectral_axis
+        equiv = u.doppler_radio(get_restfreq(cube))
+        if freq_range is not None:
+            if not spectral.unit.is_equivalent(freq_range.unit):
+                spectral = spectral.to(freq_range.unit, equivalencies=equiv)
+            mask = ((spectral > np.min(freq_range)) &
+                    (spectral < np.max(freq_range)))
+        else:
+            if not spectral.unit.is_equivalent(vel_range.unit):
+                if linefreq is not None:
+                    equiv = u.doppler_radio(linefreq)
+                spectral = spectral.to(freq_range.unit, equivalencies=equiv)
+            mask = ((spectral > np.min(vel_range)) &
+                    (spectral < np.max(vel_range)))
+        chans = np.indices(spectral.shape)[mask]
+        ch1, ch2 = np.min(chans), np.max(chans)
+        log(f'Spectral range equivalent to channels: {ch1} {ch2}')
+        return ch1, ch2
+    else:
+        raise NotImplementedError('Cannot determine channel range')
+
 def get_spectral_limits(cube: SpectralCube,
                         freq_range: Optional[u.Quantity] = None,
                         vel_range: Optional[u.Quantity] = None,
                         chan_range: Optional[List[int]] = None,
-                        chan_halfwidth: Optional[int] = None,
+                        win_halfwidth: Optional[int] = None,
                         vlsr: Optional[u.Quantity] = None,
                         linefreq: Optional[u.Quantity] = None,
                         log: Callable = print,
@@ -191,16 +238,18 @@ def get_spectral_limits(cube: SpectralCube,
     For frequency and velocity ranges, it converts the values to the spectral
     units of the cube. Channel range is sorted and returned. Channel half width
     requires a line frequency and a vlsr to determine the range from the
-    spectral axis around a specific line.
+    spectral axis around a specific line. If velocity range is given
+    together with a line frequency, then this frequency is used as the rest
+    frequency to convert from frequency to velocity.
 
     Args:
       cube: spectral cube.
       freq_range: frequency range.
       vel_range: velocity range.
       chan_range: channel range.
-      chan_halfwidth: number of channel in half the spectral range.
-      vlsr: required by chan_halfwidth; vlsr velocity.
-      linefreq: required by chan_halfwidth; line frequency.
+      win_halfwidth: number of channel in half the spectral range.
+      vlsr: required by win_halfwidth; vlsr velocity.
+      linefreq: required by win_halfwidth; line frequency.
       log: optional; logging function.
     """
     # Turn everything into frequency or velocity
@@ -224,14 +273,17 @@ def get_spectral_limits(cube: SpectralCube,
             return vel_range[0], vel_range[1]
         else:
             # Convert to spectral units
-            restfreq = get_restfreq(cube)
+            if linefreq is not None:
+                restfreq = linefreq
+            else:
+                restfreq = get_restfreq(cube)
             freq_to_vel = u.doppler_radio(restfreq)
             lim = vel_range.to(spec_unit, equivalencies=freq_to_vel)
             return np.min(lim), np.max(lim)
     elif chan_range is not None:
         log(f'Channel range = {chan_range[0]} {chan_range[1]}')
         return sorted(chan_range)
-    elif chan_halfwidth is not None and linefreq and vlsr:
+    elif win_halfwidth is not None and linefreq and vlsr:
         # Get spectral axis
         spaxis = cube.spectral_axis
         restfreq = get_restfreq(cube)
@@ -245,8 +297,8 @@ def get_spectral_limits(cube: SpectralCube,
 
         # Closest value to vlsr
         ind = np.nanargmin(np.abs(spaxis.value))
-        chmin = ind - chan_halfwidth
-        chmax = ind + chan_halfwidth
+        chmin = ind - win_halfwidth
+        chmax = ind + win_halfwidth
         chmin = max(chmin, 0)
         chmax = min(chmax, len(spaxis)-1)
         log(f'Using channel range = {chmin} {chmax}')
@@ -259,7 +311,7 @@ def get_subcube(cube: SpectralCube,
                 freq_range: Optional[u.Quantity] = None,
                 vel_range: Optional[u.Quantity] = None,
                 chan_range: Optional[List[int]] = None,
-                chan_halfwidth: Optional[int] = None,
+                win_halfwidth: Optional[int] = None,
                 vlsr: Optional[u.Quantity] = None,
                 linefreq: Optional[u.Quantity] = None,
                 blc_trc: Optional[List[int]] = None,
@@ -279,9 +331,9 @@ def get_subcube(cube: SpectralCube,
       freq_range: frequency range.
       vel_range: velocity range.
       chan_range: channel range.
-      chan_halfwidth: number of channel in half the spectral range.
-      vlsr: required by chan_halfwidth; vlsr velocity.
-      linefreq: required by chan_halfwidth; line frequency.
+      win_halfwidth: number of channel in half the spectral range.
+      vlsr: required by win_halfwidth; vlsr velocity.
+      linefreq: required by win_halfwidth; line frequency.
       blc_trc: optional; positions of the bottom left and top right corners.
       xy_ranges: optional; ranges in x and y axes.
       put_rms: optional; put the rms in the header?
@@ -294,7 +346,7 @@ def get_subcube(cube: SpectralCube,
                                     freq_range=freq_range,
                                     vel_range=vel_range,
                                     chan_range=chan_range,
-                                    chan_halfwidth=chan_halfwidth,
+                                    win_halfwidth=win_halfwidth,
                                     vlsr=vlsr,
                                     linefreq=linefreq,
                                     log=log)
@@ -386,12 +438,12 @@ def moment_from_config(cube: SpectralCube,
               'auto_rms': 'nsigma' in config}
 
     # For subcube
-    subcube_keys = ['freq_range', 'vel_range', 'chan_range', 'chan_halfwidth',
+    subcube_keys = ['freq_range', 'vel_range', 'chan_range', 'win_halfwidth',
                     'blc_trc', 'xy_ranges']
     for key in filter(lambda opt: opt in config, subcube_keys):
         if key in ['freq_range', 'vel_range']:
             kwargs[key] = config.getquantity(key)
-        elif key == 'chan_halfwidth':
+        elif key == 'win_halfwidth':
             kwargs[key] = config.getint(key)
             kwargs['vlsr'] = vlsr or config.getquantity('vlsr')
         else:
@@ -442,10 +494,10 @@ def get_moment(cube: SpectralCube,
     """
     # Get subcube if needed
     if filenamebase:
-        subcube = Path(filenamebase).expanduser().resolve()
+        subcube = pathlib.Path(filenamebase).expanduser().resolve()
         subcube = subcube.with_suffix('.subcube.fits')
     elif filename:
-        subcube = Path(filename).expanduser().resolve()
+        subcube = pathlib.Path(filename).expanduser().resolve()
     else:
         subcube = None
     if len(kwargs) != 0:
