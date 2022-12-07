@@ -133,6 +133,7 @@ def to_common_beam(cube: SpectralCube, log: Callable = print):
         cb_min = common_beam.minor.to(u.arcsec).value
         log(f"Common beam: {cb_maj:.4f}'' x {cb_min:.4f}''")
         cube.allow_huge_operations = True
+        cube.meta['comment'] = 'Convolved to common beam'
         return cube.convolve_to(common_beam, allow_huge=True)
     except AttributeError:
         log('Already with single beam')
@@ -528,12 +529,14 @@ def get_moment(cube: SpectralCube,
                                          rest_value=linefreq)
 
     # Flux mask
+    comment1 = None
     if mom > 0:
         if lower_limit:
             log('Using lower flux limit: %s',
                 f'{lower_limit.value:.3f} {lower_limit.unit}')
             mask = subcube >= lower_limit
-        elif (rms  is not None or 'RMS' in subcube.header or
+            comment1 = f'Flux lower limit {lower_limit}'
+        elif (rms is not None or 'RMS' in subcube.header or
               'RMS' in subcube.meta or auto_rms):
             if rms is not None:
                 log(f'Using input rms: {rms.value:.3e} {rms.unit}')
@@ -549,6 +552,7 @@ def get_moment(cube: SpectralCube,
                 log(f'Using cube rms: {rms.value:.3e} {rms.unit}')
             low = nsigma * rms
             log(f'{nsigma}sigma lower flux limit: {low.value:.3f} {low.unit}')
+            comment1 = f'Flux lower limit {nsigma} x {rms}'
             mask = subcube >= low
         else:
             mask = subcube.mask
@@ -568,6 +572,13 @@ def get_moment(cube: SpectralCube,
             return None
         else:
             raise ValueError from exc
+
+    # Write comments
+    if comment1 is not None:
+        mmnt.header['comment'] = comment0
+    mmnt.header['comment'] = ('Spectral axis range: '
+                              f'{subcube.spectral_axis[0]} -- '
+                              f'{subcube.spectral_axis[-1]}')
 
     # RMS of moment 0
     if mom == 0:
