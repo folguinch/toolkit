@@ -318,6 +318,7 @@ def get_subcube(cube: SpectralCube,
                 blc_trc: Optional[List[int]] = None,
                 xy_ranges: Optional[List[int]] = None,
                 put_rms: bool = False,
+                rms: Optional[u.Quantity] = None,
                 common_beam: bool = False,
                 filenamebase: Optional[Union[str, pathlib.Path]] = None,
                 log: Callable = print) -> SpectralCube:
@@ -380,7 +381,10 @@ def get_subcube(cube: SpectralCube,
         subcube = to_common_beam(subcube, log=log)
 
     # Copy RMS
-    if 'RMS' in cube.header:
+    if rms is not None:
+        log(f'Input rms = {rms}')
+        subcube.meta['RMS'] = rms.to(cube.unit).value
+    elif 'RMS' in cube.header:
         subcube.meta['RMS'] = cube.header['RMS']
         log("RMS in cube header: {cube.header['RMS']} {cube.unit}")
     elif put_rms:
