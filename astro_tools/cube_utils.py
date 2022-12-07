@@ -468,7 +468,7 @@ def get_moment(cube: SpectralCube,
                auto_rms: bool = False,
                skip_beam_error: bool = False,
                log: Callable = print,
-               **kwargs) -> Projection:
+               **kwargs) -> 'astropy.io.PrimaryHDU':
     """ Calculate a moment map.
 
     If filenamebase is given, the final file name will be filenamebase with
@@ -576,6 +576,7 @@ def get_moment(cube: SpectralCube,
             return None
         else:
             raise ValueError from exc
+    mmnt = mmnt.hdu
 
     # Write comments
     if comment1 is not None:
@@ -586,18 +587,23 @@ def get_moment(cube: SpectralCube,
 
     # RMS of moment 0
     if mom == 0:
-        rms = quick_rms(mmnt.hdu.data)
+        rms = quick_rms(mmnt.data)
         mmnt.header['RMS'] = rms
+    else:
+        try:
+            del mmnt.header['RMS']
+        except KeyError:
+            pass
 
     # Save
     if filenamebase:
         filename = pathlib.Path(filenamebase).expanduser().resolve()
         filename = filename.with_suffix(f'.moment{mom}.fits')
         log(f'Saving moment: {filename}')
-        mmnt.write(filename)
+        mmnt.writeto(filename)
     elif filename:
         log(f'Saving moment: {filename}')
-        mmnt.write(pathlib.Path(filename).expanduser().resolve())
+        mmnt.writeto(pathlib.Path(filename).expanduser().resolve())
 
     return mmnt
 
