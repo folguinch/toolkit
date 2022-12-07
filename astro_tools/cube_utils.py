@@ -579,7 +579,7 @@ def get_moment(cube: SpectralCube,
 
     # Write comments
     if comment1 is not None:
-        mmnt.header['comment'] = comment0
+        mmnt.header['comment'] = comment1
     mmnt.header['comment'] = ('Spectral axis range: '
                               f'{subcube.spectral_axis[0]} -- '
                               f'{subcube.spectral_axis[-1]}')
