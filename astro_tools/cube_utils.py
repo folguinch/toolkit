@@ -320,6 +320,7 @@ def get_subcube(cube: SpectralCube,
                 put_rms: bool = False,
                 rms: Optional[u.Quantity] = None,
                 common_beam: bool = False,
+                shink: bool = False,
                 filenamebase: Optional[Union[str, pathlib.Path]] = None,
                 log: Callable = print) -> SpectralCube:
     """Extract a sub-spectral cube in any of the axes.
@@ -340,6 +341,7 @@ def get_subcube(cube: SpectralCube,
       xy_ranges: optional; ranges in x and y axes.
       put_rms: optional; put the rms in the header?
       common_beam: optional; calculate and convolve sub-cube to common beam?
+      shrink: optional; reduce the size of the cube to fit FOV?
       filenamebase: optional; base of the output filename.
       log: optional; logging function.
     """
@@ -373,8 +375,9 @@ def get_subcube(cube: SpectralCube,
         subcube = subcube[:, ymin:ymax+1, xmin:xmax+1]
 
     # Minimal subcube
-    subcube = subcube.minimal_subcube()
-    log(f'New sub cube shape: {subcube.shape}')
+    if shrink:
+        subcube = subcube.minimal_subcube()
+        log(f'New sub cube shape: {subcube.shape}')
 
     # Common beam
     if common_beam:
