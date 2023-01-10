@@ -260,11 +260,11 @@ class LoggedObject:
       enabled: enable or disable logging.
     """
     enabled = True
-    _log = get_stdout_logger('LoggedObject')
+    log = get_stdout_logger('LoggedObject')
 
     def __init__(self, name, **kwargs):
         """Initialize the object and apply options."""
-        self._log = get_logger(name, **kwargs)
+        self.log = get_logger(name, **kwargs)
 
     def _log_message(self, message: str,
                      log_level: int = logging.INFO) -> None:
