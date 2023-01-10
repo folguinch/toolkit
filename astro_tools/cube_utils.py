@@ -470,6 +470,7 @@ def get_moment(cube: SpectralCube,
                rms: Optional[u.Quantity] = None,
                auto_rms: bool = False,
                skip_beam_error: bool = False,
+               shrink: bool = False,
                log: Callable = print,
                **kwargs) -> 'astropy.io.PrimaryHDU':
     """ Calculate a moment map.
@@ -497,6 +498,7 @@ def get_moment(cube: SpectralCube,
       rms: optional; cube rms.
       auto_rms: optional; calculate the cube rms.
       skip_beam_error: optional; raise exception if beams differ more than 1%?
+      shrink: optional; shrink cube to match FOV?
       log: optional; logging function.
       kwargs: additional parameters for get_subcube function.
     """
@@ -520,7 +522,10 @@ def get_moment(cube: SpectralCube,
             filenamebase = Path(filenamebase).expanduser().resolve()
             filenamebase = filenamebase.with_suffix('.subcube.fits')
     else:
-        subcube = cube.minimal_subcube()
+        if shrink:
+            subcube = cube.minimal_subcube()
+        else:
+            subcube = cube
         try:
             common_beam = subcube.beams.common_beam()
             subcube = subcube.convolve_to(common_beam)
