@@ -320,7 +320,7 @@ def get_subcube(cube: SpectralCube,
                 put_rms: bool = False,
                 rms: Optional[u.Quantity] = None,
                 common_beam: bool = False,
-                shink: bool = False,
+                shrink: bool = False,
                 filenamebase: Optional[Union[str, pathlib.Path]] = None,
                 log: Callable = print) -> SpectralCube:
     """Extract a sub-spectral cube in any of the axes.
