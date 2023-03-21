@@ -472,7 +472,7 @@ def get_moment(cube: SpectralCube,
                skip_beam_error: bool = False,
                shrink: bool = False,
                log: Callable = print,
-               **kwargs) -> 'astropy.io.PrimaryHDU':
+               **kwargs) -> 'astropy.io.fits.PrimaryHDU':
     """ Calculate a moment map.
 
     If filenamebase is given, the final file name will be filenamebase with
