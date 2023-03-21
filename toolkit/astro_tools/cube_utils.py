@@ -116,7 +116,7 @@ def freq_axis(cube: SpectralCube,
 
 def to_common_beam(cube: SpectralCube, log: Callable = print):
     """Convolve input cube to common beam."""
-    log(f'Convolving to common beam:')
+    log('Convolving to common beam:')
     try:
         smallest = cube.beams.smallest_beam()
         sm_maj = smallest.major.to(u.arcsec).value
