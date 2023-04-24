@@ -249,6 +249,12 @@ class ReadQuantity(argparse.Action):
         except TypeError:
             if metavar is None:
                 metavar = ('VAL', 'VAL UNIT')
+
+        # Special case of positional argument
+        if len(option_strings) == 0:
+            metavar = None
+
+        # New attribute
         self.enforce_list = enforce_list
 
         super().__init__(option_strings, dest, nargs=nargs, metavar=metavar,
