@@ -318,6 +318,7 @@ def get_subcube(cube: SpectralCube,
                 blc_trc: Optional[List[int]] = None,
                 xy_ranges: Optional[List[int]] = None,
                 put_rms: bool = False,
+                put_linefreq: bool = False,
                 rms: Optional[u.Quantity] = None,
                 common_beam: bool = False,
                 shrink: bool = False,
@@ -340,8 +341,10 @@ def get_subcube(cube: SpectralCube,
       blc_trc: optional; positions of the bottom left and top right corners.
       xy_ranges: optional; ranges in x and y axes.
       put_rms: optional; put the rms in the header?
+      put_linefreq: optional; store line frequency as rest frequency?
+      rms: optional; cube rms value.
       common_beam: optional; calculate and convolve sub-cube to common beam?
-      shrink: optional; reduce the size of the cube to fit FOV?
+      shrink: optional; reduce the size of the cube to fit FOV/mask?
       filenamebase: optional; base of the output filename.
       log: optional; logging function.
     """
@@ -363,6 +366,10 @@ def get_subcube(cube: SpectralCube,
         log('Applying channel range')
         subcube = cube[low:high+1, :, :]
 
+    # Common beam (done here jsut to avoid any border effects)
+    if common_beam:
+        subcube = to_common_beam(subcube, log=log)
+
     # Extract spatial box
     if blc_trc:
         xmin, ymin, xmax, ymax = blc_trc
@@ -379,9 +386,15 @@ def get_subcube(cube: SpectralCube,
         subcube = subcube.minimal_subcube()
         log(f'New sub cube shape: {subcube.shape}')
 
-    # Common beam
-    if common_beam:
-        subcube = to_common_beam(subcube, log=log)
+    if put_linefreq and linefreq is not None:
+        prev_unit = subcube.spectral_axis.unit
+        if prev_unit.is_equivalent(u.GHz):
+            subcube = subcube.with_spectral_unit(prev_unit,
+                                                 rest_value=linefreq)
+        else:
+            subcube = subcube.with_spectral_unit(u.GHz)
+            subcube = subcube.with_spectral_unit(prev_unit,
+                                                 rest_value=linefreq)
 
     # Copy RMS
     if rms is not None:
@@ -498,7 +511,7 @@ def get_moment(cube: SpectralCube,
       rms: optional; cube rms.
       auto_rms: optional; calculate the cube rms.
       skip_beam_error: optional; raise exception if beams differ more than 1%?
-      shrink: optional; shrink cube to match FOV?
+      shrink: optional; shrink cube to match FOV/mask?
       log: optional; logging function.
       kwargs: additional parameters for get_subcube function.
     """
@@ -608,10 +621,11 @@ def get_moment(cube: SpectralCube,
         filename = pathlib.Path(filenamebase).expanduser().resolve()
         filename = filename.with_suffix(f'.moment{mom}.fits')
         log(f'Saving moment: {filename}')
-        mmnt.writeto(filename)
+        mmnt.writeto(filename, overwrite=True)
     elif filename:
         log(f'Saving moment: {filename}')
-        mmnt.writeto(pathlib.Path(filename).expanduser().resolve())
+        mmnt.writeto(pathlib.Path(filename).expanduser().resolve(),
+                     overwrite=True)
 
     return mmnt
 
