@@ -1,6 +1,7 @@
 """Loader functions for `argparsers`."""
 from typing import Optional
 
+from astropy.io import fits
 from astropy.io.registry import IORegistryError
 from configparseradv import configparser
 from spectral_cube import SpectralCube
@@ -24,6 +25,15 @@ def load_spectral_cube(args: 'argparse.Namespace',
 
     if use_dask:
         args.cube.use_dask_scheduler('threads', num_workers=10)
+
+    if hasattr(args, 'mask') and args.mask is not None:
+        mask = fits.open(args.mask)[0]
+        mask = mask.data.astype(bool)
+        try:
+            args.cube = args.cube.with_mask(mask)
+        except ValueError:
+            print(('WARNING: mask and cube shape differ: '
+                   f'{args.cube.shape} vs {mask.shape}'))
 
 def load_config(args, config: Optional[str] = None):
     """Read a configuration file and store it in args.
