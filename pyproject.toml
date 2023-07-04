@@ -15,6 +15,9 @@ radio-beam = "^0.3.4"
 scipy = "^1.10.1"
 matplotlib = "^3.7.1"
 configparseradv = {path = "../configparseradv"}
+#configparseradv = {git = "https://github.com/folguinch/configparseradv.git"}
+shapely = "^2.0.1"
+regions = "^0.7"
 
 
 [build-system]
