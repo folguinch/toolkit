@@ -185,6 +185,7 @@ def limits_to_chan_range(cube: SpectralCube,
                          win_halfwidth: Optional[int] = None,
                          vlsr: Optional[u.Quantity] = None,
                          linefreq: Optional[u.Quantity] = None,
+                         allow_all: bool = False,
                          log: Callable = print,
                          ) -> Tuple[int, int]:
     """Convert specral limits to channel range.
@@ -197,6 +198,7 @@ def limits_to_chan_range(cube: SpectralCube,
       win_halfwidth: number of channel in half the spectral range.
       vlsr: required by win_halfwidth; vlsr velocity.
       linefreq: required by win_halfwidth; line frequency.
+      allow_all: optional; allow using all the channels as default.
       log: optional; logging function.
     """
     if chan_range is not None or win_halfwidth is not None:
@@ -222,6 +224,8 @@ def limits_to_chan_range(cube: SpectralCube,
         ch1, ch2 = np.min(chans), np.max(chans)
         log(f'Spectral range equivalent to channels: {ch1} {ch2}')
         return ch1, ch2
+    elif allow_all:
+        return 0, len(cube.spectral_axis)-1
     else:
         raise NotImplementedError('Cannot determine channel range')
 
