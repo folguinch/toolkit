@@ -103,7 +103,8 @@ class LoadArray(argparse.Action):
         setattr(namespace, self.dest, array)
 
 class ArrayFromRange(argparse.Action):
-    """Action class for creating a np.array with linspace from command line"""
+    """Action class for creating a `np.array` with linspace from command line.
+    """
 
     def __init__(self, option_strings, dest, nargs=2, **kwargs):
         if nargs not in range(2, 5):

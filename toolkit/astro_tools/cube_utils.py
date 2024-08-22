@@ -288,7 +288,8 @@ def get_spectral_limits(cube: SpectralCube,
     elif chan_range is not None:
         log(f'Channel range = {chan_range[0]} {chan_range[1]}')
         return sorted(chan_range)
-    elif win_halfwidth is not None and linefreq and vlsr:
+    elif (win_halfwidth is not None and linefreq is not None and
+          vlsr is not None):
         # Get spectral axis
         spaxis = cube.spectral_axis
         restfreq = get_restfreq(cube)
