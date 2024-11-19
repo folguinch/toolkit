@@ -126,8 +126,8 @@ def split_mask_structures(mask: npt.ArrayLike,
     submasks = []
     for slcy, slcx in objects:
         # Padding
-        padx = abs(slcx.start - slcx.stop) * padding
-        pady = abs(slcy.start - slcy.stop) * padding
+        padx = int(abs(slcx.start - slcx.stop) * padding)
+        pady = int(abs(slcy.start - slcy.stop) * padding)
 
         # Valid indices
         slc = (slice(max(0, slcy.start - pady),
