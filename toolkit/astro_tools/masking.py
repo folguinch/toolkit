@@ -119,7 +119,7 @@ def split_mask_structures(mask: npt.ArrayLike,
     mask, labels, _ = mask_structures(mask, min_area=min_area)
 
     # Identify mask structures
-    objects = ndimage.find_objects(labels)
+    objects = ndimg.find_objects(labels)
 
     # Iterate over objects and generate individual masks
     shape = mask.shape
