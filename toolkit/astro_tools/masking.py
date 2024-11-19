@@ -1,5 +1,5 @@
 """Tools for generating masks from image data."""
-from typing import Optional, Callable, Sequence, Tuple, Dict
+from typing import Optional, Callable, Sequence, Tuple, Dict, List
 
 from astropy.wcs import WCS
 from astropy.io import fits
