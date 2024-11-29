@@ -1,8 +1,7 @@
 """Argparse parent parsers commonly used."""
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, Sequence
 import argparse
 import pathlib
-import warnings
 
 try:
     from astro_source import source
