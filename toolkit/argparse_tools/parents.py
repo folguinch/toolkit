@@ -11,7 +11,7 @@ except ImportError:
 
 from .functions import positions_to_pixels
 from .actions import (ReadSkyCoords, PeakPosition, StartLogger, CheckFile,
-                      MakePath)
+                      MakePath, ReadQuantity)
 
 # Typing
 PosFunction = Callable[[argparse.Namespace], None]
@@ -27,7 +27,7 @@ def _astro_source(parser: argparse.ArgumentParser) -> None:
         pass
 
 def astro_source() -> argparse.ArgumentParser:
-    """Read an `astro_source.Source` and return it in parser."""
+    """Read an `source.Source` and return it in parser."""
     parser = argparse.ArgumentParser(add_help=False)
     _astro_source(parser)
     return parser
@@ -45,8 +45,8 @@ def source_position(
         line input.
 
     Args:
-      required: optional; is the argument required?
-      function: optional; a function mapping the postion values to xy pixels.
+      required: Optional. Is the argument required?
+      function: Optional. A function mapping the postion values to xy pixels.
     """
     parser = argparse.ArgumentParser(add_help=False)
     group1 = parser.add_mutually_exclusive_group(required=required)
@@ -59,10 +59,34 @@ def source_position(
                         action=PeakPosition,
                         help='Reference image to get position from peak')
     _astro_source(group1)
-    warnings.warn(('The values pos and position_fn will be removed from'
-                   'the parser in future versions of this parent'),
-                  FutureWarning)
-    parser.set_defaults(position_fn=function, pos=[])
+    #warnings.warn(('The values pos and position_fn will be removed from'
+    #               'the parser in future versions of this parent'),
+    #              FutureWarning)
+    parser.set_defaults(position_fn=function)
+
+    return parser
+
+def source_properties(properties: Sequence[str],
+                      add_source: bool = False,
+                      required: bool = False) -> argparse.ArgumentParser:
+    """Parent for source properties as quantities.
+
+    Args:
+      properties: Source properties requested.
+      add_source: Optional. Include `source.Source`?
+      required: Optional. Are all properties required?
+    """
+    parser = argparse.ArgumentParser(add_help=False)
+    if add_source:
+        _astro_source(parser)
+    for prop in properties:
+        if required:
+            opt = f'{prop}'
+        else:
+            opt = f'--{prop}'
+        parser.add_argument(opt, metavar=('VAL', 'UNIT'), default=None,
+                            action=ReadQuantity,
+                            help=f'Source {prop}')
 
     return parser
 
