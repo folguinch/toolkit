@@ -104,11 +104,12 @@ def source_properties(args: 'argparse.Namespace',
         source = None
     props_values = {}
     for prop in properties:
-        if source is not None:
+        if prop in args_dict and (val := args_dict[prop]) is not None:
+            props_values[prop] = val
+        elif source is not None:
             props_values[prop] = source.config.getquantity('INFO', prop,
-                                                           vars=args_dict,
                                                            fallback=None)
         else:
-            props_values[prop] = args_dict.get(prop)
+            props_values[prop] = None
 
     return props_values
