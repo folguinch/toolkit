@@ -94,7 +94,7 @@ def stats_at_position(image: fits.PrimaryHDU,
                       position: SkyCoord,
                       radius: u.Quantity,
                       stats: Sequence[Callable] = (np.mean, np.std)
-                      ) -> Sequence[u.Quantity]:
+                      ) -> List[u.Quantity]:
     """Calculate statistics in a circle centered at a given position.
 
     Args:
@@ -102,6 +102,9 @@ def stats_at_position(image: fits.PrimaryHDU,
       position: center of the circular region.
       radius: radius of the circular region.
       stats: optional; statistical functions.
+
+    Returns:
+      A list with the requested statistics.
     """
     # Get distance map
     data = quantity_from_hdu(image)
