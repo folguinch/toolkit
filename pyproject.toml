@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "toolkit"
-version = "0.1.0"
+version = "0.2.0"
 description = "A collection of frequently used tools"
 authors = ["Fernando Olguin <f.olguin.ch@gmail.com>"]
 license = "MIT"
@@ -14,8 +14,8 @@ spectral-cube = "^0.6.5"
 radio-beam = "^0.3.4"
 scipy = "^1.12.0"
 matplotlib = "^3.8.3"
-configparseradv = {path = "../configparseradv"}
-#configparseradv = {git = "https://github.com/folguinch/configparseradv.git"}
+#configparseradv = {path = "../configparseradv"}
+configparseradv = {git = "https://github.com/folguinch/configparseradv.git"}
 shapely = "^2.0.1"
 regions = "^0.7"
 
