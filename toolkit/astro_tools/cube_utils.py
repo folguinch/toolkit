@@ -45,7 +45,15 @@ def get_cube_rms(cube: SpectralCube, use_header: bool = False,
     # From header
     if use_header and 'RMS' in cube.header:
         log('Using cube rms in header')
-        return cube.header['RMS'] * cube.unit
+        try:
+            rms = cube.header['RMS'] * cube.unit
+        except ValueError:
+            rms = cube.header['RMS'].strip('[]').split(',')
+            if len(rms) != 1:
+                raise ValueError(f'Multiple rms values: {rms}')
+            else:
+                rms = float(rms[0]) * cube.unit
+        return rms
 
     # From cube
     try:
