@@ -575,7 +575,7 @@ def get_moment(cube: SpectralCube,
                     rms = float(subcube.header['RMS']) * subcube.unit
                 except ValueError:
                     rms = subcube.header['RMS'].strip('[]').split(',')
-                    if len(rms) != 0:
+                    if len(rms) != 1:
                         raise ValueError(f'Multiple rms values: {rms}')
                     else:
                         rms = float(rms[0]) * subcube.unit
@@ -585,7 +585,7 @@ def get_moment(cube: SpectralCube,
                     rms = float(subcube.meta['RMS']) * subcube.unit
                 except ValueError:
                     rms = subcube.meta['RMS'].strip('[]').split(',')
-                    if len(rms) != 0:
+                    if len(rms) != 1:
                         raise ValueError(f'Multiple rms values: {rms}')
                     else:
                         rms = float(rms[0]) * subcube.unit
