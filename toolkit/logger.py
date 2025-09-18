@@ -4,11 +4,13 @@ This is a compilation of functions for loading and configuring the logging
 system. It also implements a `LoggedObject` class that can be inherited in
 order to implement logging for the class.
 """
+from typing import Optional, Union, TypeVar
 from datetime import datetime
 from logging import handlers
-from typing import Optional, Union
 import logging
 import pathlib
+
+Logger = TypeVar('Logger')
 
 def get_level(loglevel):
     """Convert to numeric logging level."""
