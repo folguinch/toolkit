@@ -17,10 +17,13 @@ from ..converters import quantity_from_hdu, array_to_hdu
 
 def copy_header_keys(ref_header: Dict,
                      new_header: Dict,
-                     keys: Sequence = ('BUNIT', 'BMIN', 'BMAJ', 'BPA')
+                     keys: Sequence = ('BUNIT', 'BMIN', 'BMAJ', 'BPA'),
+                     if_exists: bool = False,
                      ) -> Dict:
     """Copy selected keys from one header into another header."""
     for key in keys:
+        if if_exists and key not in ref_header:
+            continue
         new_header[key] = ref_header[key]
 
     return new_header
@@ -28,6 +31,7 @@ def copy_header_keys(ref_header: Dict,
 def squeeze_image(image: fits.PrimaryHDU) -> fits.PrimaryHDU:
     """Reduce number of axes not used in input image."""
     header = WCS(image, naxis=['longitude', 'latitude']).to_header()
+    header = copy_header_keys(image.header, header, if_exists=True)
 
     return fits.PrimaryHDU(data=np.squeeze(image.data), header=header)
 
