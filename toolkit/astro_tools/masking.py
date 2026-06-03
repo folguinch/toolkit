@@ -192,3 +192,29 @@ def plot_mask(
                     color='c', ha='center', va='bottom')
 
     return fig, ax
+
+def proportional_dilation(mask: npt.ArrayLike,
+                          fraction: float = 1.) -> Tuple[npt.ArrayLike, int]:
+    """Dilate a mask with total number of points not exceeding a fraction of
+    initial points.
+
+    Args:
+      mask: Mask array.
+      fraction: Optional. Fraction of inital number of points.
+    Returns:
+      The dilated mask and the number of iterations
+    """
+    # Initial case
+    new_total = (1. + fraction) * np.sum(mask)
+    iterations = 0
+    
+    # Iterate
+    while np.sum(mask) < new_total:
+        aux = ndimg.binary_dilation(mask, iterations=1)
+        if np.sum(aux) > new_total:
+            break
+        else:
+            mask = aux
+            iterations += 1
+
+    return mask, iterations
